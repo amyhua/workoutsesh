@@ -106,11 +106,15 @@ export default function WorkoutSesh() {
     // sync with backend
     // if backend successful, update frontend
     const reorderedRoutines = reorder(
-      routines,
+      routines.slice(activeRoutineIdx + 1),
       result.source.index,
       result.destination.index
     )
-    setRoutines(reorderedRoutines)
+    setRoutines([
+      ...routines.slice(0, activeRoutineIdx),
+      routines[activeRoutineIdx],
+      ...reorderedRoutines
+    ])
   }
   useEffect(() => {
     setWinReady(true)
@@ -217,7 +221,11 @@ export default function WorkoutSesh() {
         </div>
         <section className="bg-white">
           <div className="mx-3 pt-3 text-sm uppercase tracking-wider font-bold text-gray-600">
-            Next
+            {
+              activeRoutineIdx === routines.length - 1 ?
+              'Last Exercise!' :
+              'Next Up'
+            }
           </div>
           {
             winReady &&
@@ -231,7 +239,11 @@ export default function WorkoutSesh() {
                     className="bg-white"
                   >
                       {
-                        routines.map((routine: any, i: number) => {
+                        (
+                          seshStarted ?
+                          routines.slice(activeRoutineIdx + 1) :
+                          routines
+                        ).map((routine: any, i: number) => {
                           return (
                             <Draggable
                               index={i}
