@@ -1,3 +1,11 @@
+#### Assets
+
+* https://thenounproject.com/icon/cardio-workout-2224734/
+
+* [Animations](https://www.fiverr.com/fitness_videos/create-an-animated-character-doing-exercises?utm_source=google&utm_medium=cpc&utm_campaign=g_ge-us_ln-en_dv-desktop_cat-video-animation_cst-dsa_static-gig-page-feed&utm_term=us_dsa_static-feed_character_animation_desktop&utm_content=AdID%5e517667159261%5eKeyword%5e%5ePlacement%5e%5eDevice%5ec&caid=12874323001&agid=119381937577&ad_id=517667159261&kw=&lpcat=br_general&&cq_src=google_ads&cq_cmp=12874323001&cq_term=&cq_plac=&cq_net=g&cq_plt=gp&gclid=CjwKCAjwtp2bBhAGEiwAOZZTuNeRntbqfAIShH3QHD0f5RL8GXhJeTxXFXAZhTyuoYXwZO1wW_1x3xoCGMsQAvD_BwE&gclsrc=aw.ds)
+-----
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
