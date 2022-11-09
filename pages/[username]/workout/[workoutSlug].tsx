@@ -146,7 +146,7 @@ export default function WorkoutSesh() {
 
   return (
     <Layout title="Workout Sesh" background="#F4F3EC">
-      <main className="bg-wheat max-w-lg mx-auto min-h-[100vh]">
+      <main className="bg-wheat max-w-2xl mx-auto min-h-[100vh]">
         <div className={classnames(
           "sticky top-0 left-0 right-0 text-cyan z-20 bg-gradient-to-b",
           isActiveSet ?
