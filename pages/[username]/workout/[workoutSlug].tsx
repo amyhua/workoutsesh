@@ -6,6 +6,7 @@ import SeshCounter from '../../../components/SeshCounter'
 import classnames from 'classnames'
 import WorkoutRoutine from '../../../components/WorkoutRoutine'
 import { resetServerContext, DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import Clamped from '../../../components/Clamped'
 // see: https://github.com/atlassian/react-beautiful-dnd/issues/2350#issuecomment-1242917371
 
 resetServerContext()
@@ -14,7 +15,7 @@ const workout = {
   name: 'Upper Body Extended Workout',
   routines: [{
     id: 1,
-    name: 'Chest Press with Dumbbells',
+    name: 'Chest Press with Free Weights (25 to 100 pounds+)',
     image_url: 'https://personallevelfitness.com/wp-content/uploads/2018/08/Chest-Press-DB.jpg',
     description: '4 sets of 12-15',
     restBetweenSets: true
@@ -65,9 +66,9 @@ const PrevIconSvg = () => (
   </svg>
 )
 
-const NextIconSvg = () => (
+const NextIconSvg = ({ color }: { color: string; }) => (
   <svg width="16" height="14" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M0.5 13.25L10.5 7L0.5 0.75V13.25ZM15.5 0.75H11.75V13.25H15.5V0.75Z" fill="#545454"/>
+    <path d="M0.5 13.25L10.5 7L0.5 0.75V13.25ZM15.5 0.75H11.75V13.25H15.5V0.75Z" fill={color} />
   </svg>
 )
 
@@ -79,6 +80,8 @@ const reorder = (list: any[], startIndex: number, endIndex: number) => {
 
   return result;
 }
+
+const ACTIVE_ROUTINE_ID = 'active-workout-routine'
 
 export default function WorkoutSesh() {
   const { routines: initialRoutines = [] } = workout
@@ -93,8 +96,28 @@ export default function WorkoutSesh() {
     setSeshStarted(true);
     setCounterIsActive(true);
   }
+  const isActiveSet = currWorkoutSetType === WorkoutSetType.Active;
   const startNextSet = () => {
+    if (routines[activeRoutineIdx].restBetweenSets) {
+      if (isActiveSet) {
+        // return rest
+        setCurrWorkoutSetType(WorkoutSetType.Rest)
+        return
+      } else {
+        // is rest -> start active set
+        setCurrWorkoutSetType(WorkoutSetType.Active)
+        setWorkoutSetNum(i => i + 1)
+      }
+    }
     setWorkoutSetNum(set => set + 1)
+  }
+  const startNextRoutine = () => {
+    setActiveRoutineIdx(idx => idx + 1)
+    setCurrWorkoutSetType(WorkoutSetType.Active)
+    setWorkoutSetNum(1)
+  }
+  const finishWorkout = () => {
+    // finish last running set, log workout data, and go to summary
   }
   const router = useRouter()
   const { workoutSlug } = router.query
@@ -106,15 +129,16 @@ export default function WorkoutSesh() {
     // sync with backend
     // if backend successful, update frontend
     const reorderedRoutines = reorder(
-      routines.slice(activeRoutineIdx + 1),
+      seshStarted ?
+        routines.slice(activeRoutineIdx + 1) : routines,
       result.source.index,
       result.destination.index
     )
-    setRoutines([
+    setRoutines(seshStarted ? [
       ...routines.slice(0, activeRoutineIdx),
       routines[activeRoutineIdx],
       ...reorderedRoutines
-    ])
+    ] : reorderedRoutines)
   }
   useEffect(() => {
     setWinReady(true)
@@ -123,9 +147,18 @@ export default function WorkoutSesh() {
   return (
     <Layout title="Workout Sesh" background="#F4F3EC">
       <main className="bg-wheat max-w-lg mx-auto min-h-[100vh]">
-        <div className="sticky top-0 left-0 right-0 bg-wheat z-20">
+        <div className={classnames(
+          "sticky top-0 left-0 right-0 text-cyan z-20 bg-gradient-to-b",
+          isActiveSet ?
+            "from-active1 to-active2" :
+            "from-rest1 to-rest2"
+        )}>
           <div className="px-4 pt-4">
-            <div className="rounded-lg border-2 border-black">
+            <div className={classnames(
+              "rounded-lg border-2",
+              isActiveSet ?
+                "border-navym2" : "border-pink"
+            )}>
               <div className="flex">
                 <div className="relative flex border-r-2 border-black items-center h-[125px] w-[125px] bg-white rounded-tl-lg rounded-bl-lg overflow-hidden">
                   <Image
@@ -138,25 +171,64 @@ export default function WorkoutSesh() {
                     className="inline-block"
                   />
                 </div>
-                <div className="flex-1 ml-4 mr-2 flex items-center">
+                <div className="flex-1 ml-4 mr-2 my-3">
                   <div className="flex flex-col">
                     <div
-                      className="w-[calc(100vw - 251px)] sm:w-auto text-xs text-gray-600 mb-2 block overflow-hidden overflow-ellipsis whitespace-nowrap">
+                      className={classnames(
+                        "w-[calc(100vw - 251px)] sm:w-auto text-xs mt-1 mb-2 block overflow-hidden overflow-ellipsis whitespace-nowrap",
+                        {
+                          "text-navym1": isActiveSet,
+                          "text-pink": !isActiveSet
+                        }
+                      )}>
                       {workout.name}
                     </div>
                     <div className="flex-1 flex flex-col justify-center">
-                      <h1 className="font-bold text-lg leading-snug">
-                        {routines[activeRoutineIdx].name}
+                      <h1 className={classnames(
+                        "font-semibold text-base leading-snug",
+                        "text-white"
+                        // {
+                        //   "text-white": !isActiveSet,
+                        //   "text-white": isActiveSet
+                        // }
+                      )}>
+                        <Clamped clamp={2}>
+                          {routines[activeRoutineIdx].name}
+                        </Clamped>
                       </h1>
-                      <p className="text-base mt-1 text-left">
-                        {routines[activeRoutineIdx].description}
-                      </p>
+                      <div className={classnames(
+                          "text-base text-left",
+                          {
+                            "text-navym1": isActiveSet,
+                            "text-pink": !isActiveSet
+                          }
+                        )}>
+                          <Clamped clamp={1}>
+                            {routines[activeRoutineIdx].description}
+                          </Clamped>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="px-3 flex items-center">
-                  <NextIconSvg />
-                </div>
+                {
+                  seshStarted &&
+                  <div
+                    onClick={
+                      activeRoutineIdx === routines.length - 1 ?
+                        finishWorkout
+                        : startNextRoutine
+                    }
+                    className={classnames(
+                      "cursor-pointer px-3 flex items-center",
+                      {
+                        "hidden": activeRoutineIdx === routines.length - 1
+                      }
+                    )}>
+                    <NextIconSvg color={
+                      isActiveSet ? '#5d86ff' : '#ffcfff'
+                    } />
+                  </div>
+                }
               </div>
 
             </div>
@@ -174,40 +246,69 @@ export default function WorkoutSesh() {
                   <CheckCircleIconSvg
                     key={i}
                     size={28}
-                    color={(i + 1) === workoutSetNum ? '#1DBE5D' : 'black'}
+                    color={(i + 1) === workoutSetNum ? '#ffffff' : '#01FFA4'}
                     className={classnames(
-                      "inline-block",
-                      (i + 1) === workoutSetNum ? 'mr-0' : 'mr-2'
+                      "inline-block m-2"
                     )} />
                 ))
               }
             </div>
             <div className={classnames({
-              "hidden": !seshStarted
+              "hidden": !seshStarted,
             })}>
-              <p className="mt-3 text-center text-xl uppercase tracking-widest font-semibold">
-                Set {workoutSetNum}
+              <p className="text-white mt-3 text-center text-xl uppercase tracking-widest font-semibold">
+                {
+                  isActiveSet ? (
+                    <span>
+                      Set <strong className="font-bold">
+                        {workoutSetNum}
+                      </strong>
+                    </span>
+                  ) : (
+                    <span className="font-bold text-white">
+                      Rest
+                    </span>
+                  )
+                }
               </p>
             </div>
-            <SeshCounter key={workoutSetNum} active={
-              seshStarted &&
-              counterIsActive}
-            />
+            <div className={classnames({
+              "pt-5": !seshStarted,
+              "pt-2": seshStarted
+            })}>
+              <SeshCounter
+                key={workoutSetNum + '-' + isActiveSet}
+                isActiveSet={isActiveSet}
+                active={
+                  seshStarted &&
+                  counterIsActive}
+                />
+            </div>
           </div>
           <button
             onClick={seshStarted ? startNextSet : startSesh}
             className={classnames(
               "mt-0 w-full font-bold p-3 tracking-widest uppercase text-xl",
-              seshStarted ? "text-white bg-orange" : "text-black bg-brightGreen",
+              {
+                "bg-navy0 text-white": seshStarted && isActiveSet,
+                "bg-restBg text-pink": seshStarted && !isActiveSet,
+                "text-black bg-brightGreen": !seshStarted
+              }
             )}>
             { seshStarted ? (
               <div className="h-[56px]">
                 <p className="text-2xl mb-1 tracking-widest">
-                  {currWorkoutSetType === WorkoutSetType.Active ?
-                    'Finish Set' : 'Start Set'
+                  {isActiveSet ?
+                    'Finish Set' : 'Finish Rest'
                   }
                 </p>
-                <p className="text-sm uppercase tracking-widest font-normal">
+                <p className={classnames(
+                  "text-sm uppercase tracking-widest font-normal",
+                  {
+                    "text-whitem1": isActiveSet,
+                    "text-pink": !isActiveSet
+                  }
+                )}>
                   Next: {getNextWorkoutSetTypeLabel(routines[activeRoutineIdx], currWorkoutSetType, workoutSetNum)}
                 </p>
               </div>
@@ -219,11 +320,16 @@ export default function WorkoutSesh() {
             }
           </button>
         </div>
-        <section className="bg-white">
-          <div className="mx-3 pt-3 text-sm uppercase tracking-wider font-bold text-gray-600">
+        <section className="bg-finish0">
+          <div className={classnames(
+            "bg-white px-3 pt-3 text-sm uppercase tracking-wider font-bold text-gray-600",
+            {
+              "pb-12 text-center": activeRoutineIdx === routines.length - 1
+            }
+          )}>
             {
               activeRoutineIdx === routines.length - 1 ?
-              'Last Exercise!' :
+              'Last Exercise! You\'re almost done!' :
               'Next Up'
             }
           </div>
@@ -255,6 +361,7 @@ export default function WorkoutSesh() {
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
+                                  className="bg-white"
                                   style={{
                                     ...provided.draggableProps.style,
                                   }}
@@ -262,6 +369,7 @@ export default function WorkoutSesh() {
                                 >
                                   <WorkoutRoutine
                                     isFirst={i === 0}
+                                    isLast={i === routines.length - activeRoutineIdx - (seshStarted ? 2 : 1)}
                                     routine={routine}
                                     isDragging={snapshot.isDragging}
                                   />
@@ -276,10 +384,12 @@ export default function WorkoutSesh() {
               </Droppable>
             </DragDropContext>
           }
-          <div className="p-3 pb-16">
+          <div className="pb-16">
             {
               seshStarted &&
-              <button className="text-base py-3 px-5 w-full font-bold uppercase tracking-widest text-white rounded-md bg-gradient-to-r from-finish to-finish2">
+              <button
+                onClick={finishWorkout}
+                className="text-xl py-8 px-5 w-full font-bold uppercase tracking-widest text-white bg-gradient-to-r from-finish to-finish2">
                 Finish Workout
               </button>
             }

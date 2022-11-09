@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
+import classnames from "classnames"
 
 const toSeconds = (secondsTotal: number) => secondsTotal % 60;
 const toMinutes = (secondsTotal: number) => Math.floor(secondsTotal / 60);
 
 export default function SeshCounter({
-  active
+  active,
+  isActiveSet
 }: {
   active: boolean;
+  isActiveSet: boolean;
 }) {
   const [secondsTotal, setSecondsTotal] = useState(0);
   const seconds = toSeconds(secondsTotal);
@@ -23,7 +26,13 @@ export default function SeshCounter({
     }
   }, [active])
   return (
-    <div className="text-black py-5 font-bold tracking-widest text-5xl text-center">
+    <div className={classnames(
+      "pb-5 font-semibold tracking-widest text-5xl text-center",
+      {
+        "text-pink": !isActiveSet,
+        "text-cyan": isActiveSet
+      }
+    )}>
       {minutes.toFixed(0)}:{seconds <= 9 ? '0' + seconds : seconds}
     </div>
   )
