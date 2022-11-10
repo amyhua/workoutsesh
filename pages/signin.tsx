@@ -112,23 +112,21 @@ const SigninPage = () => {
               name="email"
               placeholder="Email Address"
             />
-            <div className="sm:flex">
+            <div>
               {
                 focusedMethod === SigninMethod.Create ?
-                <>
-                  <input
-                    className={classNames(
-                      "p-3 mt-3 bg-slate-200",
-                      "w-full sm:w-auto flex-1 rounded-lg sm:rounded-tl-lg sm:rounded-bl-lg",
-                      "border-r border-r-slate-300"
-                    )}
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                  />
-                </>
+                <input
+                  className={classNames(
+                    "p-3 mt-3 bg-slate-200",
+                    "w-full flex-1 rounded-lg sm:rounded-tl-lg sm:rounded-bl-lg",
+                    "border-r border-r-slate-300"
+                  )}
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                />
                 :
-                <div className="flex">
+                <div className="flex w-full">
                   <input
                     className={classNames(
                       "p-3 mt-3 bg-slate-200",
