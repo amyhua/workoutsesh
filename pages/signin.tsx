@@ -34,6 +34,8 @@ enum SigninMethod {
   Create = 'Signup'
 }
 
+const ENABLE_APPLE_SIGNIN = false
+
 const SigninPage = () => {
   const [loading, setLoading] = useState(false);
   const [focusedMethod, setFocusedMethod] = useState<SigninMethod>();
@@ -77,7 +79,12 @@ const SigninPage = () => {
           </ul>
         </header>
         <div className="mx-10 py-10">
-          <button className="text-base p-3 w-full bg-black text-white rounded-lg">
+          <button className={classNames(
+            "text-base p-3 w-full bg-black text-white rounded-lg",
+            {
+              "hidden": !ENABLE_APPLE_SIGNIN
+            }
+          )}>
             <AppleIconSvg /> Sign in with Apple
           </button>
           <button
@@ -92,8 +99,8 @@ const SigninPage = () => {
             Sign in with Email
           </button>
           <form className={classNames(
-            "pt-0 mt-3 border-t border-slate-200",
             {
+              "pt-0 mt-3 border-t border-slate-200": ENABLE_APPLE_SIGNIN,
               "hidden": !(
                 focusedMethod === SigninMethod.Email ||
                 focusedMethod === SigninMethod.Create
