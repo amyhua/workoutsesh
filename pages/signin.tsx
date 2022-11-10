@@ -31,18 +31,30 @@ const LoadingPage = ({ active, message }: { active?: boolean; message: string; }
 enum SigninMethod {
   Apple = 'Apple',
   Email = 'Email',
-  Login = 'Login',
   Create = 'Signup'
 }
 
 const SigninPage = () => {
   const [loading, setLoading] = useState(false);
   const [focusedMethod, setFocusedMethod] = useState<SigninMethod>();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const signInWithEmail = () => {
     setFocusedMethod(SigninMethod.Email)
   }
   const startCreateAccount = () => {
     setFocusedMethod(SigninMethod.Create)
+  }
+  const onSigninOrCreate = (e: any) => {
+    e.preventDefault()
+    if (focusedMethod === SigninMethod.Apple) {
+
+    } else if (focusedMethod === SigninMethod.Email) {
+
+    } else if (focusedMethod === SigninMethod.Create) {
+
+    }
   }
   return (
     <Layout title="Sign in | Workout Sesh" background="white">
@@ -83,7 +95,7 @@ const SigninPage = () => {
               focusedMethod === SigninMethod.Email ||
               focusedMethod === SigninMethod.Create
             )
-          })} onSubmit={() => {}}>
+          })} onSubmit={onSigninOrCreate}>
             <input
               className="rounded-lg w-full p-3 mt-3 bg-slate-200"
               type="email"
