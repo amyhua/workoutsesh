@@ -72,11 +72,11 @@ const SigninPage = () => {
           </h1>
           <ul className="mt-7 text-xl text-center mx-auto">
             <li className="mb-3">
-              Track your sessions with ease
+              Track your workouts with ease.
             </li>
           </ul>
         </header>
-        <div className="absolute bottom-0 left-0 right-0 mx-10 py-10">
+        <div className="mx-10 py-10">
           <button className="text-base p-3 w-full bg-black text-white rounded-lg">
             <AppleIconSvg /> Sign in with Apple
           </button>
@@ -85,65 +85,100 @@ const SigninPage = () => {
             className={classNames(
               "text-base font-semibold mt-3 p-3 w-full text-black bg-brightGreen rounded-lg",
               {
-                "hidden": focusedMethod === SigninMethod.Email
+                "hidden": focusedMethod === SigninMethod.Email ||
+                  focusedMethod === SigninMethod.Create
               }
             )}>
             Sign in with Email
           </button>
-          <form className={classNames({
-            "hidden": !(
-              focusedMethod === SigninMethod.Email ||
-              focusedMethod === SigninMethod.Create
-            )
-          })} onSubmit={onSigninOrCreate}>
+          <form className={classNames(
+            "pt-0 mt-3 border-t border-slate-200",
+            {
+              "hidden": !(
+                focusedMethod === SigninMethod.Email ||
+                focusedMethod === SigninMethod.Create
+              )
+            })} onSubmit={onSigninOrCreate}>
             <input
               className="rounded-lg w-full p-3 mt-3 bg-slate-200"
               type="email"
               name="email"
               placeholder="Email Address"
             />
-            <div className="flex">
-              <input
-                className={classNames(
-                  "p-3 mt-3 bg-slate-200",
-                  "flex-1 rounded-tl-lg rounded-bl-lg",
-                  {
-                    "border-r border-r-slate-300": focusedMethod === SigninMethod.Create
-                  }
-                )}
-                type="password"
-                name="password"
-                placeholder="Password"
-              />
-              <input
-                className={classNames(
-                  "p-3 mt-3 bg-slate-200",
-                  {
-                    "hidden": focusedMethod === SigninMethod.Email,
-                    // "rounded-lg": focusedMethod === SigninMethod.Create,
-                    "flex-1 rounded-tl-lg rounded-bl-lg": focusedMethod === SigninMethod.Email
-                  }
-                )}
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-              />
-              <button
-                type="submit"
-                className="p-3 mt-3 rounded-tr-lg rounded-br-lg font-bold bg-brightGreen text-black"
-              >
-                →
-              </button>
+            <div className="sm:flex">
+              {
+                focusedMethod === SigninMethod.Create ?
+                <>
+                  <input
+                    className={classNames(
+                      "p-3 mt-3 bg-slate-200",
+                      "w-full sm:w-auto flex-1 rounded-lg sm:rounded-tl-lg sm:rounded-bl-lg",
+                      "border-r border-r-slate-300"
+                    )}
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                  />
+                </>
+                :
+                <div className="flex">
+                  <input
+                    className={classNames(
+                      "p-3 mt-3 bg-slate-200",
+                      "flex-1 rounded-tl-lg rounded-bl-lg"
+                    )}
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                  />
+                  <button
+                    type="submit"
+                    className="p-3 mt-3 rounded-tr-lg rounded-br-lg font-semibold bg-brightGreen text-black"
+                  >
+                    Sign in
+                  </button>
+                </div>
+              }
+              {
+                focusedMethod === SigninMethod.Create ?
+                <div className="flex">
+                  <input
+                    className={classNames(
+                      "p-3 mt-3 bg-slate-200",
+                      "flex-1 rounded-tl-lg rounded-bl-lg"
+                    )}
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="Confirm Password"
+                  />
+                  <button
+                    type="submit"
+                    className="p-3 mt-3 rounded-tr-lg rounded-br-lg font-semibold bg-brightGreen text-black"
+                  >
+                    Sign up
+                  </button>
+                </div>
+                : null
+              }
             </div>
           </form>
           <button onClick={startCreateAccount}
-          className={classNames(
-            "text-base mt-3 p-3 w-full rounded-lg text-slate-500",
-            {
-              "hidden": focusedMethod === SigninMethod.Create
-            }
-          )}>
+            className={classNames(
+              "text-base mt-3 p-3 w-full rounded-lg text-slate-500",
+              {
+                "hidden": focusedMethod === SigninMethod.Create
+              }
+            )}>
             Create a New Account
+          </button>
+          <button onClick={signInWithEmail}
+            className={classNames(
+              "text-base mt-3 p-3 w-full rounded-lg text-slate-500",
+              {
+                "hidden": focusedMethod !== SigninMethod.Create
+              }
+            )}>
+            Sign in with Email
           </button>
         </div>
       </main>
