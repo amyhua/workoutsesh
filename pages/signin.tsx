@@ -83,7 +83,7 @@ const SigninPage = () => {
           <button
             onClick={signInWithEmail}
             className={classNames(
-              "text-base mt-3 p-3 w-full text-black bg-brightGreen rounded-lg",
+              "text-base font-semibold mt-3 p-3 w-full text-black bg-brightGreen rounded-lg",
               {
                 "hidden": focusedMethod === SigninMethod.Email
               }
