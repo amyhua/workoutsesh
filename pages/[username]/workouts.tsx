@@ -31,7 +31,7 @@ export default function Workouts() {
 
   return (
     <Layout title="Workouts" background="#F4F3EC">
-      <main className="bg-wheat min-h-full max-w-lg mx-auto">
+      <main className="bg-wheat min-h-full max-w-4xl mx-auto">
         <div className="p-5">
           <h1 className="text-2xl font-bold mt-3 mb-2">
             Afternoon, Amy
@@ -62,9 +62,12 @@ export default function Workouts() {
             })
           }
         </section>
-        <button className="py-3 px-5 text-lg font-semibold text-forest hover:bg-gray-200 w-full text-left">
-          + Add a workout
-        </button>
+        <div className="mb-10">
+          <button
+            className="py-5 px-5 text-lg font-semibold text-forest hover:bg-gray-200 w-full text-left">
+            + Add a workout
+          </button>
+        </div>
       </main>
     </Layout>
   )

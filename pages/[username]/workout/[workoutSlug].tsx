@@ -106,10 +106,10 @@ export default function WorkoutSesh() {
       } else {
         // is rest -> start active set
         setCurrWorkoutSetType(WorkoutSetType.Active)
-        setWorkoutSetNum(i => i + 1)
+        setWorkoutSetNum(workoutSetNum + 1)
       }
     }
-    setWorkoutSetNum(set => set + 1)
+    setWorkoutSetNum(workoutSetNum + 1)
   }
   const startNextRoutine = () => {
     setActiveRoutineIdx(idx => idx + 1)
@@ -146,7 +146,7 @@ export default function WorkoutSesh() {
 
   return (
     <Layout title="Workout Sesh" background="#F4F3EC">
-      <main className="bg-wheat max-w-2xl mx-auto min-h-[100vh]">
+      <main className="bg-wheat max-w-4xl mx-auto min-h-[100vh]">
         <div className={classnames(
           "sticky top-0 left-0 right-0 text-cyan z-20 bg-gradient-to-b",
           isActiveSet ?
@@ -320,16 +320,17 @@ export default function WorkoutSesh() {
             }
           </button>
         </div>
-        <section className="bg-finish0">
+        <section className="bg-wheat">
           <div className={classnames(
-            "bg-white px-3 pt-3 text-sm uppercase tracking-wider font-bold text-gray-600",
+            "bg-white px-3 uppercase tracking-wider font-bold text-gray-600",
             {
-              "pb-12 text-center": activeRoutineIdx === routines.length - 1
+              "pt-3 text-sm": activeRoutineIdx !== routines.length - 1,
+              "pt-12 pb-12 text-center text-xl": activeRoutineIdx === routines.length - 1
             }
           )}>
             {
               activeRoutineIdx === routines.length - 1 ?
-              'Last Exercise! You\'re almost done!' :
+              'Last Exercise!' :
               'Next Up'
             }
           </div>
