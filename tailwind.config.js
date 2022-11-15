@@ -14,7 +14,7 @@ module.exports = {
         wheat2: '#c3c2bd',
         brightGreen0: '#51FFC0',
         brightGreen: '#01FFA4',
-        brightGreen1: '#00FF66',
+        brightGreen1: '#45ffb9',
         brightGreen2: '#02B61F',
         floral: '#ff87ec',
         cyan0: '#87afbc',
@@ -39,7 +39,8 @@ module.exports = {
         restBg: '#302c65',
         pink: '#ffcfff',
         active1: '#202e91',
-        active2: '#020405'
+        active2: '#020405',
+        purple0: '#f3efff',
       }
     },
   },

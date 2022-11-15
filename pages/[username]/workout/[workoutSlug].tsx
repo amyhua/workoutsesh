@@ -16,25 +16,25 @@ const workout = {
   routines: [{
     id: 1,
     name: 'Chest Press with Free Weights (25 to 100 pounds+)',
-    image_url: 'https://personallevelfitness.com/wp-content/uploads/2018/08/Chest-Press-DB.jpg',
+    imageUrl: 'https://personallevelfitness.com/wp-content/uploads/2018/08/Chest-Press-DB.jpg',
     description: '4 sets of 12-15',
     restBetweenSets: true
   }, {
     id: 2,
     name: 'Chest Flies',
-    image_url: 'https://gethealthyu.com/wp-content/uploads/2014/08/Chest-Flies_Exercise.jpg',
+    imageUrl: 'https://gethealthyu.com/wp-content/uploads/2014/08/Chest-Flies_Exercise.jpg',
     description: '4 sets of 10-12',
     restBetweenSets: true
   }, {
     id: 3,
     name: 'Reverse Lunges',
-    image_url: 'https://www.wikihow.com/images/thumb/c/c0/Do-a-Reverse-Lunge-Step-8-Version-2.jpg/v4-460px-Do-a-Reverse-Lunge-Step-8-Version-2.jpg.webp',
+    imageUrl: 'https://www.wikihow.com/images/thumb/c/c0/Do-a-Reverse-Lunge-Step-8-Version-2.jpg/v4-460px-Do-a-Reverse-Lunge-Step-8-Version-2.jpg.webp',
     description: '4 sets of 12-15',
     restBetweenSets: false
   }, {
     id: 4,
     name: '(Knee) Push-Ups',
-    image_url: 'https://i.pinimg.com/originals/56/e4/61/56e4612e4837f1d0bbd45402c4bc01d7.jpg',
+    imageUrl: 'https://i.pinimg.com/originals/56/e4/61/56e4612e4837f1d0bbd45402c4bc01d7.jpg',
     description: '4 sets of 10-16',
     restBetweenSets: true
   }],
@@ -162,12 +162,12 @@ export default function WorkoutSesh() {
               <div className="flex">
                 <div className="relative flex border-r-2 border-black items-center h-[125px] w-[125px] bg-white rounded-tl-lg rounded-bl-lg overflow-hidden">
                   <Image
-                    src={routines[activeRoutineIdx].image_url}
+                    src={routines[activeRoutineIdx].imageUrl}
                     alt="Active Routine Image"
                     priority
                     height={125}
                     width={125}
-                    placeholder={require('./routine-placeholder.png')}
+                    placeholder={require('../../../components/routine-placeholder.png')}
                     className="inline-block"
                   />
                 </div>

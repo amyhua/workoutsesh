@@ -11,7 +11,7 @@ export default class AuthService {
     this.authorized = false
     this.isMock = isMock
   }
-  signin(username?: string, password?: string) {
+  signin(username?: string, password?: string): Promise<string> {
     this.authorized = true
     if (this.isMock) return new Promise((resolve: any, reject: any) => {
       setTimeout(() => {

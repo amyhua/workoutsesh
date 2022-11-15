@@ -1,9 +1,11 @@
 import classNames from "classnames";
 import Image from "next/image"
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Layout from "../components/Layout"
 import AuthService from "../auth-service";
+import AuthContext from "../contexts/auth-context";
+import Logo from "../components/Logo";
 
 const AppleIconSvg = () => (
   <svg className="inline-block align-top mr-1 mt-0.25" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -48,15 +50,30 @@ enum SigninMethod {
 
 const ENABLE_APPLE_SIGNIN = false
 const IS_MOCK_AUTH = true
+const IS_MOCK_FIRST_USER = true
 const SigninPage = () => {
-  const [loading, setLoading] = useState(false);
-  const [focusedMethod, setFocusedMethod] = useState<SigninMethod>();
+  const { setAuthToken, authorized } = useContext(AuthContext)
+  const router = useRouter()
+  const isFirstTimeUser = IS_MOCK_FIRST_USER
+  if (authorized) {
+    // TODO: deserialize token, get username, and go to user's homepage
+    console.log("TODO: deserialize token, get username, and go to user's homepage")
+    // @TODO: fetch username and navigate accordingly
+    console.log('@TODO: fetch username and navigate accordingly')
+    if (isFirstTimeUser) {
+      router.push('/intro')
+    } else {
+      router.push('/amyhua')
+    }
+  }
+
+  const [loading, setLoading] = useState(false)
+  const [focusedMethod, setFocusedMethod] = useState<SigninMethod>()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isAuthError, setIsAuthError] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const router = useRouter()
   const signInWithEmail = () => {
     setFocusedMethod(SigninMethod.Email)
   }
@@ -81,6 +98,17 @@ const SigninPage = () => {
     const auth = new AuthService(email, password, IS_MOCK_AUTH) 
     setIsAuthError(false)
     auth.signin()
+      .then((token: string) => {
+        setAuthToken(token)
+        console.log('Navigating to user homepage...')
+        // @TODO: fetch username and navigate accordingly
+        console.log('@TODO: fetch username and navigate accordingly')
+        if (isFirstTimeUser) {
+          router.push('/intro')
+        } else {
+          router.push('/amyhua')
+        }
+      })
       .catch(() => {
         console.error('Invalid login')
         setIsAuthError(true)
@@ -100,15 +128,13 @@ const SigninPage = () => {
             height={200}
             alt="Workout animation"
             src={require('./workout-woman.gif')} />
-          <h1 className="leading-10 text-center my-6 text-3xl font-bold px-3">
+          <h1 className="leading-10 text-center mt-6 mb-4 text-3xl font-bold px-3">
             Welcome to<br/>
-            <div className="mt-5 uppercase tracking-wider italic">Workout Sesh</div>
+            <Logo size={320} className="mx-auto mt-3" />
           </h1>
-          <ul className="mt-7 text-xl text-center mx-auto">
-            <li className="mb-3">
-              Track your workouts with ease.
-            </li>
-          </ul>
+          <div className="mb-3 text-xl text-center">
+            Track your workouts with ease.
+          </div>
         </header>
         <div className="mx-10 py-10">
           <button
@@ -256,7 +282,11 @@ const SigninPage = () => {
                     isAuthError ?
                     'Invalid email and/or password. Please try again.' :
                     submitting ?
-                    'Submitting...' :
+                    (
+                      focusedMethod === SigninMethod.Create ?
+                      'Creating account...' :
+                      'Signing you in...'
+                    ) :
                     null
                   }
                 </span>
@@ -287,4 +317,5 @@ const SigninPage = () => {
     </Layout>
   )
 }
+
 export default SigninPage
