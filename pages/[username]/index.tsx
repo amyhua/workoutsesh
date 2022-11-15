@@ -148,7 +148,7 @@ export default function Workouts() {
             <Logo size={180} className="my-0" />
           </div>
         </nav>
-        <div className="p-5 mt-[90px]">
+        <div className="mt-[70px] p-5">
           <section className="p-4 border-2 border-black mb-10">
             <header>
               <h2 className="text-2xl font-bold mt-0 mb-6">
@@ -182,8 +182,8 @@ export default function Workouts() {
                 imageUrls={prevWorkout.exercises.map((e: any) => e.imageUrl)}
                 className="border-2 border-black rounded-sm"
               />
-              <p className="mt-2 mb-5">
-                <h3 className="text-xl font-bold mb-2">{prevWorkout.name}</h3>
+              <p className="mt-1 mb-5">
+                <h3 className="text-xl font-bold mb-1">{prevWorkout.name}</h3>
                 <div className="font-semibold">
                   Completed 2 days ago in {prevWorkout.durationMin.toFixed(1)} minutes
                 </div>
@@ -193,82 +193,55 @@ export default function Workouts() {
               </Link>
             </main>
           </section>
-          <section>
-            {
-              workouts && workouts.length &&
-              <header>
-                <h2 className="italic uppercase tracking-widest text-3xl mb-6 font-bold">
-                  Start a Workout
-                </h2>
-              </header>
-
-            }
-            <main>
-              <ul>
-                {
-                  (workouts || []).map((workout: any, i) => (
-                    <li
-                      onClick={onStartWorkout && onStartWorkout(workout)}
-                      key={i}
-                      className="my-3 cursor-pointer pb-4">
-                      <article className="py-2 rounded-lg">
-                        <h3 className="font-bold text-2xl mb-2">
-                          {workout.name}
-                        </h3>
-                        <ImageTileRow
-                          size={75}
-                          imageUrls={workout.exercises.map((exc: any) => exc.imageUrl)}
-                          className="border-2 border-black rounded-sm"
-                        />
-                        <div className="flex mt-3">
-                          <p className="flex-1 font-semibold mt-2 text-base">
-                            {workout.description}
-                          </p>
-                          <button className="ml-2 text-base mt-0.5 py-1 px-3 rounded-sm font-semibold bg-brightGreen h-[32.5px] hover:bg-brightGreen1">
-                            Start
-                          </button>
-                        </div>
-                      </article>    
-                    </li>    
-                  ))
-                }
-              </ul>
-              <div className="my-5">
-                <button className="my-2 p-3 rounded-md border border-black hover:bg-slate-50 font-semibold text-black w-full">
-                  Create a Workout
-                </button>
-              </div>
-            </main>
-          </section>
         </div>
         <section>
           {
-            workouts.map((workout: any, i: number) => {
-              return (
-                <Link key={i} className="block pt-7" href={`/${username}/workout/${workout.slug}`}>
-                  <div className="px-5">
-                    {/* <WorkoutIconSvg size={60} /> */}
-                    <h2 className="text-xl font-bold mt-3 mb-1">
-                      {workout.name}
-                    </h2>
-                    <p className="text-base mb-3">
-                      {workout.description}
-                    </p>
-                  </div>
-                  <button className="w-full cursor-pointer text-base text-left uppercase tracking-widest font-bold px-5 py-4 bg-brightGreen">
-                    Begin workout
-                  </button>
-                </Link>
-              )
-            })
+            workouts && workouts.length &&
+            <header className="px-5">
+              <h2 className="italic uppercase tracking-widest text-3xl mb-6 font-bold">
+                Start a Workout
+              </h2>
+            </header>
+
           }
+          <main>
+            <ul>
+              {
+                (workouts || []).map((workout: any, i) => (
+                  <li
+                    onClick={onStartWorkout && onStartWorkout(workout)}
+                    key={i}
+                    className="cursor-pointer">
+                    <article
+                      className="group hover:bg-green-100 py-5 px-5">
+                      <h3 className="font-bold text-2xl mb-2">
+                        {workout.name}
+                      </h3>
+                      <ImageTileRow
+                        size={75}
+                        imageUrls={workout.exercises.map((exc: any) => exc.imageUrl)}
+                        className="border-2 border-black rounded-sm"
+                      />
+                      <div className="flex mt-3">
+                        <p className="flex-1 font-semibold mt-2 text-base">
+                          {workout.description}
+                        </p>
+                        <button className="ml-2 text-base mt-0.5 py-1 px-3 rounded-sm font-semibold bg-brightGreen group-hover:bg-brightGreen1 h-[32.5px] hover:bg-brightGreen1">
+                          Start
+                        </button>
+                      </div>
+                    </article>    
+                  </li>    
+                ))
+              }
+            </ul>
+            <div className="mt-5 mb-14">
+              <button className="my-2 p-3 rounded-md border border-black hover:bg-slate-50 font-semibold text-black w-full">
+                Create a Workout
+              </button>
+            </div>
+          </main>
         </section>
-        <div className="mb-10">
-          <button
-            className="py-5 px-5 text-lg font-semibold text-forest hover:bg-gray-200 w-full text-left">
-            + Add a workout
-          </button>
-        </div>
       </main>
     </Layout>
   )
