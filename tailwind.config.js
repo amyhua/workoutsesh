@@ -7,9 +7,13 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'monospace': ['Inconsolata', 'Maison Neue Mono', 'Courier', 'Courier New', 'monospace'],
+      },
       colors: {
         whitem1: '#ffffff85',
         white0: '#ffffff33',
+        black0: '#00000095',
         wheat: '#F4F3EC',
         wheat2: '#c3c2bd',
         brightGreen0: '#51FFC0',
@@ -19,6 +23,8 @@ module.exports = {
         floral: '#ff87ec',
         cyan0: '#87afbc',
         cyan: '#0affb2',
+        cyanm2: '#062426',
+        cyanm1: '#0b4c50',
         forest: '#1F5B25',
         navym2: '#5d86ff',
         navym1: '#aabffc',

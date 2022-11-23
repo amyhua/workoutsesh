@@ -10,12 +10,12 @@ const ReorderIconSvg = ({ color }: { color: string; }) => (
 
 
 const WorkoutRoutine = ({
-  routine,
+  exercise,
   isFirst,
   isLast,
   isDragging,
 }: {
-  routine: any;
+  exercise: any;
   isFirst?: boolean;
   isLast?: boolean;
   isDragging?: boolean;
@@ -27,15 +27,15 @@ const WorkoutRoutine = ({
         "border-t border-b" :
         isLast ? "border-none" : "border-b"
     )}>
-      <div className="mr-1">
+      <div className="mr-1 mt-2">
         <div className={classnames(
-          "mx-3 relative rounded-md w-[75px] h-[75px] border border-black text-center bg-gray-500 overflow-hidden",
+          "mx-3 relative rounded-sm w-[75px] h-[75px] border border-black text-center bg-gray-500 overflow-hidden",
           isFirst ? "mb-5 mt-2" : "my-5",
           isDragging ? "text-navy0": "text-black"
         )}>
           <Image
-            src={routine.image_url}
-            alt="Routine Image"
+            src={exercise.imageUrl}
+            alt="Exercise Image"
             priority
             fill
             placeholder={require('./heart-pulse.png')}
@@ -49,7 +49,7 @@ const WorkoutRoutine = ({
           isDragging ? "text-navy0" : "text-black"
         )}>
           <Clamped clamp={2}>
-            {routine.name}
+            {exercise.name}
           </Clamped>
         </h2>
         <p className={classnames(
@@ -57,7 +57,7 @@ const WorkoutRoutine = ({
           "text-gray-500"
         )}>
           <Clamped clamp={1}>
-            {routine.description}
+            {exercise.description}
           </Clamped>
         </p>
       </div>

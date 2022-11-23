@@ -6,10 +6,12 @@ const toMinutes = (secondsTotal: number) => Math.floor(secondsTotal / 60);
 
 export default function SeshCounter({
   active,
-  isActiveSet
+  isActiveSet,
+  seshStarted,
 }: {
   active: boolean;
   isActiveSet: boolean;
+  seshStarted: boolean;
 }) {
   const [secondsTotal, setSecondsTotal] = useState(0);
   const seconds = toSeconds(secondsTotal);
@@ -27,10 +29,11 @@ export default function SeshCounter({
   }, [active])
   return (
     <div className={classnames(
-      "pb-5 font-semibold tracking-widest text-5xl text-center",
+      "pb-5 font-monospace font-semibold tracking-widest text-5xl text-center",
       {
-        "text-pink": !isActiveSet,
-        "text-cyan": isActiveSet
+        "text-pink": seshStarted && !isActiveSet,
+        "text-white": seshStarted && isActiveSet,
+        "text-black": seshStarted
       }
     )}>
       {minutes.toFixed(0)}:{seconds <= 9 ? '0' + seconds : seconds}

@@ -125,19 +125,15 @@ export default function Workouts() {
   const [winReady, setWinReady] = useState(false)
 
   useEffect(() => {
-    winReady
+    setWinReady(true)
   }, [])
 
   const onStartWorkout =
     (workout: any) =>
       () => {
-        router.push({
-          href: '/sesh',
-          query: {
-            workout: workout.slug,
-            username,
-          }
-        })
+        if (winReady) router.push(
+          `/${username}/workout/${workout.slug}`
+        )
       }
 
   return (
@@ -159,8 +155,8 @@ export default function Workouts() {
               {
                 stats.map((stat: Stat, i: number) => (
                   <article key={i} className="flex-1 pr-5 last:pr-0">
-                    <div className="text-3xl font-semibold text-green-500">
-                      {stat.value}
+                    <div className="font-monospace text-3xl font-semibold text-black bg-slate-200 rounded-lg inline-block p-2">
+                      {stat.value.toLocaleString()}
                     </div>
                     <div className="text-lg font-semibold text-gray-600 mt-2 mb-6">
                       {stat.label}
@@ -170,7 +166,7 @@ export default function Workouts() {
               }
             </div>
           </section>
-          <section className="mb-8 px-4 pt-6 pb-8 mb-10 bg-purple0 border-2 border-black">
+          <section className="mb-8 px-4 pt-6 pb-8 bg-purple0 border-2 border-black">
             <header>
               <h2 className="font-bold mb-0 text-2xl">
                 Last workout
@@ -182,15 +178,15 @@ export default function Workouts() {
                 imageUrls={prevWorkout.exercises.map((e: any) => e.imageUrl)}
                 className="border-2 border-black rounded-sm"
               />
-              <p className="mt-1 mb-5">
+              <div className="mt-1">
                 <h3 className="text-xl font-bold mb-1">{prevWorkout.name}</h3>
                 <div className="font-semibold">
-                  Completed 2 days ago in {prevWorkout.durationMin.toFixed(1)} minutes
+                  Completed 2 days ago in {prevWorkout.durationMin.toFixed(1)} minutes. <Link
+                  className="block underline" href="#">
+                    Summary
+                  </Link>
                 </div>
-              </p>
-              <Link className="py-2 px-3 border-2 font-semibold border-black rounded-lg" href="/amyhua/workouts/3">
-                Workout Summary
-              </Link>
+              </div>
             </main>
           </section>
         </div>
@@ -199,7 +195,7 @@ export default function Workouts() {
             workouts && workouts.length &&
             <header className="px-5">
               <h2 className="italic uppercase tracking-widest text-3xl mb-6 font-bold">
-                Start a Workout
+                Start
               </h2>
             </header>
 
@@ -226,7 +222,7 @@ export default function Workouts() {
                         <p className="flex-1 font-semibold mt-2 text-base">
                           {workout.description}
                         </p>
-                        <button className="ml-2 text-base mt-0.5 py-1 px-3 rounded-sm font-semibold bg-brightGreen group-hover:bg-brightGreen1 h-[32.5px] hover:bg-brightGreen1">
+                        <button className="ml-2 text-base mt-0.5 py-1 px-3 rounded-sm font-bold bg-brightGreen group-hover:bg-brightGreen1 h-[32.5px] hover:bg-brightGreen1">
                           Start
                         </button>
                       </div>
@@ -235,10 +231,10 @@ export default function Workouts() {
                 ))
               }
             </ul>
-            <div className="mt-5 mb-14">
-              <button className="my-2 p-3 rounded-md border border-black hover:bg-slate-50 font-semibold text-black w-full">
+            <div className="mt-8 px-5 pb-14">
+              <Link href={`/${username}/workout/create`} className="cursor-pointer text-lg font-bold my-2 p-3 rounded-md border-2 border-black hover:bg-brightGreen text-black w-full">
                 Create a Workout
-              </button>
+              </Link>
             </div>
           </main>
         </section>

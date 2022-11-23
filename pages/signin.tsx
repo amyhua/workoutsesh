@@ -175,6 +175,7 @@ const SigninPage = () => {
               type="email"
               name="email"
               required
+              value={email}
               onChange={(e: any) => setEmail(e.target.value)}
               placeholder="Email Address"
             />
@@ -192,6 +193,7 @@ const SigninPage = () => {
                   type="password"
                   required
                   name="password"
+                  value={password}
                   onChange={(e: any) => setPassword(e.target.value)}
                   placeholder="Password"
                 />
@@ -207,6 +209,7 @@ const SigninPage = () => {
                     type="password"
                     required
                     name="password"
+                    value={password}
                     onChange={(e: any) => setPassword(e.target.value)}
                     placeholder="Password"
                   />
@@ -239,6 +242,7 @@ const SigninPage = () => {
                     type="password"
                     required
                     name="confirmPassword"
+                    value={confirmPassword}
                     onChange={(e: any) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm Password"
                   />
