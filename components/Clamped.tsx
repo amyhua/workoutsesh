@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import $clamp from '../libs/clamp'
+import $clamp from '../lib/clamp'
 
 const Clamped = ({ children, clamp }: { children: any; clamp: number; }) => {
   const ref = useRef(null)
