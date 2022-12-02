@@ -1,11 +1,13 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import Layout from '../../components/Layout'
-import Logo from '../../components/Logo'
+import Layout from '../components/Layout'
+import Logo from '../components/Logo'
 import Image from 'next/image'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
-import { Error, User } from '../../types'
+import { getSession } from 'next-auth/react'
+import { NextPageContext } from 'next'
 
 const workouts = [{
   name: 'Upper Body',
@@ -106,7 +108,7 @@ const ImageTileRow = ({ className, imageUrls=[], size }: { className?: string; i
             <Image
               alt="Previous Workout Exercise Image"
               src={imageUrl}
-              placeholder={require('../../components/routine-placeholder.png')}
+              placeholder={require('./routine-placeholder.png')}
               width={size}
               height={size}
               className={classNames(
@@ -120,28 +122,15 @@ const ImageTileRow = ({ className, imageUrls=[], size }: { className?: string; i
   </div>
 )
 
-export default function IndexPage() {
+export default function IndexDashboard({
+  user
+}: any) {
   const router = useRouter()
   const { username } = router.query
   const [winReady, setWinReady] = useState(false)
-
-  async function loadUserData() {
-    try {
-      const resp = await fetch(`/api/user?username=${username}`);
-      const data = await resp.json() as any
-      if (resp.status !== 200) {
-        throw Error(data.message);
-      }
-      console.log('LOAD DATA', data);
-    } catch(err) {
-      router.push(`/signin?error=${err}`)
-    }
-  }
-
   useEffect(() => {
-    setWinReady(true)
-    loadUserData()
-  }, [])
+    setWinReady(true);
+  }, []);
 
   const onStartWorkout =
     (workout: any) =>
@@ -256,4 +245,23 @@ export default function IndexPage() {
       </main>
     </Layout>
   )
+}
+
+export async function getServerSideProps(context: any) {
+  const session = await getSession(context)
+  try {
+    return {
+      props : {
+        session,
+        params: context.params
+      }
+    }
+  } catch(error) {
+    console.log('error: ', error)
+    return {
+      props : {
+        error
+      }
+    }
+  }  
 }

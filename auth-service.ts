@@ -1,33 +1,53 @@
 const MOCK_JWT_TOKEN = 'mockjwttoken'
 
 export default class AuthService {
-  username: string;
+  email: string;
   password: string;
   authorized: boolean;
   isMock: boolean;
-  constructor(username: string, password: string, isMock: boolean) {
-    this.username = username
+  constructor(email: string, password: string, isMock: boolean = false) {
+    this.email = email
     this.password = password
     this.authorized = false
     this.isMock = isMock
   }
-  signin(username?: string, password?: string): Promise<string> {
-    this.authorized = true
-    if (this.isMock) return new Promise((resolve: any, reject: any) => {
-      setTimeout(() => {
-        resolve({
-          token: MOCK_JWT_TOKEN
+  async signupEmail(confirmPassword: string, csrfToken: any) {
+    if (this.password !== confirmPassword) {
+      return Promise.reject({
+        error: true,
+        message: 'The confirm password did not match. Please try again.'
+      })
+    }
+    try {
+      const response = await fetch('/api/auth/signin/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: this.email,
+          password: this.password,
+          csrfToken,
         })
-        // mock rejection
-        // reject(404)
-      }, 2000)
+      })
+      return response.json();
+    } catch(err) {
+      console.log('Auth Service err', err);
+      return Promise.reject(err)
+    }
+  }
+  async signin() {
+    const response = await fetch(`/api/login`, {
+
     })
-    return Promise.resolve(200)
+    this.authorized = response.status === 200
+    return response.json()
   }
   get isAuthorized() {
     return this.authorized
   }
   signout() {
+    // TODO: end session
     this.authorized = false
   }
 }

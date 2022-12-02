@@ -8,4 +8,116 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL") // Only needed when using a cloud provider that doesn't support the creation of new databases, like Heroku. Learn more: https://pris.ly/migrate-shadow
+}
+
+// model User {
+//   id  Int @id @default(autoincrement())
+//   createdAt     DateTime  @default(now()) @map(name: "created_at")
+//   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+//   name String @db.VarChar(200)
+//   email   String   @unique
+//   username String @unique
+//   password   String
+//   workouts Workout[]
+//   avatarUrl String?
+// }
+
+model Exercise {
+  id  Int @id @default(autoincrement())
+  workoutId Int
+  workout Workout @relation(fields: [workoutId], references: [id])
+  workoutOrder Int @default(0)
+  name String @db.VarChar(200)
+  imageUrl String?
+  setsDescription String?
+  repsDescription String?
+  restBetweenSets Boolean @default(true)
+  intervals SeshInterval[]
+}
+
+model Workout {
+  id  Int @id @default(autoincrement())
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  name String @db.VarChar(300)
+  description String?
+  slug String @unique
+  exercises Exercise[]
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  userOrder Int @default(0)
+  averageDurationS Int // average duration in seconds
+  countCompleted Int // count of completed seshes
+  seshes Sesh[]
+}
+
+model Sesh {
+  id  Int @id @default(autoincrement())
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  timeCompletedS Int // running total seconds completed
+  workoutId Int
+  workout Workout @relation(fields: [workoutId], references: [id])
+  intervals SeshInterval[]
+  note String? @db.VarChar(200)
+}
+
+model SeshInterval {
+  id  Int @id @default(autoincrement())
+  seshId Int
+  sesh Sesh @relation(fields: [seshId], references: [id])
+  exerciseId Int
+  exercise Exercise @relation(fields: [exerciseId], references: [id])
+  durationS Int
+  setNo Int @default(1)
+  active Boolean
+  note String?
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  workouts      Workout[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }

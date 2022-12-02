@@ -1,3 +1,27 @@
+#### Database Setup
+
+`npx prisma migrate dev --name <name of migration>`
+to generate and apply migrations in development. [Docs](https://www.prisma.io/docs/concepts/components/prisma-migrate/migrate-development-production)
+
+To reset the database:
+`npx prisma migrate reset`
+
+
+Build Instructions
+
+```
+npm install @prisma/client
+prisma generate
+```
+
+### Route Making
+
+Restricted route making:
+[https://next-auth.js.org/getting-started/example#backend---api-route](https://next-auth.js.org/getting-started/example#backend---api-route)
+
+
+-----
+
 #### Assets
 
 * https://thenounproject.com/icon/cardio-workout-2224734/
