@@ -1,10 +1,10 @@
 import classNames from "classnames";
 import Image from "next/image"
 import { useRouter } from "next/router";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../components/Layout"
 import AuthService from "../auth-service";
-import { getProviders, getCsrfToken, signIn, signOut, useSession, } from 'next-auth/react';
+import { getProviders, getCsrfToken, signIn, useSession, } from 'next-auth/react';
 import Logo from "../components/Logo";
 
 const AppleIconSvg = () => (
@@ -45,7 +45,8 @@ const LoadingPage = ({ active, message }: { active?: boolean; message: string; }
 enum SigninMethod {
   Apple = 'Apple',
   Email = 'Email',
-  Create = 'Signup'
+  Create = 'Signup',
+  CreateCredentials = 'CreateCredentials',
 }
 
 const ENABLE_APPLE_SIGNIN = false
@@ -68,16 +69,17 @@ const Signin = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [authError, setAuthError] = useState(error !== undefined ? JSON.stringify(error) : undefined)
   const [submitting, setSubmitting] = useState(false)
-  const [csrfToken, setCsrfToken] = useState<any>();
   const [providers, setProviders] = useState<any>([]);
   const loadProviders = async () => {
     const providers = await getProviders();
-    setProviders(providers);
-    const token = await getCsrfToken();
-    setCsrfToken(token);
+    if (providers) setProviders(providers);
   }
-  const signInWithEmail = () => {
+  const signInWithEmail = async () => {
     setFocusedMethod(SigninMethod.Email)
+    // const token = await signIn('email', {
+    //   email,
+    // });
+    // console.log('email signin', token);
   }
   const startCreateAccount = () => {
     setFocusedMethod(SigninMethod.Create)
@@ -85,23 +87,38 @@ const Signin = () => {
   const onSigninOrCreate = (e: any) => {
     e.preventDefault()
     setSubmitting(true)
-    const auth = new AuthService(email, password)
     if (focusedMethod === SigninMethod.Create) {
-      auth.signupEmail(confirmPassword, csrfToken)
-        .catch((err: any) => {
-          console.error('Created error response', err)
-          setAuthError(err.message);
-        })
-        .finally(() => {
-          setSubmitting(false);
-        })
+      // auth.signupEmail(confirmPassword)
+      //   .catch((err: any) => {
+      //     console.error('Created error response', err)
+      //     setAuthError(err.message);
+      //   })
+      //   .finally(() => {
+      //     setSubmitting(false);
+      //   })
       return;
     }
     // sign in
     if (focusedMethod === SigninMethod.Apple) {
       // TODO: apple sign-in
     } else if (focusedMethod === SigninMethod.Email) {
-
+      signIn('credentials', {
+        redirect: false,
+        email,
+        password,
+        callbackUrl: '/',
+      })
+      .then((res) => {
+        if (res && !res.ok) {
+          setAuthError(res.error);
+        }
+      })
+      .catch(err => {
+        console.log('on err', err);
+      })
+      .finally(() => {
+        setSubmitting(false);
+      })
     }
     // console.log('TODO: submit form', {
     //   email,
@@ -201,13 +218,15 @@ const Signin = () => {
               "pt-0 mt-3 border-t border-slate-200": ENABLE_APPLE_SIGNIN,
               "hidden": !(
                 focusedMethod === SigninMethod.Email ||
-                focusedMethod === SigninMethod.Create
+                focusedMethod === SigninMethod.Create ||
+                focusedMethod === SigninMethod.CreateCredentials
               )
             })} onSubmit={onSigninOrCreate}>
-            <h2 className="text-center text-base mb-0 text-gray-600 font-semibold">
+            <h2 className="mt-5 text-center text-base mb-0 text-gray-600 font-semibold">
               {
                 focusedMethod === SigninMethod.Create ?
-                'Sign up' : 'Sign in'
+                'Sign up' :
+                'Sign in'
               }
             </h2>
             <input
@@ -239,36 +258,38 @@ const Signin = () => {
                   placeholder="Password"
                 />
                 :
-                <div className="flex w-full">
-                  <input
-                    disabled={submitting}
-                    className={classNames(
-                      "p-3 mt-3 bg-slate-200",
-                      "flex-1 rounded-tl-lg rounded-bl-lg",
-                      "focus:outline-none"
-                    )}
-                    type="password"
-                    required
-                    name="password"
-                    value={password}
-                    onChange={(e: any) => setPassword(e.target.value)}
-                    placeholder="Password"
-                  />
-                  <button
-                    disabled={submitting}
-                    type="submit"
-                    className={classNames(
-                      "p-3 mt-3 rounded-tr-lg rounded-br-lg font-semibold text-black",
-                      "focus:outline-brightGreen2",
-                      {
-                        "bg-brightGreen": !submitting,
-                        "bg-slate-300": submitting
-                      }
-                    )}
-                  >
-                    Sign in
-                  </button>
-                </div>
+                (
+                  focusedMethod === SigninMethod.Email &&
+                  <div className="flex w-full">
+                    <input
+                      disabled={submitting}
+                      className={classNames(
+                        "py-3 pl-3 pr-5 mt-3 bg-slate-200",
+                        "flex-1 rounded-tl-lg rounded-bl-lg",
+                        "focus:outline-none"
+                      )}
+                      type="password"
+                      required
+                      name="password"
+                      value={password}
+                      onChange={(e: any) => setPassword(e.target.value)}
+                      placeholder="Password"
+                    />
+                    <button
+                      disabled={submitting}
+                      type="submit"
+                      className={classNames(
+                        "p-3 mt-3 rounded-tr-lg rounded-br-lg font-semibold text-white",
+                        {
+                          "bg-black": !submitting,
+                          "bg-slate-700": submitting
+                        }
+                      )}
+                    >
+                      Sign in
+                    </button>
+                  </div>
+                )
               }
               {
                 focusedMethod === SigninMethod.Create ?
@@ -306,7 +327,7 @@ const Signin = () => {
               }
             </div>
             {
-              submitting &&
+              (submitting || authError) &&
               <div className={classNames(
                 "mt-5 text-center px-3",
                 {
@@ -314,16 +335,21 @@ const Signin = () => {
                   "text-red-400": !!authError && !submitting,
                 }
               )}>
-                <LoadingBarbellSvg
-                  size={25}
-                  className="inline-block align-middle p-1 animate-spin"
-                  color="#cbd5e1"
-                />
+                {
+                  submitting &&
+                  <LoadingBarbellSvg
+                    size={25}
+                    className="inline-block align-middle p-1 animate-spin"
+                    color="#cbd5e1"
+                  />
+                }
                 <span className="ml-1 align-middle inline-block">
                   {
                     focusedMethod === SigninMethod.Create ?
                     'Creating account...' :
-                    'Signing you in...'
+                    submitting ?
+                    'Signing you in...' :
+                    'See error message above.'
                   }
                 </span>
               </div>

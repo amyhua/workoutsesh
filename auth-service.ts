@@ -37,7 +37,7 @@ export default class AuthService {
     }
   }
   async signin() {
-    const response = await fetch(`/api/login`, {
+    const response = await fetch(`/api/auth`, {
 
     })
     this.authorized = response.status === 200

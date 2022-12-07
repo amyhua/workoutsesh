@@ -1,16 +1,53 @@
-// import { withIronSessionApiRoute } from 'iron-session/next'
-// import { sessionOptions } from '../../lib/session'
-// import { NextApiRequest, NextApiResponse } from 'next'
-// import { PrismaClient } from '@prisma/client'
-// import { isImportEqualsDeclaration } from 'typescript'
-// import { User } from '../../types'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { PrismaClient } from '@prisma/client'
+import { getSession } from 'next-auth/react'
+import prisma from '../../lib/prismadb'
 
-// const prisma = new PrismaClient()
+const isThisMonth = (date: Date | string) => {
+  const d = new Date(date);
+  const today = new Date();
+  return d.getFullYear() === today.getFullYear() &&
+    d.getMonth() === today.getMonth();
+}
 
-// export type Error = {
-//   error: boolean
-//   message: string
-// }
+async function userRoute(req: NextApiRequest, res: NextApiResponse<any>) {
+  const session = await getSession({ req });
+  if (!session || !session.user) {
+    res.send({
+      error: 'You must be signed in to access this content.'
+    });
+    return;
+  }
+  switch (req.method) {
+    case 'GET':
+      if (!session.user || !session.user.email) return res.send({
+        error: `User does not exist`
+      })
+      const user = await prisma.user.findUnique({
+        where: {
+          email: session.user.email
+        },
+        include: {
+          seshes: true,
+        }
+      })
+      if (user) return res.send({
+        ...user,
+        seshesTotal: user.seshes.length,
+        seshesThisMonth: user.seshes.filter((s: any) => isThisMonth(s.createdAt)).length,
+      });
+      return res.status(404).send({
+        error: 'Cannot find user'
+      });
+      break;
+    default:
+      res.setHeader('Allow', ['GET'])
+      res.status(405).end(`Method ${req.method} Not Allowed`)
+      break;
+  }
+}
+
+export default userRoute;
 
 // async function userRoute(req: NextApiRequest, res: NextApiResponse<User | Error>) {
 //   const method = req.method;

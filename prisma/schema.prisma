@@ -44,11 +44,10 @@ model Workout {
   description String?
   slug String @unique
   exercises Exercise[]
-  userId String
-  user User @relation(fields: [userId], references: [id])
-  userOrder Int @default(0)
-  averageDurationS Int // average duration in seconds
-  countCompleted Int // count of completed seshes
+  userEmail String
+  user User @relation(fields: [userEmail], references: [email])
+  averageDurationS Int? // average duration in seconds
+  countCompleted Int @default(0) // count of completed seshes
   seshes Sesh[]
 }
 
@@ -59,6 +58,8 @@ model Sesh {
   timeCompletedS Int // running total seconds completed
   workoutId Int
   workout Workout @relation(fields: [workoutId], references: [id])
+  userEmail String
+  user  User  @relation(fields: [userEmail], references: [email])
   intervals SeshInterval[]
   note String? @db.VarChar(200)
 }
@@ -108,10 +109,14 @@ model User {
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
   email         String?   @unique
   emailVerified DateTime?
+  username      String?
+  password      String?
   image         String?
+  name          String?
   accounts      Account[]
   sessions      Session[]
   workouts      Workout[]
+  seshes        Sesh[]
 }
 
 model VerificationToken {

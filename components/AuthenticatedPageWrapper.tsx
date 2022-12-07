@@ -42,6 +42,8 @@ const AuthenticatedPageWrapper = ({
     </Layout>
   );
 
+  if (!session.data || !session.data.user) return null;
+
   return React.cloneElement(children, {
     ...(session.data || {})
   });
