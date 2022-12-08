@@ -2,8 +2,9 @@ import { Fragment } from "react";
 import Image from "next/image";
 import { User } from "../types";
 import { Menu, Transition } from '@headlessui/react';
-import { ChevronDownIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/20/solid';
+import { ChevronDownIcon, ArrowLeftOnRectangleIcon, Bars3CenterLeftIcon } from '@heroicons/react/20/solid';
 import { signOut } from "next-auth/react";
+import classNames from "classnames";
 
 const AvatarMenu = ({
   user
@@ -14,7 +15,12 @@ const AvatarMenu = ({
     <Menu as="div" className="z-50 relative inline-block text-left">
       <div>
         <Menu.Button className="inline-flex w-full">
-        <div className="inline-block mr-5 align-top">
+        <div className="inline-block sm:hidden py-3 px-1">
+          <Bars3CenterLeftIcon className="h-6" />
+        </div>
+        <div className={classNames(
+          "mr-5 align-top hidden sm:inline-block",
+        )}>
             <div className="flex items-center">
               {
                 user && user.image &&
@@ -52,7 +58,7 @@ const AvatarMenu = ({
         <Menu.Items className="absolute -ml-1 left-0 right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg border-2 border-black ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
             <Menu.Item>
-              {
+            {
                 ({ active }: { active: boolean }) => (
                   <button
                     onClick={() => signOut()}

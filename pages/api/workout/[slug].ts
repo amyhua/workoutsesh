@@ -1,19 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
-import { prisma } from '../../lib/prismadb'
+import { prisma } from '../../../lib/prismadb'
 
-async function workoutsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
+async function workoutRoute(req: NextApiRequest, res: NextApiResponse<any>) {
   const session = await getSession({ req });
   if (!session || !session.user) {
     res.status(401).send({
       error: 'You must be signed in to access this content.'
     });
     return;
-  }
-  if (!session.user.email) {
-    return res.json({
-      error: 'No user email specified.'
-    })
   }
   switch (req.method) {
     case 'GET':
@@ -24,23 +19,28 @@ async function workoutsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
       }
       if (typeof req.query.slug === 'number' &&
       typeof session.user.email === 'string') {
-        const workout = await prisma.workout.findFirstOrThrow({
-          where: {
-            userEmail: session.user.email,
-            slug: req.query.slug,
-          },
-          include: {
-            exercises: true,
-          }
-        });
-        return res.json(workout);
+        try {
+          const workout = await prisma.workout.findFirstOrThrow({
+            where: {
+              userEmail: session.user.email,
+              slug: req.query.slug,
+            },
+            include: {
+              exercises: true,
+            }
+          });
+          return res.json(workout);
+        } catch(err) {
+          console.error('Error', err);
+          return res.status(404).json(err);
+        }
       }
       break;
     default:
-      res.setHeader('Allow', ['GET', 'PUT'])
+      res.setHeader('Allow', ['GET'])
       res.status(405).end(`Method ${req.method} Not Allowed`)
       break;
   }
 }
 
-export default workoutsRoute
+export default workoutRoute;

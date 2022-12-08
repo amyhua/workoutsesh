@@ -109,7 +109,7 @@ model User {
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
   email         String?   @unique
   emailVerified DateTime?
-  username      String?
+  username      String?   @unique
   password      String?
   image         String?
   name          String?

@@ -161,14 +161,14 @@ export default function IndexDashboard({
     (workout: any) =>
       () => {
         if (winReady) router.push(
-          `/${username}/workout/${workout.slug}`
+          `/workout/${workout.slug}`
         )
       }
 
   if (!user) return null;
   return (
     <Layout title="Workouts" background="#F4F3EC">
-      <main className="bg-white min-h-full max-w-4xl mx-auto px-3">
+      <main className="bg-white min-h-full max-w-4xl mx-auto px-5">
         <nav className="fixed top-0 left-0 right-0 z-10 bg-white h-[90px]">
           <div className="relative max-w-4xl mx-auto h-[90px] align-middle p-4">
             <AvatarMenu user={user} />
@@ -179,10 +179,10 @@ export default function IndexDashboard({
         </nav>
         <div className="mt-[90px] max-w-sm mx-auto">
           <section className="pt-0 mb-2">
-            <div className="sm:flex mt-4 pt-0 mb-0">
+            <div className="sm:flex mt-4 pt-0">
               {
                 stats.map((stat: Stat, i: number) => (
-                  <article key={i} className="flex-1 text-center pr-5 last:pr-0">
+                  <article key={i} className="flex-1 text-center sm:pr-5 last:pr-0">
                     <div className="text-3xl font-bold text-black inline-block">
                       {stat.value.toLocaleString()}
                     </div>
@@ -199,13 +199,18 @@ export default function IndexDashboard({
             <LastSeshPreview sesh={lastSesh} />
           }
         </div>
-        <section className="max-w-3xl">
+        <section className="max-w-3xl mx-auto">
           {
             workouts && workouts.length ?
-            <header>
-              <h2 className="mx-5 mb-3 text-3xl font-bold">
-                Start a Workout.
+            <header className="mt-10 flex">
+              <h2 className="mx-0 mb-3 text-3xl text-left font-bold">
+                Work out
               </h2>
+              <div className="flex-1 -mt-3 text-right">
+                <Link href={`/workout/create`} className="inline-block text-center text-lg cursor-pointer font-bold ml-2 px-3 py-2 rounded-md border-2 border-black text-black">
+                  ✏️ + New
+                </Link>
+              </div>
             </header>
             : null
           }
@@ -215,36 +220,36 @@ export default function IndexDashboard({
                 workouts.map((workout: any, i) => (
                   <li
                     key={i}
-                    className="cursor-pointer border-b">
+                    className="px-6 pt-5 sm:pb-8 pb-3 border-2 border-black rounded-lg my-5">
                     <article
-                      className="group hover:bg-green-100 py-5 px-5">
-                      <h3 className="font-bold text-xl mb-2">
-                        {workout.name}
+                      className="group cursor-pointer"
+                      onClick={onStartWorkout && onStartWorkout(workout)}>
+                      <div className="py-0">
+                        <ImageTileRow
+                          size={75}
+                          imageUrls={workout.exercises
+                            .filter((exc: any) => !!exc.imageUrl)
+                            .map((exc: any) => exc.imageUrl)
+                          }
+                          className="border rounded-sm"
+                        />
+                      </div>
+                      <h3 className="font-bold text-2xl mt-4">
+                        <PlayCircleIcon className="inline-block h-9 align-middle -ml-0.5 -mt-1" /> {workout.name}
                       </h3>
-                      <ImageTileRow
-                        size={75}
-                        imageUrls={workout.exercises
-                          .filter((exc: any) => !!exc.imageUrl)
-                          .map((exc: any) => exc.imageUrl)
-                        }
-                        className="border-2 border-black rounded-sm"
-                      />
-                      <div className="flex">
-                        <button
-                          onClick={onStartWorkout && onStartWorkout(workout)}
-                          className="text-lg h-10 mr-4 py-2 px-3 mb-2 rounded-lg font-bold bg-brightGreen group-hover:bg-brightGreen1 hover:bg-brightGreen1">
-                          <PlayCircleIcon className="inline-block h-6 mr-1 align-middle -mt-1" /> Start
-                        </button>
-                        <div className="flex-1 mx-1">
-                          <p className="font-semibold text-lg mt-1">
-                            {workout.description}
-                          </p>
-                          <p className="text-sm mt-1 text-gray-500">
-                            {workout.exercises.map((exc: Exercise) => exc.name).join(' · ')}
-                          </p>
-                          <div className="text-right text-gray-500 hover:text-black cursor-pointer">
-                            <MoreMenu />
+                      <div className="flex sm:flex-row flex-col">
+                        <div className="ml-0.25 flex-1 flex sm:flex-row-reverse">
+                          <div className="flex-1">
+                            <p className="font-semibold text-lg mt-1">
+                              {workout.description}
+                            </p>
+                            <p className="text-sm mt-1 text-gray-500">
+                              {workout.exercises.map((exc: Exercise) => exc.name).join(' · ')}
+                            </p>
                           </div>
+                        </div>
+                        <div onClick={e => e.stopPropagation()} className="text-left text-gray-500 hover:text-black cursor-pointer">
+                          <MoreMenu />
                         </div>
                       </div>
                     </article>    
@@ -252,11 +257,6 @@ export default function IndexDashboard({
                 ))
               }
             </ul>
-            <div className="mt-12 px-5 pb-14">
-              <Link href={`/workout/create`} className="block text-center text-xl cursor-pointer font-bold my-2 p-4 rounded-md border-2 border-black hover:bg-brightGreen text-black w-full">
-                Create Workout
-              </Link>
-            </div>
           </main>
         </section>
       </main>
@@ -265,11 +265,18 @@ export default function IndexDashboard({
 }
 
 export async function getServerSideProps(context: any) {
-  const session = await getSession(context)
+  const session = await getSession(context);
+  // const workouts = await prisma.workout.findMany({
+  //   where: {
+  //     userEmail: session && session.user &&
+  //       session.user.email,
+  //   }
+  // });
   try {
     return {
       props : {
         session,
+        // workouts,
         params: context.params
       }
     }

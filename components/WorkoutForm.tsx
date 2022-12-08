@@ -3,9 +3,9 @@ import classNames from "classnames";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import Clamped from "../../components/Clamped";
-import Layout from "../../components/Layout";
-import Logo from "../../components/Logo";
+import Clamped from "./Clamped";
+import Layout from "./Layout";
+import Logo from "./Logo";
 
 type Exercise = {
   name: string;
@@ -16,6 +16,25 @@ type Exercise = {
   // "15" or "12-15" or "15-20 each leg"
   restBetweenSets: boolean;
 }
+
+const RestBetweenSetsDescription = ({
+  value
+}: {
+  value: boolean;
+}) => (
+  <div className="text-gray-700">
+    {
+      value ?
+      <span>
+        <CheckIcon className="-ml-0.5 inline-block h-5 align-top mt-0.5 text-green-500" /> Rest between sets
+      </span> : (
+        <span>
+          <XMarkIcon className="-ml-1.5 inline-block h-5 align-top mt-0.5 text-red-500" /> No rest between sets
+        </span>
+      )
+    }
+  </div>
+)
 
 const ExerciseDescription = ({ setsDescription, repsDescription }: { setsDescription: string; repsDescription: string; }) => (
   <Clamped clamp={1}>
@@ -178,7 +197,7 @@ function ExerciseForm({
                 priority
                 height={125}
                 width={125}
-                placeholder={require('../../components/routine-placeholder.png')}
+                placeholder={require('./routine-placeholder.png')}
                 className="inline-block bg-slate-200"
               />
             }
@@ -196,18 +215,9 @@ function ExerciseForm({
                   repsDescription={repsDescription}
                 />
               </div>
-              <div className="text-gray-700 text-base">
-                {
-                  restBetweenSets === true ?
-                  <span>
-                    <CheckIcon className="-ml-1.5 inline-block h-5 align-top mt-0.5 text-green-500" /> Rest between sets
-                  </span> : (
-                    <span>
-                      <XMarkIcon className="-ml-1.5 inline-block h-5 align-top mt-0.5 text-red-500" /> No rest between sets
-                    </span>
-                  )
-                }
-              </div>
+              <RestBetweenSetsDescription
+                value={restBetweenSets}
+              />
             </div>
           </div>
         </div>
@@ -274,7 +284,12 @@ function WorkoutForm({
   return (
     <>
       <div
-        className="absolute z-10 top-0 bottom-o right-0 py-10 left-0 bg-black0">
+        className={classNames(
+          "absolute z-10 top-0 bottom-o right-0 py-10 left-0 bg-black0",
+          {
+            "hidden": !showExerciseForm
+          }
+        )}>
         <ExerciseForm
           key={showExerciseForm ? 1 : 0}
           editing={editingExerciseIdx !== undefined}
@@ -367,28 +382,31 @@ function WorkoutForm({
                 exercises.map((exc: Exercise, i) => (
                   <li key={i} className="flex">
                     <div className="flex-1 flex bg-white rounded-lg mb-3 shadow-md border border-black">
-                      <div className="relative h-[75px] w-[75px] bg-slate-200 flex border-r border-black items-center rounded-tl-lg rounded-bl-lg overflow-hidden">
+                      <div className="relative h-[100px] w-[100px] bg-slate-200 flex border-r border-black items-center rounded-tl-lg rounded-bl-lg overflow-hidden">
                         {
                           exc.imageUrl &&
                           <Image
                             src={exc.imageUrl}
                             alt="Exercise Image"
                             priority
-                            height={75}
-                            width={75}
-                            placeholder={require('../../components/routine-placeholder.png')}
+                            height={100}
+                            width={100}
+                            placeholder={require('./routine-placeholder.png')}
                             className="inline-block bg-slate-200"
                           />
                         }
                       </div>
                       <div className="flex-1 p-3">
-                        <h3 className="font-semibold">
+                        <h3 className="font-semibold text-base">
                           {exc.name}
                         </h3>
-                        <div className="text-slate-500">
+                        <div className="text-slate-600">
                           <ExerciseDescription
                             setsDescription={exc.setsDescription}
                             repsDescription={exc.repsDescription}
+                          />
+                          <RestBetweenSetsDescription
+                            value={exc.restBetweenSets}
                           />
                         </div>
                       </div>

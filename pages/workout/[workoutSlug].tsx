@@ -1,14 +1,17 @@
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import Layout from '../../../components/Layout'
-import SeshCounter from '../../../components/SeshCounter'
+import Layout from '../../components/Layout'
+import SeshCounter from '../../components/SeshCounter'
 import classnames from 'classnames'
-import WorkoutRoutine from '../../../components/WorkoutRoutine'
+import WorkoutRoutine from '../../components/WorkoutRoutine'
 import { resetServerContext, DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-import Clamped from '../../../components/Clamped'
+import Clamped from '../../components/Clamped'
 import classNames from 'classnames'
-import ExerciseDescription from '../../../components/ExerciseDescription'
+import ExerciseDescription from '../../components/ExerciseDescription'
+import { getSession } from 'next-auth/react'
+import { prisma } from '../../lib/prismadb'
+import RestBetweenSetsDescription from '../../components/RestBetweenSetsDescription'
 // see: https://github.com/atlassian/react-beautiful-dnd/issues/2350#issuecomment-1242917371
 
 resetServerContext()
@@ -95,9 +98,13 @@ const reorder = (list: any[], startIndex: number, endIndex: number) => {
 
 const ACTIVE_ROUTINE_ID = 'active-workout-routine'
 
-export default function WorkoutSesh() {
-  const { exercises: initialexercises = [] } = workout
-  const [exercises, setexercises] = useState(initialexercises);
+export default function WorkoutSesh({
+  session,
+  workout,
+}: any) {
+  const { exercises: initialExercises = [] } = JSON.parse(workout);
+  const [exercises, setExercises] = useState(initialExercises);
+  console.log('!!workout-exercises!', workout)
   const [counterIsActive, setCounterIsActive] = useState(false);
   const [seshStarted, setSeshStarted] = useState(false);
   const [workoutSetNum, setWorkoutSetNum] = useState(1);
@@ -147,7 +154,7 @@ export default function WorkoutSesh() {
       result.source.index,
       result.destination.index
     )
-    setexercises(seshStarted ? [
+    setExercises(seshStarted ? [
       ...exercises.slice(0, activeExerciseIdx),
       exercises[activeExerciseIdx],
       ...reorderedexercises
@@ -192,7 +199,7 @@ export default function WorkoutSesh() {
                     priority
                     height={500}
                     width={500}
-                    placeholder={require('../../../components/routine-placeholder.png')}
+                    placeholder={require('../../components/routine-placeholder.png')}
                     className="inline-block"
                   />
                 </div>
@@ -216,7 +223,7 @@ export default function WorkoutSesh() {
                     </div>
                     <div className="flex-1 flex flex-col justify-center">
                       <h1 className={classnames(
-                        "font-semibold text-base leading-snug",
+                        "font-bold text-left text-lg leading-snug",
                         {
                           "text-white": seshStarted,
                           "text-black": !seshStarted
@@ -237,6 +244,13 @@ export default function WorkoutSesh() {
                           <ExerciseDescription
                             setsDescription={exercises[activeExerciseIdx].setsDescription}
                             repsDescription={exercises[activeExerciseIdx].repsDescription}
+                          />
+                          <RestBetweenSetsDescription
+                            value={exercises[activeExerciseIdx].restBetweenSets}
+                            className={seshStarted ?
+                              isActiveSet ? 'text-navym1' : 'text-pink' :
+                              'text-black'
+                            }
                           />
                       </div>
                     </div>
@@ -450,4 +464,38 @@ export default function WorkoutSesh() {
       </main>
     </Layout>
   )
+}
+
+export async function getServerSideProps(context: any) {
+  try {
+    const session = await getSession(context);
+    let workout;
+    if (session && session.user) {
+      const { email } = session.user || {};
+      workout = await prisma.workout.findFirst({
+        where: {
+          AND: {
+            userEmail: email || '',
+            slug: context.query.workoutSlug,
+          }
+        },
+        include: {
+          exercises: true,
+        }
+      });
+    }
+    return {
+      props : {
+        session,
+        workout: JSON.stringify(workout || null),
+        params: context.params
+      }
+    }
+  } catch(error) {
+    return {
+      props : {
+        error
+      }
+    }
+  }
 }

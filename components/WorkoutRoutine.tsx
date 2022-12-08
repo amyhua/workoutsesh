@@ -52,14 +52,14 @@ const WorkoutRoutine = ({
             {exercise.name}
           </Clamped>
         </h2>
-        <p className={classnames(
+        <div className={classnames(
           "text-base",
           "text-gray-500"
         )}>
           <Clamped clamp={1}>
             {exercise.description}
           </Clamped>
-        </p>
+        </div>
       </div>
       {
         (isFirst && isLast) ?

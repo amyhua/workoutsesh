@@ -29,7 +29,7 @@ export default function SeshCounter({
   }, [active])
   return (
     <div className={classnames(
-      "pb-5 font-monospace font-semibold tracking-widest text-5xl text-center",
+      "pt-3 pb-5 font-bold tracking-widest text-6xl text-center",
       {
         "text-pink": seshStarted && !isActiveSet,
         "text-white": seshStarted && isActiveSet,
