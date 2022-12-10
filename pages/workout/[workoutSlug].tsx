@@ -265,15 +265,15 @@ export default function WorkoutSesh({
                   })}>
                   <h2 className="mx-auto text-center text-xl font-normal w-[90%] overflow-hidden">
                     <span className="">
-                      {activeExercise.name} this is the name of a very long exercise
+                      {activeExercise.name}
                     </span>
                   </h2>
                   <div className={classNames(
-                    "text-center mb-2 mt-2",
+                    "text-center mb-2 mt-2 mx-5 p-2",
                     {
                       "text-lg text-black": !seshStarted,
                       "text-sm font-bold uppercase tracking-wide": seshStarted,
-                      "p-2 rounded-full bg-brightGreen text-black": seshStarted && isActiveSet,
+                      "rounded-full bg-white text-black": seshStarted && isActiveSet,
                     }
                   )}>
                     {
