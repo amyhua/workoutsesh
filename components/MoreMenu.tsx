@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Menu, Transition } from '@headlessui/react';
 import { EllipsisHorizontalIcon, PencilIcon, TrashIcon } from "@heroicons/react/20/solid";
 
-const MoreMenu = () => {
+const MoreMenu = ({ workoutId }: { workoutId: string }) => {
   return (
     <Menu
       onClick={(e: any) => e.stopPropagation()}

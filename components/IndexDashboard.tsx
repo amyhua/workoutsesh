@@ -12,70 +12,7 @@ import MoreMenu from './MoreMenu'
 import { Exercise } from '@prisma/client'
 import { PlayCircleIcon } from '@heroicons/react/20/solid'
 
-const workouts = [{
-  name: 'Upper Body',
-  description: 'Arms for 45 minutes.',
-  slug: 'upper-body',
-  exercises: [{
-    imageUrl: 'https://personallevelfitness.com/wp-content/uploads/2018/08/Chest-Press-DB.jpg',
-  }, {
-    imageUrl: 'https://gethealthyu.com/wp-content/uploads/2014/08/Chest-Flies_Exercise.jpg',
-  }, {
-    imageUrl: 'https://www.wikihow.com/images/thumb/c/c0/Do-a-Reverse-Lunge-Step-8-Version-2.jpg/v4-460px-Do-a-Reverse-Lunge-Step-8-Version-2.jpg.webp',
-  }, {
-    imageUrl: 'https://i.pinimg.com/originals/56/e4/61/56e4612e4837f1d0bbd45402c4bc01d7.jpg',
-  }, {
-    imageUrl: 'https://personallevelfitness.com/wp-content/uploads/2018/08/Chest-Press-DB.jpg',
-  }, {
-    imageUrl: 'https://gethealthyu.com/wp-content/uploads/2014/08/Chest-Flies_Exercise.jpg',
-  }, {
-    imageUrl: 'https://www.wikihow.com/images/thumb/c/c0/Do-a-Reverse-Lunge-Step-8-Version-2.jpg/v4-460px-Do-a-Reverse-Lunge-Step-8-Version-2.jpg.webp',
-  }, {
-    imageUrl: 'https://i.pinimg.com/originals/56/e4/61/56e4612e4837f1d0bbd45402c4bc01d7.jpg',
-  }]
-}, {
-  name: 'Lower Body',
-  description: 'Legs, legs, legs. 45 min.',
-  slug: 'lower-body',
-  exercises: [{
-    imageUrl: 'https://personallevelfitness.com/wp-content/uploads/2018/08/Chest-Press-DB.jpg',
-  }, {
-    imageUrl: 'https://gethealthyu.com/wp-content/uploads/2014/08/Chest-Flies_Exercise.jpg',
-  }, {
-    imageUrl: 'https://www.wikihow.com/images/thumb/c/c0/Do-a-Reverse-Lunge-Step-8-Version-2.jpg/v4-460px-Do-a-Reverse-Lunge-Step-8-Version-2.jpg.webp',
-  }, {
-    imageUrl: 'https://i.pinimg.com/originals/56/e4/61/56e4612e4837f1d0bbd45402c4bc01d7.jpg',
-  }]
-}, {
-  name: 'Cardio #1',
-  description: 'Cycling Prep. 45 min.',
-  slug: 'cardio-1',
-  exercises: [{
-    imageUrl: 'https://personallevelfitness.com/wp-content/uploads/2018/08/Chest-Press-DB.jpg',
-  }, {
-    imageUrl: 'https://gethealthyu.com/wp-content/uploads/2014/08/Chest-Flies_Exercise.jpg',
-  }, {
-    imageUrl: 'https://www.wikihow.com/images/thumb/c/c0/Do-a-Reverse-Lunge-Step-8-Version-2.jpg/v4-460px-Do-a-Reverse-Lunge-Step-8-Version-2.jpg.webp',
-  }, {
-    imageUrl: 'https://i.pinimg.com/originals/56/e4/61/56e4612e4837f1d0bbd45402c4bc01d7.jpg',
-  }]
-}]
-
 type Stat = { value: number | string; label: string; }
-
-const prevWorkout = {
-  name: 'Upper Body Madness',
-  durationMin: 58.255664,
-  exercises: [{
-    imageUrl: 'https://personallevelfitness.com/wp-content/uploads/2018/08/Chest-Press-DB.jpg',
-  }, {
-    imageUrl: 'https://gethealthyu.com/wp-content/uploads/2014/08/Chest-Flies_Exercise.jpg',
-  }, {
-    imageUrl: 'https://www.wikihow.com/images/thumb/c/c0/Do-a-Reverse-Lunge-Step-8-Version-2.jpg/v4-460px-Do-a-Reverse-Lunge-Step-8-Version-2.jpg.webp',
-  }, {
-    imageUrl: 'https://i.pinimg.com/originals/56/e4/61/56e4612e4837f1d0bbd45402c4bc01d7.jpg',
-  }]
-}
 
 const ImageTileRow = ({ className, imageUrls=[], size }: { className?: string; imageUrls: string[]; size: number; }) => (
   <div className="w-full my-2 overflow-x-auto">
@@ -106,44 +43,43 @@ const ImageTileRow = ({ className, imageUrls=[], size }: { className?: string; i
   </div>
 )
 
-const LastSeshPreview = ({ sesh }: { sesh: any }) => (
-  <section className="mb-8 px-4 pt-6 pb-8 bg-purple0 p-4 border-4 rounded-lg border-black">
-    <header>
-      <h2 className="font-bold mb-3 text-3xl">
-        Last workout
-      </h2>
-    </header>
-    <main className="my-1">
-      <ImageTileRow
-        size={75}
-        imageUrls={prevWorkout.exercises.map((e: any) => e.imageUrl)}
-        className="border-2 border-black rounded-sm"
-      />
-      <div className="mt-1">
-        <h3 className="text-2xl font-bold my-2">{prevWorkout.name}</h3>
-        <div className="font-semibold">
-          SAMPLE 2 days ago. Completed in {prevWorkout.durationMin.toFixed(1)} minutes. <Link
-          className="block underline" href="#">
-            Summary
-          </Link>
-        </div>
-      </div>
-    </main>
-  </section>
-)
+// const LastSeshPreview = ({ sesh }: { sesh: any }) => (
+//   <section className="mb-8 px-4 pt-6 pb-8 bg-purple0 p-4 border-4 rounded-lg border-black">
+//     <header>
+//       <h2 className="font-bold mb-3 text-3xl">
+//         Last workout
+//       </h2>
+//     </header>
+//     <main className="my-1">
+//       <ImageTileRow
+//         size={75}
+//         imageUrls={prevWorkout.exercises.map((e: any) => e.imageUrl)}
+//         className="border-2 border-black rounded-sm"
+//       />
+//       <div className="mt-1">
+//         <h3 className="text-2xl font-bold my-2">{prevWorkout.name}</h3>
+//         <div className="font-semibold">
+//           SAMPLE 2 days ago. Completed in {prevWorkout.durationMin.toFixed(1)} minutes. <Link
+//           className="block underline" href="#">
+//             Summary
+//           </Link>
+//         </div>
+//       </div>
+//     </main>
+//   </section>
+// )
 
 export default function IndexDashboard({
   user
 }: any) {
   const stats = [{
     value: user.seshesTotal || 0,
-    label: 'total sessions'
+    label: 'total workouts'
   }, {
     value: user.seshesThisMonth || 0,
     label: 'this month'
   }]
   const router = useRouter()
-  const { username } = router.query
   const [winReady, setWinReady] = useState(false)
   const [workouts, setWorkouts] = useState([])
   const loadWorkouts = async () => {
@@ -167,23 +103,25 @@ export default function IndexDashboard({
 
   if (!user) return null;
   return (
-    <Layout title="Workouts" background="#F4F3EC">
-      <main className="bg-white min-h-full max-w-4xl mx-auto px-5">
-        <nav className="fixed top-0 left-0 right-0 z-10 bg-white h-[90px]">
-          <div className="relative max-w-4xl mx-auto h-[90px] align-middle p-4">
-            <AvatarMenu user={user} />
-            <Link href="/" className="absolute text-center py-2.5 left-0 right-0">
+    <Layout title="Workouts" background="#000000">
+      <main className="bg-transparent text-white min-h-full bg-gradient-to-b from-active1 to-active2 px-5">
+        <nav className="text-white bg-transparent h-[90px]">
+          <div className="flex relative max-w-4xl mx-auto h-[90px] align-middle py-4">
+            <Link href="/" className="inline-block align-middle text-center py-2.5">
               <Logo size={180} className="my-0 inline-block" />
             </Link>
+            <div className="flex-1 text-right">
+              <AvatarMenu user={user} />
+            </div>
           </div>
         </nav>
-        <div className="mt-[90px] max-w-sm mx-auto">
+        <div className="mt-10 max-w-sm mx-auto">
           <section className="pt-0 mb-2">
-            <div className="sm:flex mt-4 pt-0">
+            <div className="sm:flex">
               {
                 stats.map((stat: Stat, i: number) => (
                   <article key={i} className="flex-1 text-center sm:pr-5 last:pr-0">
-                    <div className="text-3xl font-bold text-black inline-block">
+                    <div className="text-3xl font-bold text-white inline-block">
                       {stat.value.toLocaleString()}
                     </div>
                     <div className="text-xl font-bold mt-2 mb-6">
@@ -194,35 +132,33 @@ export default function IndexDashboard({
               }
             </div>
           </section>
-          {
+          {/* {
             lastSesh &&
             <LastSeshPreview sesh={lastSesh} />
-          }
+          } */}
         </div>
         <section className="max-w-3xl mx-auto">
           {
             workouts && workouts.length ?
             <header className="mt-10 flex">
-              <h2 className="mx-0 mb-3 text-3xl text-left font-bold">
-                Work out
-              </h2>
               <div className="flex-1 -mt-3 text-right">
-                <Link href={`/workout/create`} className="inline-block text-center text-lg cursor-pointer font-bold ml-2 px-3 py-2 rounded-md border-2 border-black text-black">
-                  ✏️ + New
+                <Link href={`/workout/create`} className="bg-white inline-block text-center text-lg cursor-pointer font-bold ml-2 px-3 py-2 rounded-md text-black">
+                  + New Workout
                 </Link>
               </div>
             </header>
             : null
           }
           <main>
-            <ul className="mx-auto">
+            <ul className="mx-auto pb-14">
               {
+                workouts.length ?
                 workouts.map((workout: any, i) => (
                   <li
                     key={i}
-                    className="px-6 pt-5 sm:pb-8 pb-3 border-2 border-black rounded-lg my-5">
+                    className="bg-white text-black shadow-xl rounded-lg my-5">
                     <article
-                      className="group cursor-pointer"
+                      className="group cursor-pointer px-6 pt-5 sm:pb-8 pb-3"
                       onClick={onStartWorkout && onStartWorkout(workout)}>
                       <div className="py-0">
                         <ImageTileRow
@@ -249,12 +185,19 @@ export default function IndexDashboard({
                           </div>
                         </div>
                         <div onClick={e => e.stopPropagation()} className="text-left text-gray-500 hover:text-black cursor-pointer">
-                          <MoreMenu />
+                          <MoreMenu workoutId={workout.id} />
                         </div>
                       </div>
                     </article>    
                   </li>    
                 ))
+                :
+                <div className="p-4 rounded-lg my-3 border-2 border-black">
+                  <h1 className="font-bold text-lg mb-2">
+                    Create a workout!
+                  </h1>
+                  Click on the "+ New Workout" button to get started.
+                </div>
               }
             </ul>
           </main>

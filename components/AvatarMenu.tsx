@@ -12,10 +12,10 @@ const AvatarMenu = ({
   user: User;
 }) => {
   return (
-    <Menu as="div" className="z-50 relative inline-block text-left">
+    <Menu as="div" className="z-50 relative inline-block text-right align-middle">
       <div>
         <Menu.Button className="inline-flex w-full">
-        <div className="inline-block sm:hidden py-3 px-1">
+        <div className="align-middle mt-1 inline-block sm:hidden py-3 px-1">
           <Bars3CenterLeftIcon className="h-6" />
         </div>
         <div className={classNames(
@@ -33,11 +33,11 @@ const AvatarMenu = ({
                 />
               }
               <div className="ml-3 text-left">
-                <p className="text-base font-semibold text-black group-hover:text-gray-900">
+                <p className="text-base font-semibold text-white group-hover:text-gray-900">
                   {user.name || user.email}
                   <ChevronDownIcon className="text-gray-300 inline-block -mr-1 ml-1 -mt-0.5 h-5 w-5" aria-hidden="true" />
                 </p>
-                <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
+                <p className="text-xs font-medium text-gray-200 group-hover:text-white">
                   Athlete
                 </p>
               </div>
@@ -55,7 +55,7 @@ const AvatarMenu = ({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute -ml-1 left-0 right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg border-2 border-black ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="bg-white text-black absolute -ml-1 left-0 right-0 z-10 mt-2 w-56 origin-top-right rounded-md shadow-lg border-2 border-black ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
             <Menu.Item>
             {

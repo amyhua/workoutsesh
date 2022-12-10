@@ -44,8 +44,8 @@ module.exports = {
         rest2: '#15398f',
         restBg: '#302c65',
         pink: '#ffcfff',
-        active1: '#202e91',
-        active2: '#020405',
+        active1: '#5e5e5e',
+        active2: '#000000',
         purple0: '#f3efff',
       }
     },
