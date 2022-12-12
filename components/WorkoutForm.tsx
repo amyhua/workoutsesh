@@ -1,16 +1,16 @@
-import { CheckCircleIcon, CheckIcon, ChevronLeftIcon, PencilIcon, PlusCircleIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { Bars2Icon, CheckCircleIcon, CheckIcon, ChevronLeftIcon, PencilIcon, PencilSquareIcon, PlusCircleIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import classNames from "classnames";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Clamped from "./Clamped";
-import Layout from "./Layout";
-import Logo from "./Logo";
+import { resetServerContext, DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
 type Exercise = {
   name: string;
   imageUrl: string;
   setsDescription: string;
+  id?: string;
   // "5" or "2-3"
   repsDescription: string;
   // "15" or "12-15" or "15-20 each leg"
@@ -45,6 +45,8 @@ const ExerciseDescription = ({ setsDescription, repsDescription }: { setsDescrip
 const OptionalText = () => (
   <span className="text-gray-400 ml-1">optional</span>
 )
+
+resetServerContext()
 
 function ExerciseForm({
   open,
@@ -245,18 +247,29 @@ export enum FormMode {
   Create = 'Create'
 }
 
+const reorder = (list: any[], startIndex: number, endIndex: number) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+}
+
 function WorkoutForm({
   mode,
+  workout = {},
 }: {
   mode: FormMode
+  workout?: any
 }) {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [exercises, setExercises] = useState<Exercise[]>([])
+  const [name, setName] = useState(workout.name || '')
+  const [description, setDescription] = useState(workout.description || '')
+  const [exercises, setExercises] = useState<Exercise[]>(workout.exercises || [])
   const [editingExerciseIdx, setEditingExerciseIdx] = useState<number | undefined>()
   const [showExerciseForm, setShowExerciseForm] = useState(false)
+  const [winReady, setWinReady] = useState(false);
   const onEditExercise = (excIdx: number) => () => {
     setEditingExerciseIdx(excIdx)
     setShowExerciseForm(true)
@@ -273,13 +286,29 @@ function WorkoutForm({
       body: JSON.stringify({
         name,
         description,
-        exercises
+        exercises: exercises.map((exc: any, i: number) => ({
+          ...exc,
+          workoutOrder: i,
+        }))
       })
     })
     .then(() => {
       router.push(`/`)
     })
-
+  }
+  useEffect(() => {
+    setWinReady(true);
+  }, [])
+  const onExerciseDragEnd = (result: any) => {
+    if (!result.destination) {
+      return
+    }
+    const reorderedExercises = reorder(
+      exercises,
+      result.source.index,
+      result.destination.index
+    )
+    setExercises(reorderedExercises)
   }
   return (
     <>
@@ -379,49 +408,88 @@ function WorkoutForm({
           <div className="border-2 border-black px-3 py-4 rounded-lg bg-slate-50">
             <ul>
               {
-                exercises.map((exc: Exercise, i) => (
-                  <li key={i} className="flex">
-                    <div className="flex-1 flex bg-white rounded-lg mb-3 shadow-md border border-black">
-                      <div className="relative h-[100px] w-[100px] bg-slate-200 flex border-r border-black items-center rounded-tl-lg rounded-bl-lg overflow-hidden">
-                        {
-                          exc.imageUrl &&
-                          <Image
-                            src={exc.imageUrl}
-                            alt="Exercise Image"
-                            priority
-                            height={100}
-                            width={100}
-                            placeholder={require('./routine-placeholder.png')}
-                            className="inline-block bg-slate-200"
-                          />
-                        }
-                      </div>
-                      <div className="flex-1 p-3">
-                        <h3 className="font-semibold text-base">
-                          {exc.name}
-                        </h3>
-                        <div className="text-slate-600">
-                          <ExerciseDescription
-                            setsDescription={exc.setsDescription}
-                            repsDescription={exc.repsDescription}
-                          />
-                          <RestBetweenSetsDescription
-                            value={exc.restBetweenSets}
-                          />
-                        </div>
-                      </div>
-                      <div className="pl-2 relative">
-                        <div
-                          onClick={onEditExercise(i)}
-                          className="whitespace-nowrap absolute top-0 right-0 px-2 py-1 text-slate-300 cursor-pointer hover:text-gray-700 text-lg">
-                          <span className="text-sm align-top inline-block p-2 cursor-pointer text-blue-400">
-                            <PencilIcon className="h-5 text-slate-500" />
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                ))
+                winReady &&
+                <DragDropContext onDragEnd={onExerciseDragEnd}>
+                  <Droppable droppableId="droppable">
+                    {(provided: any, snapshot: any) => (
+                      <li
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className="block"
+                        style={{
+                          paddingBottom: snapshot.isDraggingOver ? (102 + 12) : 0,
+                        }}
+                      >
+                      {
+                        exercises.map((exc: Exercise, i) => (
+                          <Draggable
+                            index={i}
+                            key={String(exc.id)}
+                            draggableId={String(exc.id)}
+                          >
+                          {(provided: any, snapshot: any) => (
+                            <div
+                              ref={provided.innerRef}
+                              className="flex-1 flex bg-white rounded-lg mb-3 shadow-md border border-black"
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={{
+                                ...provided.draggableProps.style,
+                              }}
+                            >
+                              <div className="relative h-[100px] w-[100px] bg-slate-200 flex border-r border-black items-center rounded-tl-lg rounded-bl-lg overflow-hidden">
+                                {
+                                  exc.imageUrl &&
+                                  <Image
+                                    src={exc.imageUrl}
+                                    alt="Exercise Image"
+                                    priority
+                                    height={100}
+                                    width={100}
+                                    placeholder={require('./routine-placeholder.png')}
+                                    className="inline-block bg-slate-200"
+                                  />
+                                }
+                              </div>
+                              <div className="flex-1 p-3">
+                                <h3 className="font-semibold text-base">
+                                  {exc.name}
+                                </h3>
+                                <div className="text-slate-600">
+                                  <ExerciseDescription
+                                    setsDescription={exc.setsDescription}
+                                    repsDescription={exc.repsDescription}
+                                  />
+                                  <RestBetweenSetsDescription
+                                    value={exc.restBetweenSets}
+                                  />
+                                </div>
+                              </div>
+                              <div className="pl-2 relative">
+                                <div
+                                  className="whitespace-nowrap absolute top-0 right-0 px-2 py-1 text-lg">
+                                  <div
+                                    onClick={onEditExercise(i)}
+                                    className="cursor-pointer text-sm align-top inline-block p-2 text-gray-400 hover:text-black">
+                                    <PencilSquareIcon className="mt-2 h-5" />
+                                  </div>
+                                  <div className="mt-3">
+                                    <Bars2Icon
+                                      className="cursor-pointer h-5 mx-2 text-gray-400 hover:text-black"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          </Draggable>
+                        ))
+                      }
+                      </li>
+                    )}
+                  </Droppable>
+                </DragDropContext>
               }
               <li
                 onClick={() => setShowExerciseForm(true)}
@@ -436,8 +504,10 @@ function WorkoutForm({
             type="submit"
             className="cursor-pointer text-lg font-bold mt-9 mb-14 p-3 rounded-md border-2 border-black hover:bg-brightGreen text-black w-full">
             {
-              mode === FormMode.Create ?
-              'Create' : 'Update'
+              submitting ?
+              'Submitting...' :
+                mode === FormMode.Create ?
+                'Create' : 'Update'
             }
           </button>
         </form>

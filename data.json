@@ -1,0 +1,498 @@
+{
+  "catalog": {
+      "category": {
+          "numOfProducts": 1091,
+          "productsWithMetaData": {
+              "totalCount": 1090,
+              "list": [
+                  {
+                      "id": "5e6854e4-6092-7053-69f7-a0ecca150191",
+                      "options": [],
+                      "productItems": [],
+                      "customTextFields": [],
+                      "productType": "digital",
+                      "ribbon": "4K 60FPS",
+                      "price": 1,
+                      "comparePrice": 0,
+                      "sku": "",
+                      "isInStock": true,
+                      "urlPart": "dumbbell-incline-shrug",
+                      "formattedComparePrice": "",
+                      "formattedPrice": "$1.00",
+                      "pricePerUnit": null,
+                      "formattedPricePerUnit": null,
+                      "pricePerUnitData": null,
+                      "digitalProductFileItems": [
+                          {
+                              "fileType": "secure_archive"
+                          }
+                      ],
+                      "name": "Dumbbell Incline Shrug",
+                      "media": [
+                          {
+                              "url": "3864fa_034e01d74ff54fe1a1ef72d829c1f5c5f002.jpg",
+                              "index": 0,
+                              "width": 960,
+                              "mediaType": "VIDEO",
+                              "altText": null,
+                              "title": "Dumbbell Incline Shrug (2).mp4",
+                              "height": 540
+                          }
+                      ],
+                      "isManageProductItems": false,
+                      "productItemsPreOrderAvailability": "no_variants",
+                      "isTrackingInventory": false,
+                      "inventory": {
+                          "status": "in_stock",
+                          "quantity": 0,
+                          "availableForPreOrder": false,
+                          "preOrderInfoView": {
+                              "limit": null
+                          }
+                      },
+                      "subscriptionPlans": {
+                          "list": []
+                      },
+                      "priceRange": null,
+                      "discount": {
+                          "mode": "PERCENT",
+                          "value": 0
+                      }
+                  },
+                  {
+                      "id": "c26fa2b0-eb59-4287-659f-bfeabe23153c",
+                      "options": [],
+                      "productItems": [],
+                      "customTextFields": [],
+                      "productType": "digital",
+                      "ribbon": "4K 60FPS",
+                      "price": 1,
+                      "comparePrice": 0,
+                      "sku": "",
+                      "isInStock": true,
+                      "urlPart": "dumbbell-incline-row",
+                      "formattedComparePrice": "",
+                      "formattedPrice": "$1.00",
+                      "pricePerUnit": null,
+                      "formattedPricePerUnit": null,
+                      "pricePerUnitData": null,
+                      "digitalProductFileItems": [
+                          {
+                              "fileType": "secure_archive"
+                          }
+                      ],
+                      "name": "Dumbbell Incline Row",
+                      "media": [
+                          {
+                              "url": "3864fa_0a282a92f357475b9deba0e6e42d6273f002.jpg",
+                              "index": 0,
+                              "width": 960,
+                              "mediaType": "VIDEO",
+                              "altText": null,
+                              "title": "Dumbbell Incline Row (2).mp4",
+                              "height": 540
+                          }
+                      ],
+                      "isManageProductItems": false,
+                      "productItemsPreOrderAvailability": "no_variants",
+                      "isTrackingInventory": false,
+                      "inventory": {
+                          "status": "in_stock",
+                          "quantity": 0,
+                          "availableForPreOrder": false,
+                          "preOrderInfoView": {
+                              "limit": null
+                          }
+                      },
+                      "subscriptionPlans": {
+                          "list": []
+                      },
+                      "priceRange": null,
+                      "discount": {
+                          "mode": "PERCENT",
+                          "value": 0
+                      }
+                  },
+                  {
+                      "id": "0c545786-5dc4-f083-32cd-472a05cfa47c",
+                      "options": [],
+                      "productItems": [],
+                      "customTextFields": [],
+                      "productType": "digital",
+                      "ribbon": "",
+                      "price": 1,
+                      "comparePrice": 0,
+                      "sku": "",
+                      "isInStock": true,
+                      "urlPart": "dumbbell-incline-rear-lateral-raise",
+                      "formattedComparePrice": "",
+                      "formattedPrice": "$1.00",
+                      "pricePerUnit": null,
+                      "formattedPricePerUnit": null,
+                      "pricePerUnitData": null,
+                      "digitalProductFileItems": [
+                          {
+                              "fileType": "secure_archive"
+                          }
+                      ],
+                      "name": "Dumbbell Incline Rear Lateral Raise",
+                      "media": [
+                          {
+                              "url": "3864fa_97162512cbd34b5fa5117b2033baead3f002.jpg",
+                              "index": 0,
+                              "width": 960,
+                              "mediaType": "VIDEO",
+                              "altText": null,
+                              "title": "Dumbbell Incline Rear Lateral Raise (2).mp4",
+                              "height": 540
+                          }
+                      ],
+                      "isManageProductItems": false,
+                      "productItemsPreOrderAvailability": "no_variants",
+                      "isTrackingInventory": false,
+                      "inventory": {
+                          "status": "in_stock",
+                          "quantity": 0,
+                          "availableForPreOrder": false,
+                          "preOrderInfoView": {
+                              "limit": null
+                          }
+                      },
+                      "subscriptionPlans": {
+                          "list": []
+                      },
+                      "priceRange": null,
+                      "discount": {
+                          "mode": "PERCENT",
+                          "value": 0
+                      }
+                  },
+                  {
+                      "id": "55c7b0b2-dd84-0450-2f4d-eca41083acfa",
+                      "options": [],
+                      "productItems": [],
+                      "customTextFields": [],
+                      "productType": "digital",
+                      "ribbon": "",
+                      "price": 1,
+                      "comparePrice": 0,
+                      "sku": "",
+                      "isInStock": true,
+                      "urlPart": "dumbbell-incline-palm-in-press",
+                      "formattedComparePrice": "",
+                      "formattedPrice": "$1.00",
+                      "pricePerUnit": null,
+                      "formattedPricePerUnit": null,
+                      "pricePerUnitData": null,
+                      "digitalProductFileItems": [
+                          {
+                              "fileType": "secure_archive"
+                          }
+                      ],
+                      "name": "Dumbbell Incline Palm-in Press",
+                      "media": [
+                          {
+                              "url": "3864fa_b401cf952e8243f6b8b0075efd4c50e4f002.jpg",
+                              "index": 0,
+                              "width": 960,
+                              "mediaType": "VIDEO",
+                              "altText": null,
+                              "title": "Dumbbell Incline Palm-in Press (2).mp4",
+                              "height": 540
+                          }
+                      ],
+                      "isManageProductItems": false,
+                      "productItemsPreOrderAvailability": "no_variants",
+                      "isTrackingInventory": false,
+                      "inventory": {
+                          "status": "in_stock",
+                          "quantity": 0,
+                          "availableForPreOrder": false,
+                          "preOrderInfoView": {
+                              "limit": null
+                          }
+                      },
+                      "subscriptionPlans": {
+                          "list": []
+                      },
+                      "priceRange": null,
+                      "discount": {
+                          "mode": "PERCENT",
+                          "value": 0
+                      }
+                  },
+                  {
+                      "id": "139a1905-b112-ad0d-cea0-55acd08a5019",
+                      "options": [],
+                      "productItems": [],
+                      "customTextFields": [],
+                      "productType": "digital",
+                      "ribbon": "",
+                      "price": 1,
+                      "comparePrice": 0,
+                      "sku": "",
+                      "isInStock": true,
+                      "urlPart": "dumbbell-incline-one-arm-press",
+                      "formattedComparePrice": "",
+                      "formattedPrice": "$1.00",
+                      "pricePerUnit": null,
+                      "formattedPricePerUnit": null,
+                      "pricePerUnitData": null,
+                      "digitalProductFileItems": [
+                          {
+                              "fileType": "secure_archive"
+                          }
+                      ],
+                      "name": "Dumbbell Incline One Arm Press",
+                      "media": [
+                          {
+                              "url": "3864fa_522b9d5dd4ac4bb68987c7901be9ad8df002.jpg",
+                              "index": 0,
+                              "width": 960,
+                              "mediaType": "VIDEO",
+                              "altText": null,
+                              "title": "Dumbbell Incline One Arm Press (2).mp4",
+                              "height": 540
+                          }
+                      ],
+                      "isManageProductItems": false,
+                      "productItemsPreOrderAvailability": "no_variants",
+                      "isTrackingInventory": false,
+                      "inventory": {
+                          "status": "in_stock",
+                          "quantity": 0,
+                          "availableForPreOrder": false,
+                          "preOrderInfoView": {
+                              "limit": null
+                          }
+                      },
+                      "subscriptionPlans": {
+                          "list": []
+                      },
+                      "priceRange": null,
+                      "discount": {
+                          "mode": "PERCENT",
+                          "value": 0
+                      }
+                  },
+                  {
+                      "id": "7c4550b1-9b70-0478-d48d-bd54885b6b53",
+                      "options": [],
+                      "productItems": [],
+                      "customTextFields": [],
+                      "productType": "digital",
+                      "ribbon": "",
+                      "price": 1,
+                      "comparePrice": 0,
+                      "sku": "",
+                      "isInStock": true,
+                      "urlPart": "dumbbell-incline-one-arm-lateral-raise",
+                      "formattedComparePrice": "",
+                      "formattedPrice": "$1.00",
+                      "pricePerUnit": null,
+                      "formattedPricePerUnit": null,
+                      "pricePerUnitData": null,
+                      "digitalProductFileItems": [
+                          {
+                              "fileType": "secure_archive"
+                          }
+                      ],
+                      "name": "Dumbbell Incline One Arm Lateral Raise",
+                      "media": [
+                          {
+                              "url": "3864fa_8353f2d7e2fc4b8eb78062c77ec620e2f002.jpg",
+                              "index": 0,
+                              "width": 960,
+                              "mediaType": "VIDEO",
+                              "altText": null,
+                              "title": "Dumbbell Incline One Arm Lateral Raise (2).mp4",
+                              "height": 540
+                          }
+                      ],
+                      "isManageProductItems": false,
+                      "productItemsPreOrderAvailability": "no_variants",
+                      "isTrackingInventory": false,
+                      "inventory": {
+                          "status": "in_stock",
+                          "quantity": 0,
+                          "availableForPreOrder": false,
+                          "preOrderInfoView": {
+                              "limit": null
+                          }
+                      },
+                      "subscriptionPlans": {
+                          "list": []
+                      },
+                      "priceRange": null,
+                      "discount": {
+                          "mode": "PERCENT",
+                          "value": 0
+                      }
+                  },
+                  {
+                      "id": "6325fd5e-a3d7-8a8e-f44b-5da3808e9e0a",
+                      "options": [],
+                      "productItems": [],
+                      "customTextFields": [],
+                      "productType": "digital",
+                      "ribbon": "",
+                      "price": 1,
+                      "comparePrice": 0,
+                      "sku": "",
+                      "isInStock": true,
+                      "urlPart": "dumbbell-incline-lying-front-raise",
+                      "formattedComparePrice": "",
+                      "formattedPrice": "$1.00",
+                      "pricePerUnit": null,
+                      "formattedPricePerUnit": null,
+                      "pricePerUnitData": null,
+                      "digitalProductFileItems": [
+                          {
+                              "fileType": "secure_archive"
+                          }
+                      ],
+                      "name": "Dumbbell Incline Lying Front Raise",
+                      "media": [
+                          {
+                              "url": "3864fa_7501bbda7a7644139ce5792fc8327aebf002.jpg",
+                              "index": 0,
+                              "width": 960,
+                              "mediaType": "VIDEO",
+                              "altText": null,
+                              "title": "Dumbbell Incline Lying Front Raise (2).mp4",
+                              "height": 540
+                          }
+                      ],
+                      "isManageProductItems": false,
+                      "productItemsPreOrderAvailability": "no_variants",
+                      "isTrackingInventory": false,
+                      "inventory": {
+                          "status": "in_stock",
+                          "quantity": 0,
+                          "availableForPreOrder": false,
+                          "preOrderInfoView": {
+                              "limit": null
+                          }
+                      },
+                      "subscriptionPlans": {
+                          "list": []
+                      },
+                      "priceRange": null,
+                      "discount": {
+                          "mode": "PERCENT",
+                          "value": 0
+                      }
+                  },
+                  {
+                      "id": "3a5430e7-d59d-5c55-3c85-d82ae07ed0b7",
+                      "options": [],
+                      "productItems": [],
+                      "customTextFields": [],
+                      "productType": "digital",
+                      "ribbon": "",
+                      "price": 1,
+                      "comparePrice": 0,
+                      "sku": "",
+                      "isInStock": true,
+                      "urlPart": "dumbbell-incline-hammer-simultaneous-curl",
+                      "formattedComparePrice": "",
+                      "formattedPrice": "$1.00",
+                      "pricePerUnit": null,
+                      "formattedPricePerUnit": null,
+                      "pricePerUnitData": null,
+                      "digitalProductFileItems": [
+                          {
+                              "fileType": "secure_archive"
+                          }
+                      ],
+                      "name": "Dumbbell Incline Hammer Simultaneous Curl",
+                      "media": [
+                          {
+                              "url": "3864fa_19878b66ba164a01bdf1d4b9abe709e0f002.jpg",
+                              "index": 0,
+                              "width": 960,
+                              "mediaType": "VIDEO",
+                              "altText": null,
+                              "title": "Dumbbell Incline Hammer Simultaneous Curl (2).mp4",
+                              "height": 540
+                          }
+                      ],
+                      "isManageProductItems": false,
+                      "productItemsPreOrderAvailability": "no_variants",
+                      "isTrackingInventory": false,
+                      "inventory": {
+                          "status": "in_stock",
+                          "quantity": 0,
+                          "availableForPreOrder": false,
+                          "preOrderInfoView": {
+                              "limit": null
+                          }
+                      },
+                      "subscriptionPlans": {
+                          "list": []
+                      },
+                      "priceRange": null,
+                      "discount": {
+                          "mode": "PERCENT",
+                          "value": 0
+                      }
+                  },
+                  {
+                      "id": "619596f7-ff04-3c4c-eb6f-89a0f85ed02b",
+                      "options": [],
+                      "productItems": [],
+                      "customTextFields": [],
+                      "productType": "digital",
+                      "ribbon": "",
+                      "price": 1,
+                      "comparePrice": 0,
+                      "sku": "",
+                      "isInStock": true,
+                      "urlPart": "dumbbell-incline-hammer-shoulder-press",
+                      "formattedComparePrice": "",
+                      "formattedPrice": "$1.00",
+                      "pricePerUnit": null,
+                      "formattedPricePerUnit": null,
+                      "pricePerUnitData": null,
+                      "digitalProductFileItems": [
+                          {
+                              "fileType": "secure_archive"
+                          }
+                      ],
+                      "name": "Dumbbell Incline Hammer Shoulder Press",
+                      "media": [
+                          {
+                              "url": "3864fa_748ea72941204049aed2c4a85b252c55f002.jpg",
+                              "index": 0,
+                              "width": 960,
+                              "mediaType": "VIDEO",
+                              "altText": null,
+                              "title": "Dumbbell Incline Hammer Shoulder Press (2).mp4",
+                              "height": 540
+                          }
+                      ],
+                      "isManageProductItems": false,
+                      "productItemsPreOrderAvailability": "no_variants",
+                      "isTrackingInventory": false,
+                      "inventory": {
+                          "status": "in_stock",
+                          "quantity": 0,
+                          "availableForPreOrder": false,
+                          "preOrderInfoView": {
+                              "limit": null
+                          }
+                      },
+                      "subscriptionPlans": {
+                          "list": []
+                      },
+                      "priceRange": null,
+                      "discount": {
+                          "mode": "PERCENT",
+                          "value": 0
+                      }
+                  }
+              ]
+          }
+      }
+  }
+}

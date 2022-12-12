@@ -97,7 +97,7 @@ export default function IndexDashboard({
     (workout: any) =>
       () => {
         if (winReady) router.push(
-          `/workout/${workout.slug}`
+          `/workout/${workout.id}`
         )
       }
 
@@ -107,7 +107,7 @@ export default function IndexDashboard({
       <main className="bg-transparent text-white min-h-full bg-gradient-to-b from-active1 to-active2 px-5">
         <nav className="text-white bg-transparent h-[90px]">
           <div className="flex relative max-w-4xl mx-auto h-[90px] align-middle py-4">
-            <Link href="/" className="inline-block align-middle text-center py-2.5">
+            <Link href="/" className="inline-block align-middle py-2.5">
               <Logo size={180} className="my-0 inline-block" />
             </Link>
             <div className="flex-1 text-right">
@@ -140,7 +140,7 @@ export default function IndexDashboard({
         <section className="max-w-3xl mx-auto">
           {
             workouts && workouts.length ?
-            <header className="mt-10 flex">
+            <header className="mt-16 sm:mt-10 flex">
               <div className="flex-1 -mt-3 text-right">
                 <Link href={`/workout/create`} className="bg-white inline-block text-center text-lg cursor-pointer font-bold ml-2 px-3 py-2 rounded-md text-black">
                   + New Workout

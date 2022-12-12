@@ -13,7 +13,7 @@ function CreateWorkout() {
     <Layout title="Create Workout | WorkoutSesh">
       <nav className="fixed top-0 left-0 right-0 z-10 bg-white h-[90px]">
         <div className="max-w-4xl mx-auto h-[90px]">
-          <Logo size={180} className="my-0" />
+          <Logo onDark={false} size={180} className="my-0" />
         </div>
       </nav>
       <WorkoutForm mode={FormMode.Create} />

@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import Image from "next/image";
 import { Menu, Transition } from '@headlessui/react';
 import { EllipsisHorizontalIcon, PencilIcon, TrashIcon } from "@heroicons/react/20/solid";
+import Link from "next/link";
 
 const MoreMenu = ({ workoutId }: { workoutId: string }) => {
   return (
@@ -29,9 +30,11 @@ const MoreMenu = ({ workoutId }: { workoutId: string }) => {
           <Menu.Item>
             {
               ({ active }: { active: boolean }) => (
-                <div className="py-2 px-3 whitespace-nowrap">
-                  <PencilIcon className="inline-block h-4 align-top mt-0.5 mr-1" /> Edit
-                </div>
+                <Link href={`/workout/${workoutId}/edit`}>
+                  <div className="py-2 px-3 whitespace-nowrap">
+                    <PencilIcon className="inline-block h-4 align-top mt-0.5 mr-1" /> Edit
+                  </div>
+                </Link>
               )
             }
           </Menu.Item>
@@ -42,7 +45,7 @@ const MoreMenu = ({ workoutId }: { workoutId: string }) => {
                     <TrashIcon className="inline-block h-4 align-top mt-0.5 mr-1" /> Delete
                 </div>
               )
-            }
+          }
           </Menu.Item>
         </Menu.Items>
       </Transition>

@@ -30,6 +30,7 @@ const WorkoutRoutine = ({
       <div className="mr-1 mt-2">
         <div className={classnames(
           "mx-3 relative rounded-sm w-[75px] h-[75px] border border-black text-center bg-gray-500 overflow-hidden",
+          "text-black z-100",
           isFirst ? "mb-5 mt-2" : "my-5",
           isDragging ? "text-navy0": "text-black"
         )}>

@@ -1,17 +1,17 @@
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import Layout from '../../components/Layout'
-import SeshCounter from '../../components/SeshCounter'
+import Layout from '../../../components/Layout'
+import SeshCounter from '../../../components/SeshCounter'
 import classnames from 'classnames'
-import WorkoutRoutine from '../../components/WorkoutRoutine'
+import WorkoutRoutine from '../../../components/WorkoutRoutine'
 import { resetServerContext, DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
-import Clamped from '../../components/Clamped'
+import Clamped from '../../../components/Clamped'
 import classNames from 'classnames'
-import ExerciseDescription from '../../components/ExerciseDescription'
+import ExerciseDescription from '../../../components/ExerciseDescription'
 import { getSession, useSession } from 'next-auth/react'
-import { prisma } from '../../lib/prismadb'
-import { ArrowLeftIcon, ArrowRightCircleIcon, ArrowRightIcon, ArrowUpIcon, BackwardIcon, CheckCircleIcon, ForwardIcon, PlayCircleIcon, StopCircleIcon } from '@heroicons/react/20/solid'
+import { prisma } from '../../../lib/prismadb'
+import { ArrowLeftIcon, ArrowRightCircleIcon, ArrowRightIcon, ArrowUpIcon, BackwardIcon, CheckCircleIcon, ForwardIcon, PlayCircleIcon, PlusCircleIcon, StopCircleIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 // see: https://github.com/atlassian/react-beautiful-dnd/issues/2350#issuecomment-1242917371
 
@@ -43,11 +43,13 @@ const reorder = (list: any[], startIndex: number, endIndex: number) => {
 const ACTIVE_ROUTINE_ID = 'active-workout-routine'
 
 export default function WorkoutSesh({
-  workout
+  workout,
+  error
 }: any) {
   const session = useSession();
-  workout = JSON.parse(workout);
-  const { exercises: initialExercises = [] } = workout;
+  workout = workout ? JSON.parse(workout) : undefined;
+  error = error ? JSON.parse(error) : undefined;
+  const { exercises: initialExercises = [] } = workout || {};
   const [exercises, setExercises] = useState(initialExercises);
   const [counterIsActive, setCounterIsActive] = useState(false);
   const [seshStarted, setSeshStarted] = useState(false);
@@ -61,6 +63,10 @@ export default function WorkoutSesh({
   const startSesh = () => {
     setSeshStarted(true);
     setCounterIsActive(true);
+    setExpanded(false);
+  }
+  const cancelSesh = () => {
+    setSeshStarted(false)
   }
   const isActiveSet = currWorkoutSetType === WorkoutSetType.Active;
   if (!session) {
@@ -116,6 +122,23 @@ export default function WorkoutSesh({
     setWinReady(true)
   }, [])
 
+  if (error) {
+    console.error(error)
+    return (
+      <div className="p-3 max-w-md mx-auto my-14">
+        <h1 className="text-3xl font-bold mb-4">
+          404 Not Found
+        </h1>
+        <h1 className="text-xl font-semibold">
+          We couldn't find what you were looking for.
+        </h1>
+        <p className="mt-3 text-red-500">
+          {JSON.stringify(error)}
+        </p>
+      </div>
+    )
+  }
+
   return (
     <Layout title="Workout Sesh" background="#9ca3a5">
       <main className={classNames(
@@ -153,7 +176,7 @@ export default function WorkoutSesh({
             </div>
             <div className="px-4 text-center flex items-center md:min-h-[calc(100% - 32px)] h-[400px] max-w-xl sm:h-[300px]">
               <div className={classnames(
-                "w-full flex flex-col justify-center"
+                "mt-0 sm:mt-5 w-full flex flex-col justify-center"
               )} style={{
                 minHeight: 'calc(100% - 32px)'
               }}>
@@ -164,7 +187,7 @@ export default function WorkoutSesh({
                     priority
                     height={500}
                     width={500}
-                    placeholder={require('../../components/routine-placeholder.png')}
+                    placeholder={require('../../../components/routine-placeholder.png')}
                     className="w-auto text-center inline-block"
                   />
                   <div className={classNames(
@@ -229,10 +252,11 @@ export default function WorkoutSesh({
               </div>
             </div>
             <div className={classNames(
-              "absolute bottom-0 pt-[100px] left-0 right-0",
+              "pt-[50px] left-0 right-0",
               {
                 "bg-gradient-to-b from-transparent via-active2 to-active2": seshStarted && isActiveSet,
                 "bg-gradient-to-b from-transparent via-[#353e94] to-[#353e94]": seshStarted && !isActiveSet,
+                "absolute bottom-0": seshStarted,
                 "bg-white": !seshStarted,
                 // "absolute left-0 right-0": seshStarted,
               }
@@ -263,32 +287,9 @@ export default function WorkoutSesh({
                     "pt-5 pb-2": !seshStarted,
                     "pt-3": seshStarted
                   })}>
-                  <h2 className="mx-auto text-center text-xl font-normal w-[90%] overflow-hidden">
-                    <span className="">
-                      {activeExercise.name}
-                    </span>
-                  </h2>
-                  <div className={classNames(
-                    "text-center mb-2 mt-2 mx-5 p-2",
-                    {
-                      "text-lg text-black": !seshStarted,
-                      "text-sm font-bold uppercase tracking-wide": seshStarted,
-                      "rounded-full bg-white text-black": seshStarted && isActiveSet,
-                    }
-                  )}>
-                    {
-                      isActiveSet ?
-                      <ExerciseDescription
-                        setsDescription={activeExercise.setsDescription}
-                        repsDescription={activeExercise.repsDescription}
-                      />
-                      :
-                      'Rest!'
-                    }
-                  </div>
-                  <SeshCounter
+                    <SeshCounter
                     className={classNames(
-                      "pt-2 pb-6 font-semibold tracking-widest text-6xl text-center",
+                      "pt-2 pb-2 font-semibold tracking-widest text-6xl text-center",
                       {
                         "hidden": !seshStarted
                       }
@@ -302,6 +303,35 @@ export default function WorkoutSesh({
                     seshStarted={seshStarted}
                     active={counterIsActive}
                   />
+                  <h2 className="mx-auto mb-2 text-center text-xl font-normal w-[90%] overflow-hidden">
+                    <span>
+                      <Clamped clamp={2}>
+                        {activeExercise.name}
+                      </Clamped>
+                    </span>
+                  </h2>
+                  <div className={classNames(
+                    "text-center mb-2 mt-2 mx-2 p-2",
+                    "rounded-full text-sm font-bold uppercase tracking-wide",
+                    {
+                      "text-black": !seshStarted,
+                      "bg-white text-black": seshStarted && isActiveSet,
+                    }
+                  )}>
+                    {
+                      isActiveSet ?
+                      <ExerciseDescription
+                        fancy={true}
+                        setsDescription={activeExercise.setsDescription}
+                        repsDescription={activeExercise.repsDescription}
+                        setNum={workoutSetNum}
+                      />
+                      :
+                      <span className="text-4xl tracking-widest">
+                        Rest...
+                      </span>
+                    }
+                  </div>
                 </div>
               </div>
               <div
@@ -363,7 +393,10 @@ export default function WorkoutSesh({
                                 <p className="text-lg mb-0 mt-0 tracking-widest">
                                   {
                                     isActiveSet ?
-                                    `Set ${workoutSetNum}` : `Rest!`
+                                    <div className="mb-1">
+                                      Finish Set {workoutSetNum}
+                                    </div>
+                                    : `End Rest`
                                   }
                                 </p>
                                 <p className={classnames(
@@ -507,7 +540,7 @@ export default function WorkoutSesh({
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className="bg-white"
+                          className="bg-white text-black"
                         >
                             {
                               (
@@ -526,10 +559,10 @@ export default function WorkoutSesh({
                                         ref={provided.innerRef}
                                         {...provided.draggableProps}
                                         {...provided.dragHandleProps}
-                                        className="bg-white"
                                         style={{
                                           ...provided.draggableProps.style,
                                         }}
+                                        className="bg-white"
                                       >
                                         <WorkoutRoutine
                                           isFirst={i === 0}
@@ -550,10 +583,18 @@ export default function WorkoutSesh({
                 }
                 <div className="rounded-b-xl overflow-hidden">
                   <button
+                    className={classNames(
+                      "mt-3 py-4 px-5 w-full font-bold",
+                      "text-black bg-white mb-5"
+                    )}
+                  >
+                    <PlusCircleIcon className="h-5 inline-block align-top mt-[1.25px] mr-0.5" /> Add New Exercise
+                  </button>
+                  <button
                     onClick={seshStarted ? finishWorkout : startSesh}
                     className={classNames(
-                      "text- py-8 px-5 w-full font-bold",
-                      "text-black bg-brightGreen"
+                      "py-4 px-5 w-full font-bold",
+                      "text-black text-lg bg-brightGreen"
                     )}>
                     {
                       seshStarted ?
@@ -562,6 +603,11 @@ export default function WorkoutSesh({
                   </button>
                 </div>
               </div>
+                <div
+                  onClick={cancelSesh}
+                  className="text-white mt-2 p-3 text-center opacity-70 hover:opacity-100 cursor-pointer">
+                  Cancel Workout
+                </div>
             </div>
           </section>
         </div>
@@ -578,10 +624,7 @@ export async function getServerSideProps(context: any) {
       const { email } = session.user || {};
       workout = await prisma.workout.findFirstOrThrow({
         where: {
-          AND: {
-            userEmail: email || '',
-            slug: context.query.workoutSlug,
-          }
+          id: Number(context.query.id),
         },
         include: {
           exercises: true,
@@ -591,14 +634,14 @@ export async function getServerSideProps(context: any) {
     return {
       props : {
         session: JSON.stringify(session),
-        workout: JSON.stringify(workout || null),
+        workout: workout ? JSON.stringify(workout) : null,
         params: context.params
       }
     }
   } catch(error) {
     return {
       props : {
-        error
+        error: error ? JSON.stringify(error) : null,
       }
     }
   }
