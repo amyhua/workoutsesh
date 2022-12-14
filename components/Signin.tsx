@@ -213,7 +213,7 @@ const Signin = () => {
             src={require('./workout-woman.gif')} />
           <h1 className="leading-10 text-center mt-6 mb-4 text-3xl font-bold px-3">
             Welcome to<br/>
-            <Logo size={320} className="mx-auto mt-3" />
+            <Logo onDark={false} size={320} className="mx-auto mt-3" />
           </h1>
           <div className="mb-3 text-xl text-center">
             Track your workouts with ease.

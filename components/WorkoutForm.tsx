@@ -2,9 +2,10 @@ import { Bars2Icon, CheckCircleIcon, CheckIcon, ChevronLeftIcon, PencilIcon, Pen
 import classNames from "classnames";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Clamped from "./Clamped";
 import { resetServerContext, DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import AppContext from "../contexts/app-context";
 
 type Exercise = {
   name: string;
@@ -74,19 +75,20 @@ function ExerciseForm({
   const [repsDescription, setRepsDescription] = useState(exercise.repsDescription)
   const [setsDescription, setSetsDescription] = useState(exercise.setsDescription)
   const [restBetweenSets, setRestBetweenSets] = useState(true)
+  const onSubmit = () => {
+    setExercise({
+      name,
+      imageUrl,
+      setsDescription,
+      repsDescription,
+      restBetweenSets,
+    })
+    onClose()
+  };
   return (!open ? null :
     <form
       className="z-50 relative rounded-md bg-white shadow-xl sm:mt-[90px] border border-slate-800 py-8 px-7 border-3 max-w-md mx-auto mb-5"
-      onSubmit={() => {
-        setExercise({
-          name,
-          imageUrl,
-          setsDescription,
-          repsDescription,
-          restBetweenSets,
-        })
-        onClose()
-      }}>
+      onSubmit={onSubmit}>
       <div onClick={onClose} className="absolute top-0 right-0 p-3 text-gray-200 cursor-pointer hover:text-gray-600 text-2xl">
         ✖
       </div>
@@ -263,6 +265,7 @@ function WorkoutForm({
   workout?: any
 }) {
   const router = useRouter()
+  const { setIndexError, setIndexSuccess } = useContext(AppContext)
   const [submitting, setSubmitting] = useState(false)
   const [name, setName] = useState(workout.name || '')
   const [description, setDescription] = useState(workout.description || '')
@@ -280,10 +283,14 @@ function WorkoutForm({
   const onSubmit = (e: any) => {
     e.preventDefault()
     setSubmitting(true)
-    fetch('/api/workouts', {
+    let errorStatus: string;
+    return fetch(mode === FormMode.Create ?
+      '/api/workout' :
+      `/api/workout`, {
       method: mode === FormMode.Create ?
         'POST' : 'PUT',
       body: JSON.stringify({
+        ...workout,
         name,
         description,
         exercises: exercises.map((exc: any, i: number) => ({
@@ -292,8 +299,27 @@ function WorkoutForm({
         }))
       })
     })
-    .then(() => {
-      router.push(`/`)
+    .then(async (resp: any) => {
+      if (resp.ok) {
+        setIndexSuccess(`Workout ${
+          mode === FormMode.Create ?
+            'was successfully created' :
+            'was successfully updated'
+        }.`)
+        errorStatus = '';
+      } else {
+        errorStatus = `(${resp.status} ${resp.statusText})`;
+      }
+      return resp.text()
+    })
+    .then((text: any) => {
+      if (text) {
+        const match = text.match(/\"message\":\"([^"]+)\"/);
+        if (match) {
+          setIndexError([errorStatus, match[1]].filter((x: string)=>!!x).join(' '));
+        }
+      }
+      router.push('/');
     })
   }
   useEffect(() => {

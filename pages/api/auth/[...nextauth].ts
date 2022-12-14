@@ -60,43 +60,46 @@ const options = {
       },
       async authorize(credentials, req): Promise<any> {
         const { email, username, password, confirmPassword } = credentials as any;
-        console.log('auth credentials', credentials)
-        const user = await prisma.user.findUnique({
-          where: {
-            ...(email ? { email } : { username }),
+        try {
+          
+          const user = await prisma.user.findUnique({
+            where: {
+              ...(email ? { email } : { username }),
+            }
+          });
+          if (user) {
+            if (confirmPassword) {
+              throw new Error('User already exists. Sign in instead.');
+            }
+            if (user.password) {
+              // match on password
+              return new Promise(async (resolve: any, reject:any) => {
+                console.log('compare', password, user.password)
+                bcrypt.compare(password, user.password as string, (err, result) => {
+                  console.log('err?', err, result)
+                  if (result) {
+                    // password is valid
+                    return resolve(user)
+                  }
+                  throw new Error(
+                    'Invalid login.'
+                  )
+                })
+              });
+            }
+            // non-password user => use social media login
+            throw new Error("Sign in with social media instead.");
+          } else {
+            if (!confirmPassword) {
+              // signed in with nonexistent account
+              throw new Error('User not found. Use a different username/email or sign up instead.')
+            }
+            // create
+            return await createUserWithCredentials(email, password, confirmPassword, username);
           }
-        });
-        if (user) {
-          if (confirmPassword) {
-            throw new Error('User already exists. Sign in instead.');
-          }
-          if (user.password) {
-            // match on password
-            return new Promise(async (resolve: any, reject:any) => {
-              console.log('compare', password, user.password)
-              bcrypt.compare(password, user.password as string, (err, result) => {
-                console.log('err?', err, result)
-                if (result) {
-                  // password is valid
-                  return resolve(user)
-                }
-                throw new Error(
-                  'Invalid login.'
-                )
-              })
-            });
-          }
-          // non-password user => use social media login
-          throw new Error("Sign in with social media instead.");
-        } else {
-          if (!confirmPassword) {
-            // signed in with nonexistent account
-            throw new Error('User not found. Use a different username/email or sign up instead.')
-          }
-          // create
-          return await createUserWithCredentials(email, password, confirmPassword, username);
+        } catch(err: any) {
+          throw new Error(err);
         }
-        return null;
       }
     })
   ],

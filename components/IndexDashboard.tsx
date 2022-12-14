@@ -5,12 +5,13 @@ import Layout from '../components/Layout'
 import Logo from '../components/Logo'
 import Image from 'next/image'
 import classNames from 'classnames'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { getSession } from 'next-auth/react'
 import AvatarMenu from './AvatarMenu'
 import MoreMenu from './MoreMenu'
 import { Exercise } from '@prisma/client'
-import { PlayCircleIcon } from '@heroicons/react/20/solid'
+import { CheckCircleIcon, ExclamationCircleIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
+import AppContext from '../contexts/app-context'
 
 type Stat = { value: number | string; label: string; }
 
@@ -80,6 +81,7 @@ export default function IndexDashboard({
     label: 'this month'
   }]
   const router = useRouter()
+  const { indexError, indexSuccess } = useContext(AppContext)
   const [winReady, setWinReady] = useState(false)
   const [workouts, setWorkouts] = useState([])
   const loadWorkouts = async () => {
@@ -115,6 +117,38 @@ export default function IndexDashboard({
             </div>
           </div>
         </nav>
+        <div className={classNames(
+          "p-3 bg-white rounded-lg text-sm",
+          {
+            "hidden": !indexError && !indexSuccess,
+            "text-red-700": !!indexError,
+            "text-green-600": !indexError && !!indexSuccess,
+          }
+        )}>
+          <h2 className={classNames(
+            "font-semibold text-sm",
+            {
+              "mb-1": !!indexError
+            }
+          )}>
+            {
+              indexError ?
+              <ExclamationCircleIcon className="mt-0.25 inline-block mr-1 h-5 align-top" />
+              :
+              <CheckCircleIcon className="mt-0.25 inline-block mr-1 h-5 align-top" />
+            } {
+              indexError ?
+              'Something went wrong.' :
+              indexSuccess
+            }
+          </h2>
+          {
+            indexError &&
+            <p className="ml-7">
+              {indexError}
+            </p>
+          }
+        </div>
         <div className="mt-10 max-w-sm mx-auto">
           <section className="pt-0 mb-2">
             <div className="sm:flex">

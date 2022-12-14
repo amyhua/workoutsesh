@@ -98,7 +98,7 @@ export default function WorkoutSesh({
   }
   const finishWorkout = () => {
     // finish last running set, log workout data, and go to summary
-
+    
   }
   const onExerciseDragEnd = (result: any) => {
     if (!result.destination) {
@@ -205,7 +205,9 @@ export default function WorkoutSesh({
                       src={activeExercise.imageUrl}
                     />
                     :
-                    <div />
+                    <h1 className="text-white text-lg">
+                      {activeExercise.name}
+                    </h1>
                   }
                   <div className={classNames(
                     "relative flex ease-linear items-center bg-white overflow-hidden w-full",

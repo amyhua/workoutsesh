@@ -28,46 +28,8 @@ async function workoutsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
       });
       res.json(workouts);
       break;
-    case 'POST':
-      const {
-        name,
-        description,
-        exercises,
-      } = JSON.parse(req.body || {});
-      if (session.user.email) {
-        const workout = await prisma.workout.create({
-          data: {
-            name,
-            description,
-            slug: name.toLowerCase().replace(/\s+/g, '-'),
-            userEmail: session.user.email,
-          }
-        })
-        const createdExercises = [] as Exercise[];
-        try {
-          exercises.forEach(async (exercise: Exercise, i: number) => {
-            const exc = await prisma.exercise.create({
-              data: {
-                ...exercise,
-                workoutId: workout.id,
-                workoutOrder: i,
-              }
-            })
-            createdExercises.push(exc);
-          });
-        } catch(err) {
-          return res.status(500).json({
-            error: `${exercises.length} exercises were meant to be created, but ${createdExercises.length} created.`
-          });
-        }
-        return res.json({
-          ...workout,
-          exercises: createdExercises,
-        });
-      }
-      break;
     default:
-      res.setHeader('Allow', ['GET', 'POST'])
+      res.setHeader('Allow', ['GET'])
       res.status(405).end(`Method ${req.method} Not Allowed`)
       break;
   }

@@ -1,3 +1,4 @@
+import { Exercise } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import { prisma } from '../../lib/prismadb'
@@ -34,6 +35,85 @@ async function workoutsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
           }
         });
         return res.json(workout);
+      }
+      break;
+    case 'PUT':
+      console.log('PUT!!!!', req.query, req.query.data)
+      if (!req.query.data || !req.query.data.id) {
+        throw new Error('Missing workout ID as query param [id]')
+      }
+      if (req.query.id &&
+        typeof req.query.data === 'string' &&
+        typeof session.user.email === 'string') {
+          const data = JSON.parse(req.query.data || '{}');
+          console.log('data', data)
+          const exercises = data.exercises || [];
+          exercises.forEach(async (exc: Exercise) => {
+            try {
+              const updatedExc = await prisma.exercise.upsert({
+                where: {
+                  id: exc.id ? Number(exc.id) : undefined,
+                },
+                update: {
+                  ...exc,
+                },
+                create: {
+                  ...exc,
+                }
+              });
+              console.log('Exercise created:', updatedExc)
+            } catch(err) {
+              res.json(err);
+              return;
+            }
+          });
+        const workout = await prisma.workout.update({
+          where: {
+            id: Number(req.query.id),
+          },
+          data: {
+            ...(JSON.parse(req.query.data))
+          },
+        });
+        return res.json(workout);
+      }
+      break;
+    case 'POST':
+      const {
+        name,
+        description,
+        exercises,
+      } = JSON.parse(req.body || {});
+      if (session.user.email) {
+        const workout = await prisma.workout.create({
+          data: {
+            name,
+            description,
+            slug: name.toLowerCase().replace(/\s+/g, '-'),
+            userEmail: session.user.email,
+          }
+        })
+        const createdExercises = [] as Exercise[];
+        try {
+          exercises.forEach(async (exercise: Exercise, i: number) => {
+            const exc = await prisma.exercise.create({
+              data: {
+                ...exercise,
+                workoutId: workout.id,
+                workoutOrder: i,
+              }
+            })
+            createdExercises.push(exc);
+          });
+        } catch(err) {
+          return res.status(500).json({
+            error: `${exercises.length} exercises were meant to be created, but ${createdExercises.length} created.`
+          });
+        }
+        return res.json({
+          ...workout,
+          exercises: createdExercises,
+        });
       }
       break;
     default:
