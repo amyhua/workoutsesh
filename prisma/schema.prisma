@@ -11,18 +11,6 @@ datasource db {
   // shadowDatabaseUrl = env("SHADOW_DATABASE_URL") // Only needed when using a cloud provider that doesn't support the creation of new databases, like Heroku. Learn more: https://pris.ly/migrate-shadow
 }
 
-// model User {
-//   id  Int @id @default(autoincrement())
-//   createdAt     DateTime  @default(now()) @map(name: "created_at")
-//   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
-//   name String @db.VarChar(200)
-//   email   String   @unique
-//   username String @unique
-//   password   String
-//   workouts Workout[]
-//   avatarUrl String?
-// }
-
 model Exercise {
   id  Int @id @default(autoincrement())
   workoutId Int

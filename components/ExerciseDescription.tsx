@@ -11,7 +11,7 @@ const ExerciseDescription = ({
   setNum?: number;
   fancy?: boolean;
 }) => (
-  <Clamped clamp={1}>
+  <>
     {
       fancy ?
       <>
@@ -43,7 +43,7 @@ const ExerciseDescription = ({
       {setsDescription || '<Sets>'} sets of {repsDescription || '<Reps>'}
       </>
     }
-  </Clamped>
+  </>
 )
 
 export default ExerciseDescription

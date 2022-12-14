@@ -174,22 +174,39 @@ export default function WorkoutSesh({
                 <Link className="text-red-600" href="/">Cancel</Link>
               }
             </div>
-            <div className="px-4 text-center flex items-center md:min-h-[calc(100% - 32px)] h-[400px] max-w-xl sm:h-[300px]">
+            <div
+              className="px-4 text-center flex items-center md:min-h-[calc(100% - 32px)] max-w-xl"
+              style={{
+                height: 'calc(100vh - 430px)'
+              }}>
               <div className={classnames(
                 "mt-0 sm:mt-5 w-full flex flex-col justify-center"
               )} style={{
                 minHeight: 'calc(100% - 32px)'
               }}>
                 <div>
-                  <Image
-                    src={activeExercise.imageUrl}
-                    alt="Active Exercise"
-                    priority
-                    height={500}
-                    width={500}
-                    placeholder={require('../../../components/routine-placeholder.png')}
-                    className="w-auto text-center inline-block"
-                  />
+                  {
+                    String(activeExercise.imageUrl).match(/\.(jpeg|jpg|gif|png)$/) ?
+                    <Image
+                      src={activeExercise.imageUrl}
+                      alt="Active Exercise"
+                      priority
+                      height={500}
+                      width={500}
+                      placeholder={require('../../../components/routine-placeholder.png')}
+                      className="w-auto text-center inline-block"
+                    />
+                    :
+                    activeExercise.imageUrl ?
+                    <video
+                      autoPlay={true}
+                      loop
+                      muted
+                      src={activeExercise.imageUrl}
+                    />
+                    :
+                    <div />
+                  }
                   <div className={classNames(
                     "relative flex ease-linear items-center bg-white overflow-hidden w-full",
                   )}>
@@ -311,7 +328,7 @@ export default function WorkoutSesh({
                     </span>
                   </h2>
                   <div className={classNames(
-                    "text-center mb-2 mt-2 mx-2 p-2",
+                    "text-center mb-4 mt-2 mx-2 p-2",
                     "rounded-full text-sm font-bold uppercase tracking-wide",
                     {
                       "text-black": !seshStarted,
@@ -382,19 +399,12 @@ export default function WorkoutSesh({
                                 :
                                 <ArrowRightCircleIcon className="inline-block h-[65px] text-white" />
                               }
-                              {/* <ArrowRightCircleIcon className={classNames(
-                                "inline-block h-[65px]",
-                                {
-                                  "text-white": !isActiveSet,
-                                  "text-black": isActiveSet,
-                                }
-                              )} /> */}
                               <div className="text-left ml-3">
                                 <p className="text-lg mb-0 mt-0 tracking-widest">
                                   {
                                     isActiveSet ?
                                     <div className="mb-1">
-                                      Finish Set {workoutSetNum}
+                                      Set {workoutSetNum}
                                     </div>
                                     : `End Rest`
                                   }
@@ -431,14 +441,19 @@ export default function WorkoutSesh({
                       className={classNames(
                         "flex items-center px-5",
                         {
-                          "hidden": !seshStarted || activeExerciseIdx === exercises.length - 1
+                          "hidden": !seshStarted
                         },
                         {
                           "bg-gray-200 text-black": seshStarted && isActiveSet,
                           "bg-[#858df0] text-white": seshStarted && !isActiveSet,
                         }
                       )}>
-                      <ArrowRightIcon className="h-7" />
+                        {
+                          activeExerciseIdx === exercises.length - 1 ?
+                          <StopCircleIcon className="h-7" />
+                          :
+                          <ArrowRightIcon className="h-7" />
+                        }
                     </div>
                   </div>
               </div>
@@ -585,20 +600,26 @@ export default function WorkoutSesh({
                   <button
                     className={classNames(
                       "mt-3 py-4 px-5 w-full font-bold",
-                      "text-black bg-white mb-5"
+                      "text-black text-lg bg-white mb-5"
                     )}
                   >
-                    <PlusCircleIcon className="h-5 inline-block align-top mt-[1.25px] mr-0.5" /> Add New Exercise
+                    <PlusCircleIcon className="h-7 inline-block align-top mr-1" /> Add New Exercise
                   </button>
                   <button
                     onClick={seshStarted ? finishWorkout : startSesh}
                     className={classNames(
-                      "py-4 px-5 w-full font-bold",
+                      "py-7 px-5 w-full font-bold",
                       "text-black text-lg bg-brightGreen"
                     )}>
                     {
                       seshStarted ?
-                      'Finish Workout' : 'Start Workout'
+                      <>
+                        <StopCircleIcon className="h-7 inline-block align-top mr-2" />
+                        Finish Workout
+                      </> : <>
+                        <PlayCircleIcon className="h-7 inline-block align-top mr-2" />
+                        Start Workout
+                      </>
                     }
                   </button>
                 </div>
