@@ -19,6 +19,18 @@ prisma generate
 Restricted route making:
 [https://next-auth.js.org/getting-started/example#backend---api-route](https://next-auth.js.org/getting-started/example#backend---api-route)
 
+### Troubleshooting
+
+If postgres crashes locally:
+
+```
+cd Library/Application\ Support/Postgres
+ls
+## copy var-* number
+
+## e.g. var-15
+rm var-15/postmaster.pid
+```
 
 -----
 

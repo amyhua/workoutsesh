@@ -118,7 +118,7 @@ export default function IndexDashboard({
           </div>
         </nav>
         <div className={classNames(
-          "p-3 bg-white rounded-lg text-sm",
+          "p-3 bg-white rounded-lg text-sm max-h-[100px] overflow-y-auto",
           {
             "hidden": !indexError && !indexSuccess,
             "text-red-700": !!indexError,

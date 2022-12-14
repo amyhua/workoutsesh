@@ -11,7 +11,7 @@ import classNames from 'classnames'
 import ExerciseDescription from '../../../components/ExerciseDescription'
 import { getSession, useSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
-import { ArrowLeftIcon, ArrowRightCircleIcon, ArrowRightIcon, ArrowUpIcon, BackwardIcon, CheckCircleIcon, ForwardIcon, PlayCircleIcon, PlusCircleIcon, StopCircleIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftCircleIcon, ArrowLeftIcon, ArrowRightCircleIcon, ArrowRightIcon, ArrowUpIcon, BackwardIcon, CheckCircleIcon, ForwardIcon, PlayCircleIcon, PlusCircleIcon, StopCircleIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 // see: https://github.com/atlassian/react-beautiful-dnd/issues/2350#issuecomment-1242917371
 
@@ -347,7 +347,7 @@ export default function WorkoutSesh({
                       />
                       :
                       <span className="text-4xl tracking-widest">
-                        Rest...
+                        Rest
                       </span>
                     }
                   </div>
@@ -376,11 +376,11 @@ export default function WorkoutSesh({
                           "hidden": !seshStarted || activeExerciseIdx === 0
                         },
                         {
-                          "bg-gray-200 text-black": seshStarted && isActiveSet,
+                          "bg-gray-200 text-gray-400 hover:text-gray-700": seshStarted && isActiveSet,
                           "bg-[#858df0] text-white": seshStarted && !isActiveSet,
                         }
                       )}>
-                      <ArrowLeftIcon className="h-7" />
+                      <ArrowLeftCircleIcon className="h-14" />
                     </div>
                     {
                       seshStarted ? (
@@ -393,30 +393,36 @@ export default function WorkoutSesh({
                               "bg-[#9fa7fe] text-white": seshStarted && !isActiveSet,
                             }
                           )}>
-                          <div className="flex">
-                            <div className="mx-5 flex items-center">
-                              {
+                          <div>
+                            <div className="mx-5">
+                              {/* {
                                 isActiveSet ?
-                                <CheckCircleIcon className="inline-block h-[65px] text-green-600" />
+                                <CheckCircleIcon className="inline-block h-[70px] text-green-600" />
                                 :
                                 <ArrowRightCircleIcon className="inline-block h-[65px] text-white" />
-                              }
-                              <div className="text-left ml-3">
-                                <p className="text-lg mb-0 mt-0 tracking-widest">
+                              } */}
+                              <div className={classNames(
+                                "text-center",
+                                "py-3 px-3 rounded-full",
+                                {
+                                  "text-gray-100 bg-gray-700": isActiveSet,
+                                  "bg-white text-[#858df0]": !isActiveSet,
+                                }
+                              )}>
+                                <p className="text-xl mb-0 mt-0 tracking-widest">
                                   {
                                     isActiveSet ?
-                                    <div className="mb-1">
-                                      Set {workoutSetNum}
+                                    <div className="text-3xl">
+                                      Finish
                                     </div>
-                                    : `End Rest`
+                                    : <div className="text-3xl">
+                                      Finish
+                                    </div>
                                   }
                                 </p>
                                 <p className={classnames(
-                                  "text-xs uppercase tracking-widest",
-                                  {
-                                    "text-gray-600 font-semibold": isActiveSet,
-                                    "text-white font-semibold": !isActiveSet
-                                  }
+                                  "text-base uppercase tracking-widest",
+                                  "font-semibold",
                                 )}>
                                   <strong className="font-semibold">
                                     Start {getNextWorkoutSetTypeLabel(activeExercise, currWorkoutSetType, workoutSetNum)}
@@ -446,15 +452,15 @@ export default function WorkoutSesh({
                           "hidden": !seshStarted
                         },
                         {
-                          "bg-gray-200 text-black": seshStarted && isActiveSet,
+                          "bg-gray-200 text-gray-400 hover:text-gray-700": seshStarted && isActiveSet,
                           "bg-[#858df0] text-white": seshStarted && !isActiveSet,
                         }
                       )}>
                         {
                           activeExerciseIdx === exercises.length - 1 ?
-                          <StopCircleIcon className="h-7" />
+                          <StopCircleIcon className="h-14" />
                           :
-                          <ArrowRightIcon className="h-7" />
+                          <ArrowRightCircleIcon className="h-14" />
                         }
                     </div>
                   </div>

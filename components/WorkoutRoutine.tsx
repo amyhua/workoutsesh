@@ -29,19 +29,24 @@ const WorkoutRoutine = ({
     )}>
       <div className="mr-1 mt-2">
         <div className={classnames(
-          "mx-3 relative rounded-sm w-[75px] h-[75px] border border-black text-center bg-gray-500 overflow-hidden",
+          "mx-3 relative rounded-sm w-[75px] h-[75px] text-center bg-gray-500 overflow-hidden",
           "text-black z-100",
           isFirst ? "mb-5 mt-2" : "my-5",
           isDragging ? "text-navy0": "text-black"
         )}>
-          <Image
-            src={exercise.imageUrl}
-            alt="Exercise Image"
-            priority
-            fill
-            placeholder={require('./heart-pulse.png')}
-            className="inline-block"
-          />
+          {
+            exercise.imageUrl ?
+            <Image
+              src={exercise.imageUrl}
+              alt="Exercise Image"
+              priority
+              fill
+              placeholder={require('./heart-pulse.png')}
+              className="inline-block h-[75px]"
+            />
+            :
+            <div className="inline-block w-[75px] h-[75px] bg-white" />
+          }
         </div>
       </div>
       <div className="flex-1 flex justify-center flex-col">

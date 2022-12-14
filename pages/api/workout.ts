@@ -38,45 +38,42 @@ async function workoutsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
       }
       break;
     case 'PUT':
-      console.log('PUT!!!!', req.query, req.query.data)
-      if (!req.query.data || !req.query.data.id) {
-        throw new Error('Missing workout ID as query param [id]')
+      req.body = req.body ? JSON.parse(req.body) : {}
+      if (!req.body ||  !req.body.id) {
+        throw new Error('Missing workout ID as body field [id]')
       }
-      if (req.query.id &&
-        typeof req.query.data === 'string' &&
-        typeof session.user.email === 'string') {
-          const data = JSON.parse(req.query.data || '{}');
-          console.log('data', data)
-          const exercises = data.exercises || [];
-          exercises.forEach(async (exc: Exercise) => {
-            try {
-              const updatedExc = await prisma.exercise.upsert({
-                where: {
-                  id: exc.id ? Number(exc.id) : undefined,
-                },
-                update: {
-                  ...exc,
-                },
-                create: {
-                  ...exc,
-                }
-              });
-              console.log('Exercise created:', updatedExc)
-            } catch(err) {
-              res.json(err);
-              return;
-            }
-          });
-        const workout = await prisma.workout.update({
+      if (typeof session.user.email !== 'string') {
+        throw new Error('Missing logged in user')
+      }
+      const workoutExercises = req.body.exercises || [];
+      workoutExercises.forEach(async (exc: Exercise) => {
+        const updatedExc = await prisma.exercise.upsert({
           where: {
-            id: Number(req.query.id),
+            id: exc.id ? Number(exc.id) : 0,
           },
-          data: {
-            ...(JSON.parse(req.query.data))
+          update: {
+            ...exc,
+            workout: undefined,
+            workoutId: Number(req.body.id),
           },
+          create: {
+            ...exc,
+            workout: undefined,
+            workoutId: Number(req.body.id),
+          }
         });
-        return res.json(workout);
-      }
+        console.log('Updated exercise', updatedExc, updatedExc.id);
+      });
+      const workout = await prisma.workout.update({
+        where: {
+          id: Number(req.body.id),
+        },
+        data: {
+          ...req.body,
+          exercises: undefined,
+        },
+      });
+      res.json(workout);
       break;
     case 'POST':
       const {

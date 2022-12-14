@@ -18,10 +18,10 @@ const ExerciseDescription = ({
         {
           setNum ?
           <>
-            <span className="text-sm mr-2 text-gray-400">Set</span>
-            <span className="mr-2 text-xl">{setNum}</span>
-            <span className="text-sm mr-2 text-gray-400">of</span>
-            <span className="mr-2 text-xl">
+            <span className="text-base mr-2 text-gray-300">Set</span>
+            <span className="mr-2 text-4xl">{setNum}</span>
+            <span className="text-base mr-2 text-gray-300">out of</span>
+            <span className="mr-2 text-3xl text-gray-500">
               {setsDescription || '<Sets>'}
             </span>
           </>
@@ -34,8 +34,8 @@ const ExerciseDescription = ({
             </span>
           </>
         }
-        <span className="ml-3 text-black inline-block rounded-full text-lg font-bold">
-          <span className="text-sm mr-2 text-gray-400">Reps:</span>{repsDescription || '<Reps>'}
+        <span className="ml-2 text-black inline-block rounded-full text-2xl font-bold">
+          <span className="text-base mr-2 text-gray-300">x</span>{repsDescription || '<Reps>'}
         </span>
       </>
       :
