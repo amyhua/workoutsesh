@@ -98,6 +98,10 @@ export default function WorkoutSesh({
   }
   const finishWorkout = () => {
     // finish last running set, log workout data, and go to summary
+    const sure = alert('Are you sure you want to end this workout?');
+    if (sure as any) {
+      console.log('finishWorkout')
+    }
     
   }
   const onExerciseDragEnd = (result: any) => {
@@ -301,7 +305,7 @@ export default function WorkoutSesh({
                   }
                 </div> */}
                 <div className={classnames(
-                  "px-3 h-[220px] flex flex-col justify-center",
+                  "px-3 h-[260px] flex flex-col justify-center",
                   {
                     "pt-5 pb-2": !seshStarted,
                     "pt-3": seshStarted
@@ -373,14 +377,16 @@ export default function WorkoutSesh({
                       className={classNames(
                         "flex items-center px-5",
                         {
-                          "hidden": !seshStarted || activeExerciseIdx === 0
-                        },
-                        {
-                          "bg-gray-200 text-gray-400 hover:text-gray-700": seshStarted && isActiveSet,
+                          "bg-gray-100 text-gray-600 hover:text-gray-700": seshStarted && isActiveSet,
                           "bg-[#858df0] text-white": seshStarted && !isActiveSet,
                         }
                       )}>
-                      <ArrowLeftCircleIcon className="h-14" />
+                      <ArrowLeftCircleIcon className={classNames(
+                        "h-14",
+                        {
+                          "collapse": !seshStarted || activeExerciseIdx === 0,
+                        }
+                       )} />
                     </div>
                     {
                       seshStarted ? (
@@ -389,7 +395,7 @@ export default function WorkoutSesh({
                           className={classNames(
                             "flex-1 py-3 cursor-pointer text-center",
                             {
-                              "bg-gray-100 text-black": seshStarted && isActiveSet,
+                              "bg-white text-black": seshStarted && isActiveSet,
                               "bg-[#9fa7fe] text-white": seshStarted && !isActiveSet,
                             }
                           )}>
@@ -405,8 +411,8 @@ export default function WorkoutSesh({
                                 "text-center",
                                 "py-3 px-3 rounded-full",
                                 {
-                                  "text-gray-100 bg-gray-700": isActiveSet,
-                                  "bg-white text-[#858df0]": !isActiveSet,
+                                  "text-black bg-brightGreen": isActiveSet,
+                                  "bg-[#343d93] text-white": !isActiveSet,
                                 }
                               )}>
                                 <p className="text-xl mb-0 mt-0 tracking-widest">
@@ -452,13 +458,13 @@ export default function WorkoutSesh({
                           "hidden": !seshStarted
                         },
                         {
-                          "bg-gray-200 text-gray-400 hover:text-gray-700": seshStarted && isActiveSet,
+                          "bg-gray-100 text-gray-600 hover:text-gray-700": seshStarted && isActiveSet,
                           "bg-[#858df0] text-white": seshStarted && !isActiveSet,
                         }
                       )}>
                         {
                           activeExerciseIdx === exercises.length - 1 ?
-                          <StopCircleIcon className="h-14" />
+                          <StopCircleIcon className="h-14 text-red-600" />
                           :
                           <ArrowRightCircleIcon className="h-14" />
                         }
@@ -607,22 +613,21 @@ export default function WorkoutSesh({
                 <div className="rounded-b-xl overflow-hidden">
                   <button
                     className={classNames(
-                      "mt-3 py-4 px-5 w-full font-bold",
-                      "text-black text-lg bg-white mb-5"
+                      "px-5 w-full font-bold",
+                      "text-gray-600 text-xl bg-gray-100 py-7"
                     )}
                   >
-                    <PlusCircleIcon className="h-7 inline-block align-top mr-1" /> Add New Exercise
+                    + Add Exercise
                   </button>
                   <button
                     onClick={seshStarted ? finishWorkout : startSesh}
                     className={classNames(
                       "py-7 px-5 w-full font-bold",
-                      "text-black text-lg bg-brightGreen"
+                      "text-black text-xl bg-brightGreen"
                     )}>
                     {
                       seshStarted ?
                       <>
-                        <StopCircleIcon className="h-7 inline-block align-top mr-2" />
                         Finish Workout
                       </> : <>
                         <PlayCircleIcon className="h-7 inline-block align-top mr-2" />
@@ -634,7 +639,7 @@ export default function WorkoutSesh({
               </div>
                 <div
                   onClick={cancelSesh}
-                  className="text-white mt-2 p-3 text-center opacity-70 hover:opacity-100 cursor-pointer">
+                  className="mt-5 text-base uppercase tracking-widest p-3 text-center text-gray-300 hover:text-white cursor-pointer">
                   Cancel Workout
                 </div>
             </div>
