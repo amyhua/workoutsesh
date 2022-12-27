@@ -47,7 +47,7 @@ async function workoutsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
       }
       const workoutExercises = req.body.exercises || [];
       workoutExercises.forEach(async (exc: Exercise) => {
-        const updatedExc = await prisma.exercise.upsert({
+        await prisma.exercise.upsert({
           where: {
             id: exc.id ? Number(exc.id) : 0,
           },
@@ -62,7 +62,6 @@ async function workoutsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
             workoutId: Number(req.body.id),
           }
         });
-        console.log('Updated exercise', updatedExc, updatedExc.id);
       });
       const workout = await prisma.workout.update({
         where: {

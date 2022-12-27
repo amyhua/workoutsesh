@@ -205,9 +205,9 @@ export default function IndexDashboard({
                         />
                       </div>
                       <h3 className="font-bold text-2xl mt-4">
-                        <PlayCircleIcon className="inline-block h-9 align-middle -ml-0.5 -mt-1" /> {workout.name}
+                        <PlayCircleIcon className="inline-block h-14 align-middle -ml-1 -mt-1 group-hover:text-green-500" /> {workout.name}
                       </h3>
-                      <div className="flex sm:flex-row flex-col">
+                      <div className="flex sm:flex-row flex-col ml-1">
                         <div className="ml-0.25 flex-1 flex sm:flex-row-reverse">
                           <div className="flex-1">
                             <p className="font-semibold text-lg mt-1">

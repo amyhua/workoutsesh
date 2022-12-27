@@ -11,7 +11,7 @@ import classNames from 'classnames'
 import ExerciseDescription from '../../../components/ExerciseDescription'
 import { getSession, useSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
-import { ArrowLeftCircleIcon, ArrowLeftIcon, ArrowRightCircleIcon, ArrowRightIcon, ArrowUpIcon, BackwardIcon, CheckCircleIcon, ForwardIcon, PlayCircleIcon, PlusCircleIcon, StopCircleIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftCircleIcon, ArrowRightCircleIcon, ArrowRightIcon, ArrowUpIcon, BackwardIcon, CheckCircleIcon, ForwardIcon, PauseCircleIcon, PlayCircleIcon, PlusCircleIcon, StarIcon, StopCircleIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 // see: https://github.com/atlassian/react-beautiful-dnd/issues/2350#issuecomment-1242917371
 
@@ -179,18 +179,26 @@ export default function WorkoutSesh({
               }
             </div>
             <div
-              className="px-4 text-center flex items-center md:min-h-[calc(100% - 32px)] max-w-xl"
+              className={classNames(
+                "px-4 text-center flex items-center md:min-h-[calc(100% - 32px)] max-w-xl",
+                {
+                  "hidden": !seshStarted
+                }
+              )}
               style={{
                 height: 'calc(100vh - 430px)'
               }}>
               <div className={classnames(
-                "mt-0 sm:mt-5 w-full flex flex-col justify-center"
+                "mt-0 sm:mt-5 w-full flex flex-col justify-center",
+                {
+                  "opacity-25": !isActiveSet,
+                }
               )} style={{
                 minHeight: 'calc(100% - 32px)'
               }}>
                 <div>
                   {
-                    String(activeExercise.imageUrl).match(/\.(jpeg|jpg|gif|png)$/) ?
+                    activeExercise.imageUrl && String(activeExercise.imageUrl).match(/\.(jpeg|jpg|gif|png)$|data/) ?
                     <Image
                       src={activeExercise.imageUrl}
                       alt="Active Exercise"
@@ -198,7 +206,7 @@ export default function WorkoutSesh({
                       height={500}
                       width={500}
                       placeholder={require('../../../components/routine-placeholder.png')}
-                      className="w-auto text-center inline-block"
+                      className="w-full text-center inline-block"
                     />
                     :
                     activeExercise.imageUrl ?
@@ -280,30 +288,11 @@ export default function WorkoutSesh({
                 "bg-gradient-to-b from-transparent via-active2 to-active2": seshStarted && isActiveSet,
                 "bg-gradient-to-b from-transparent via-[#353e94] to-[#353e94]": seshStarted && !isActiveSet,
                 "absolute bottom-0": seshStarted,
-                "bg-white": !seshStarted,
+                "hidden": !seshStarted,
                 // "absolute left-0 right-0": seshStarted,
               }
             )}>
               <div className="flex flex-col justify-center">
-                {/* <div className={classnames(
-                  "text-center mt-0",
-                  {
-                    "hidden": !seshStarted,
-                    "pt-3": seshStarted
-                  }
-                )}>
-                  {
-                    new Array(workoutSetNum).fill(1).map((set: any, i: number) => (
-                      <CheckCircleIconSvg
-                        key={i}
-                        size={28}
-                        color={(i + 1) === workoutSetNum ? '#ffffff' : '#01FFA4'}
-                        className={classnames(
-                          "inline-block m-2"
-                        )} />
-                    ))
-                  }
-                </div> */}
                 <div className={classnames(
                   "px-3 h-[260px] flex flex-col justify-center",
                   {
@@ -355,6 +344,24 @@ export default function WorkoutSesh({
                       </span>
                     }
                   </div>
+                </div>
+              </div>
+              <div className="px-6 py-3 flex">
+                <div>
+                  <span className="uppercase opacity-50 tracking-wide text-sm mr-1">set</span>
+                  <span className="font-bold mr-3 text-base text-brightGreen">#{workoutSetNum}</span>
+                </div>
+                <div className="flex-1">
+                  {
+                    new Array(workoutSetNum - 1).fill(0).map((_, i) => (
+                      <StarIcon key={i} className="h-4 inline-block align-top mt-[2.5px]" />
+                    ))
+                  }
+                  <StarIcon className="h-4 inline-block align-top mt-[2.5px] text-brightGreen" />
+                </div>
+                <div>
+                  <span className="uppercase opacity-50 tracking-wide text-sm mr-1">out of</span>
+                  <span className="uppercase text-sm font-semibold">{activeExercise.setsDescription}</span>
                 </div>
               </div>
               <div
@@ -412,27 +419,20 @@ export default function WorkoutSesh({
                                 "py-3 px-3 rounded-full",
                                 {
                                   "text-black bg-brightGreen": isActiveSet,
-                                  "bg-[#343d93] text-white": !isActiveSet,
+                                  "bg-black text-white": !isActiveSet,
                                 }
                               )}>
                                 <p className="text-xl mb-0 mt-0 tracking-widest">
                                   {
                                     isActiveSet ?
-                                    <div className="text-3xl">
-                                      Finish
-                                    </div>
-                                    : <div className="text-3xl">
-                                      Finish
-                                    </div>
+                                    <PauseCircleIcon className="h-14 text-center inline-block" />
+                                    :
+                                    <PlayCircleIcon className="h-14 text-center inline-block text-brightGreen" />
                                   }
-                                </p>
-                                <p className={classnames(
-                                  "text-base uppercase tracking-widest",
-                                  "font-semibold",
-                                )}>
-                                  <strong className="font-semibold">
-                                    Start {getNextWorkoutSetTypeLabel(activeExercise, currWorkoutSetType, workoutSetNum)}
-                                  </strong>
+                                  {
+                                    !isActiveSet &&
+                                    <span className="align-middle ml-1 opacity-50">#{workoutSetNum + 1}</span>
+                                  }
                                 </p>
                               </div>
                             </div>
@@ -464,7 +464,10 @@ export default function WorkoutSesh({
                       )}>
                         {
                           activeExerciseIdx === exercises.length - 1 ?
-                          <StopCircleIcon className="h-14 text-red-600" />
+                          <StopCircleIcon className={classNames(
+                            "h-14",
+                            isActiveSet ? "text-gray-400" : "text-white"
+                          )} />
                           :
                           <ArrowRightCircleIcon className="h-14" />
                         }
@@ -474,7 +477,7 @@ export default function WorkoutSesh({
             </div>
           </div>
           <section className={classNames(
-            "px-3 pt-3 z-50 transition-all",
+            "px-5 pt-5 z-50 transition-all",
             {
               "bg-active2": seshStarted && isActiveSet,
               "bg-[#353e94]": seshStarted && !isActiveSet,
