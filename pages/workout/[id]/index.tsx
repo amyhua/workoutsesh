@@ -11,7 +11,7 @@ import classNames from 'classnames'
 import ExerciseDescription from '../../../components/ExerciseDescription'
 import { getSession, useSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
-import { ArrowLeftCircleIcon, ArrowRightCircleIcon, ArrowRightIcon, ArrowUpIcon, BackwardIcon, CheckCircleIcon, ForwardIcon, PauseCircleIcon, PlayCircleIcon, PlusCircleIcon, StarIcon, StopCircleIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftCircleIcon, ArrowRightCircleIcon, ArrowRightIcon, ArrowUpIcon, BackwardIcon, CheckCircleIcon, ForwardIcon, PauseCircleIcon, PlayCircleIcon, PlusCircleIcon, StarIcon, StopCircleIcon, StopIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 // see: https://github.com/atlassian/react-beautiful-dnd/issues/2350#issuecomment-1242917371
 
@@ -166,14 +166,23 @@ export default function WorkoutSesh({
               "z-50 flex text-base font-normal px-4 py-3"
             )}>
               <div className="flex-1">
-                {workout.name}
+                <span className='overflow-hidden text-ellipsis w-full'>
+                  {workout.name}
+                </span>
               </div>
               {
                 seshStarted ?
-                <SeshCounter
-                  className="font-semibold text-right opacity-60"
-                  active={seshStarted}
-                />
+                <>
+                  <SeshCounter
+                    className="font-semibold text-right opacity-60"
+                    active={seshStarted}
+                  />
+                  <span
+                    onClick={finishWorkout}
+                    className="ml-2 text-brightGreen">
+                    Finish
+                  </span>
+                </>
                 :
                 <Link className="text-red-600" href="/">Cancel</Link>
               }
@@ -333,7 +342,7 @@ export default function WorkoutSesh({
                     {
                       isActiveSet ?
                       <ExerciseDescription
-                        fancy={true}
+                        fancy={false}
                         setsDescription={activeExercise.setsDescription}
                         repsDescription={activeExercise.repsDescription}
                         setNum={workoutSetNum}
