@@ -17,6 +17,7 @@ import SeshHistory from '../../../components/SeshHistory'
 import withSeshHistoryExercises from '../../../components/withSeshHistoryExercises'
 import ActiveSeshes from '../../../components/ActiveSeshes'
 import { SeshDto } from '../../../types'
+import { Exercise } from '@prisma/client'
 // see: https://github.com/atlassian/react-beautiful-dnd/issues/2350#issuecomment-1242917371
 
 resetServerContext()
@@ -67,14 +68,19 @@ function WorkoutSesh({
   error = error ? JSON.parse(error) : undefined;
   const { exercises: initialExercises = [] } = workout || {};
   const [unfinishedSeshes, setUnfinishedSeshes] = useState<SeshDto[]>(workout.seshes);
-  const [exercises, setExercises] = useState(initialExercises);
+  const orderedInitialExercises = initialExercises
+    .sort(
+      (a: Exercise, b: Exercise) => a.workoutOrder - b.workoutOrder
+    );
+  const [exercises, setExercises] = useState(orderedInitialExercises);
   const [activeIntervalCounterIsActive, setActiveIntervalCounterIsActive] = useState(false);
   const [seshStarted, setSeshStarted] = useState(false);
   const [seshCounterIsActive, setSeshCounterIsActive] = useState(seshStarted);
   const [workoutSetNum, setWorkoutSetNum] = useState(1);
   const [currWorkoutSetType, setCurrWorkoutSetType] = useState(WorkoutSetType.Active);
-  const [activeExerciseIdx, setActiveExerciseIdx] = useState(0)
-  const activeExercise = exercises[activeExerciseIdx]
+  const [activeExerciseIdx, setActiveExerciseIdx] = useState(0);
+  const activeExercise = exercises[activeExerciseIdx];
+  console.log('workout.seshes', workout.seshes, 'activeExercise', activeExercise);
   const [expanded, setExpanded] = useState(false);
   const [activeBottomTab, setActiveBottomTab] = useState(BottomTab.Exercises);
   const [winReady, setWinReady] = useState(false);
@@ -91,10 +97,27 @@ function WorkoutSesh({
     setActiveIntervalCounterIsActive(true);
     setSeshCounterIsActive(true);
     setExpanded(false);
+    if (data.orderedExerciseIds.length) {
+      const orderedExercises = exercises.sort(
+        (a: Exercise, b: Exercise) => {
+          // smaller first
+          const aIdx = data.orderedExerciseIds.findIndex((id: number) => id === a.id);
+          const bIdx = data.orderedExerciseIds.findIndex((id: number) => id === b.id);
+          return aIdx - bIdx;
+        }
+      );
+      setExercises(orderedExercises);
+      setActiveExerciseIdx(
+        data.orderedExerciseIds.length ?
+        // start at first of ordered exercise IDs, since orderedExerciseIds: unfinished exercises, ordered
+        orderedExercises.findIndex((exc: Exercise) => exc.id === data.orderedExerciseIds[0])
+        : 0
+      )
+    }
   };
-  const startSesh = (resumePrevSeshId: number) => {
+  const startSesh = (resumePrevSeshId: any) => {
     // start or resume sesh
-    (
+    return (
       !isNaN(resumePrevSeshId) ?
       fetch(`/api/sesh/${resumePrevSeshId}`)
       :
@@ -108,6 +131,7 @@ function WorkoutSesh({
     .then((resp: any) => resp.json())
     .then(onStartSesh)
     .catch((err: any) => {
+      console.error('onStartSesh failed', err);
       alert(`Something went wrong. Workout session cannot be saved. ${err.message}`);
     });
   };
@@ -119,7 +143,7 @@ function WorkoutSesh({
     if (winReady) router.push(`/signin?error=${'Not logged in'}`);
   }
   const resumeSesh = (seshId: number) => {
-    startSesh(seshId);
+    return startSesh(seshId);
   };
   const unstopSesh = (seshId: number) => {
     return fetch(`/api/sesh/${seshId}?action=unstop`)
@@ -170,7 +194,7 @@ function WorkoutSesh({
     }
     // sync with backend
     // if backend successful, update frontend
-    const reorderedexercises = reorder(
+    const reorderedExercises = reorder(
       seshStarted ?
         exercises.slice(activeExerciseIdx + 1) : exercises,
       result.source.index,
@@ -179,8 +203,8 @@ function WorkoutSesh({
     setExercises(seshStarted ? [
       ...exercises.slice(0, activeExerciseIdx),
       activeExercise,
-      ...reorderedexercises
-    ] : reorderedexercises)
+      ...reorderedExercises
+    ] : reorderedExercises)
   }
   useEffect(() => {
     setWinReady(true);
@@ -195,7 +219,9 @@ function WorkoutSesh({
     const pauseActiveSesh = () => {
       setActiveIntervalCounterIsActive(false);
       setSeshCounterIsActive(false);
-      return fetch(`/api/sesh/${seshId}?action=pause&duration=${workoutSecondsTotal}`)
+      return fetch(`/api/sesh/${seshId}?action=pause&duration=${workoutSecondsTotal}` +
+        `&orderedExerciseIds=${exercises.slice(activeExerciseIdx).map((exc: any) => exc.id).join(',')}`
+      )
     };
     const unpauseActiveSesh = () => {
       return fetch(`/api/sesh/${seshId}?action=unpause`)
@@ -685,6 +711,9 @@ function WorkoutSesh({
                               "mx-3": !seshStarted
                             }
                           )}
+                          style={{
+                            paddingBottom: snapshot.isDraggingOver ? 112 : 0,
+                          }}
                         >
                             {
                               (
@@ -756,7 +785,7 @@ function WorkoutSesh({
                       </> : <div className="relative top-1">
                         <PlayCircleIcon className="h-14 inline-block align-top mr-2 -mt-2.5" />
                         <span className="inline-block text-2xl mt-0.5">
-                          Start Workout Sesh
+                          Start New Sesh
                         </span>
                       </div>
                     }

@@ -52,7 +52,7 @@ const WorkoutRoutine = ({
       <div className="flex-1 flex justify-center flex-col">
         <h2 className={classnames(
           "font-bold text-base mb-0.5",
-          isDragging ? "text-navy0" : "text-black"
+          isDragging ? "text-green-500" : "text-black"
         )}>
           <Clamped clamp={2}>
             {exercise.name}
@@ -72,7 +72,7 @@ const WorkoutRoutine = ({
         null :
         <div className="leading-[110px] px-4 cursor-pointer">
           <ReorderIconSvg
-            color={isDragging ? '#2454e0' : '#C2C2C2'}
+            color={isDragging ? '#000000' : '#C2C2C2'}
           />
         </div>
       }

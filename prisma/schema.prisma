@@ -53,6 +53,7 @@ model Sesh {
   workoutSeshNum  Int @default(1)
   pausedAt      DateTime?
   finishedAt    DateTime?
+  orderedExerciseIds Int[] @default([]) // order of exercises left to do in this sesh
 }
 
 model SeshInterval {

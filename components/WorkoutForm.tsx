@@ -264,12 +264,15 @@ function WorkoutForm({
   mode: FormMode
   workout?: any
 }) {
+  console.log('form workout', workout);
   const router = useRouter()
   const { setIndexError, setIndexSuccess } = useContext(AppContext)
   const [submitting, setSubmitting] = useState(false)
   const [name, setName] = useState(workout.name || '')
   const [description, setDescription] = useState(workout.description || '')
-  const [exercises, setExercises] = useState<Exercise[]>(workout.exercises || [])
+  const [exercises, setExercises] = useState<Exercise[]>(workout.exercises ?
+    workout.exercises.sort((a: any, b: any) => a.workoutOrder - b.workoutOrder)
+    : [])
   const [editingExerciseIdx, setEditingExerciseIdx] = useState<number | undefined>()
   const [showExerciseForm, setShowExerciseForm] = useState(false)
   const [winReady, setWinReady] = useState(false);

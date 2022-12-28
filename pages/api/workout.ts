@@ -91,12 +91,12 @@ async function workoutsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
         })
         const createdExercises = [] as Exercise[];
         try {
-          exercises.forEach(async (exercise: Exercise, i: number) => {
+          exercises
+            .forEach(async (exercise: Exercise, i: number) => {
             const exc = await prisma.exercise.create({
               data: {
                 ...exercise,
-                workoutId: workout.id,
-                workoutOrder: i,
+                workoutId: workout.id
               }
             })
             createdExercises.push(exc);

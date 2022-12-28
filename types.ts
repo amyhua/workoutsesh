@@ -21,4 +21,5 @@ export type SeshDto = {
   finishedAt?: string;
   pausedAt?: string;
   timeCompletedS: number;
+  orderedExerciseIds: number[];
 }

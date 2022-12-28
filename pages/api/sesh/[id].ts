@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
-import { durationSeconds } from '../../../lib/time-utils';
 
 async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
   const session = await getSession({ req });
@@ -35,6 +34,9 @@ async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
             });
             break;
           case 'pause':
+            const orderedExerciseIds = req.query.orderedExerciseIds ?
+              String(req.query.orderedExerciseIds).split(',').map((x: string) => Number(x)) : undefined;
+
             sesh = await prisma.sesh.update({
               where: {
                 id: Number(req.query.id),
@@ -42,6 +44,7 @@ async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
               data: {
                 pausedAt: now,
                 timeCompletedS: Number(req.query.duration),
+                orderedExerciseIds,
               },
             });
             break;
