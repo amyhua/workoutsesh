@@ -198,6 +198,9 @@ export default function IndexDashboard({
                         <ImageTileRow
                           size={75}
                           imageUrls={workout.exercises
+                            .sort(
+                              (a: any, b: any) => a.workoutOrder - b.workoutOrder
+                            )
                             .filter((exc: any) => !!exc.imageUrl)
                             .map((exc: any) => exc.imageUrl)
                           }

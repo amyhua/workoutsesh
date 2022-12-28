@@ -236,22 +236,23 @@ function WorkoutSesh({
         if (seshStarted) unpauseActiveSesh();
       }
     };
-
-    // @ts-ignore
-    document.addEventListener('visibilitychange', visibilityChangeHandler, {
-      passive: true
-    });
     const handleRouteChange = function() {
       pauseActiveSesh();
     };
+
+    document.addEventListener('visibilitychange', visibilityChangeHandler, {
+      passive: true
+    });
+    window.addEventListener('beforeunload', handleRouteChange);
     router.events.on('routeChangeStart', handleRouteChange);
 
     return () => {
       // @ts-ignore
       document.removeEventListener('visibilitychange', visibilityChangeHandler);
+      window.removeEventListener('beforeunload', handleRouteChange);
       router.events.off('routeChangeStart', handleRouteChange);
     }
-  }, [seshId, seshStarted, workoutSecondsTotal, router.events])
+  }, [seshId, seshStarted, workoutSecondsTotal, router.events, activeExerciseIdx, exercises, onStartSesh])
 
   if (error) {
     console.error(error)
