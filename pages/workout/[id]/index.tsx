@@ -11,8 +11,12 @@ import classNames from 'classnames'
 import ExerciseDescription from '../../../components/ExerciseDescription'
 import { getSession, useSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
-import { ArrowLeftCircleIcon, ArrowRightCircleIcon, ArrowRightIcon, ArrowUpIcon, BackwardIcon, CheckCircleIcon, ForwardIcon, PauseCircleIcon, PlayCircleIcon, PlusCircleIcon, StarIcon, StopCircleIcon, StopIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftCircleIcon, ArrowRightCircleIcon, ArrowRightIcon, ArrowUpIcon, CheckCircleIcon, PencilIcon, PlayCircleIcon, StarIcon, StopCircleIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
+import SeshHistory from '../../../components/SeshHistory'
+import withSeshHistoryExercises from '../../../components/withSeshHistoryExercises'
+import ActiveSeshes from '../../../components/ActiveSeshes'
+import { SeshDto } from '../../../types'
 // see: https://github.com/atlassian/react-beautiful-dnd/issues/2350#issuecomment-1242917371
 
 resetServerContext()
@@ -20,6 +24,11 @@ resetServerContext()
 enum WorkoutSetType {
   Active = 'Set',
   Rest = 'Rest'
+}
+
+enum BottomTab {
+  Exercises = 'Exercises',
+  WorkoutLog = 'WorkoutLog',
 }
 
 const getNextWorkoutSetTypeLabel = (activeExercise: any, currWorkoutSetType: WorkoutSetType, workoutSetNum: number) => {
@@ -42,54 +51,105 @@ const reorder = (list: any[], startIndex: number, endIndex: number) => {
 
 const ACTIVE_ROUTINE_ID = 'active-workout-routine'
 
-export default function WorkoutSesh({
+const MILLISECONDS_IN_SEC = 1000;
+const fromNowSeconds = (date: Date) => {
+  const now = new Date();
+  return Math.round((now.getTime() - date.getTime()) / MILLISECONDS_IN_SEC);
+}
+function WorkoutSesh({
   workout,
-  error
+  error,
+  pastIntervals,
+  saveCurrentInterval,
 }: any) {
   const session = useSession();
   workout = workout ? JSON.parse(workout) : undefined;
   error = error ? JSON.parse(error) : undefined;
   const { exercises: initialExercises = [] } = workout || {};
+  const [unfinishedSeshes, setUnfinishedSeshes] = useState<SeshDto[]>(workout.seshes);
   const [exercises, setExercises] = useState(initialExercises);
-  const [counterIsActive, setCounterIsActive] = useState(false);
+  const [activeIntervalCounterIsActive, setActiveIntervalCounterIsActive] = useState(false);
   const [seshStarted, setSeshStarted] = useState(false);
+  const [seshCounterIsActive, setSeshCounterIsActive] = useState(seshStarted);
   const [workoutSetNum, setWorkoutSetNum] = useState(1);
   const [currWorkoutSetType, setCurrWorkoutSetType] = useState(WorkoutSetType.Active);
   const [activeExerciseIdx, setActiveExerciseIdx] = useState(0)
   const activeExercise = exercises[activeExerciseIdx]
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(false);
+  const [activeBottomTab, setActiveBottomTab] = useState(BottomTab.Exercises);
   const [winReady, setWinReady] = useState(false);
+  const [exited, setExited] = useState(false);
+  const [activeExcNote, setActiveExcNote] = useState('');
+  const [activeIntervalSecondsTotal, setActiveIntervalSecondsTotal] = useState(0);
+  const [workoutSecondsTotal, setWorkoutSecondsTotal] = useState(0);
+  const [seshId, setSeshId] = useState<number>();
   const router = useRouter();
-  const startSesh = () => {
+  const onStartSesh = (data: SeshDto) => {
+    setSeshId(data.id);
+    setWorkoutSecondsTotal(data.timeCompletedS)
     setSeshStarted(true);
-    setCounterIsActive(true);
+    setActiveIntervalCounterIsActive(true);
+    setSeshCounterIsActive(true);
     setExpanded(false);
-  }
+  };
+  const startSesh = (resumePrevSeshId: number) => {
+    // start or resume sesh
+    (
+      !isNaN(resumePrevSeshId) ?
+      fetch(`/api/sesh/${resumePrevSeshId}`)
+      :
+      fetch(`/api/sesh`, {
+        method: 'POST',
+        body: JSON.stringify({
+          workoutId: workout.id,
+        })
+      })
+    )
+    .then((resp: any) => resp.json())
+    .then(onStartSesh)
+    .catch((err: any) => {
+      alert(`Something went wrong. Workout session cannot be saved. ${err.message}`);
+    });
+  };
   const cancelSesh = () => {
     setSeshStarted(false)
-  }
+  };
   const isActiveSet = currWorkoutSetType === WorkoutSetType.Active;
   if (!session) {
     if (winReady) router.push(`/signin?error=${'Not logged in'}`);
   }
+  const resumeSesh = (seshId: number) => {
+    startSesh(seshId);
+  };
+  const unstopSesh = (seshId: number) => {
+    return fetch(`/api/sesh/${seshId}?action=unstop`)
+  };
+  const stopSesh = (seshId: number) => {
+    return fetch(`/api/sesh/${seshId}?action=stop`)
+  }
   const startNextSet = () => {
-    if (activeExercise.restBetweenSets) {
-      if (isActiveSet) {
-        // return rest
-        setCurrWorkoutSetType(WorkoutSetType.Rest)
-        return
-      } else {
-        // is rest -> start active set
-        setCurrWorkoutSetType(WorkoutSetType.Active)
-        setWorkoutSetNum(workoutSetNum + 1)
-      }
+    saveCurrentInterval({
+      exerciseId: activeExercise.id,
+      durationS: activeIntervalSecondsTotal,
+      setNo: workoutSetNum,
+      note: activeExcNote,
+      active: currWorkoutSetType === WorkoutSetType.Active,
+    });
+    if (activeExercise.restBetweenSets && isActiveSet) {
+      setCurrWorkoutSetType(WorkoutSetType.Rest)
+    } else {
+      // go to nex (active) set
+      setCurrWorkoutSetType(WorkoutSetType.Active)
+      setWorkoutSetNum(workoutSetNum + 1)
+      setActiveExcNote('');
     }
-    setWorkoutSetNum(workoutSetNum + 1)
+    setActiveIntervalSecondsTotal(0);
   }
   const startNextExercise = () => {
     setActiveExerciseIdx(idx => idx + 1)
     setCurrWorkoutSetType(WorkoutSetType.Active)
     setWorkoutSetNum(1)
+    setActiveIntervalSecondsTotal(0)
   }
   const startPrevExercise = () => {
     setActiveExerciseIdx(idx => idx - 1)
@@ -123,8 +183,49 @@ export default function WorkoutSesh({
     ] : reorderedexercises)
   }
   useEffect(() => {
-    setWinReady(true)
+    setWinReady(true);
+    // return () => {
+    //   console.log('unmount', seshStarted, seshId)
+    //   pauseOnUnmount();
+    // }
+    console.log('mount1')
   }, [])
+
+  useEffect(() => {
+    const pauseActiveSesh = () => {
+      setActiveIntervalCounterIsActive(false);
+      setSeshCounterIsActive(false);
+      return fetch(`/api/sesh/${seshId}?action=pause&duration=${workoutSecondsTotal}`)
+    };
+    const unpauseActiveSesh = () => {
+      return fetch(`/api/sesh/${seshId}?action=unpause`)
+        .then((r: any) => r.json())
+        .then(onStartSesh)
+    };
+
+    const visibilityChangeHandler = function() {
+      if (document.visibilityState !== 'visible') {
+        if (seshStarted) pauseActiveSesh();
+      } else {
+        if (seshStarted) unpauseActiveSesh();
+      }
+    };
+
+    // @ts-ignore
+    document.addEventListener('visibilitychange', visibilityChangeHandler, {
+      passive: true
+    });
+    const handleRouteChange = function() {
+      pauseActiveSesh();
+    };
+    router.events.on('routeChangeStart', handleRouteChange);
+
+    return () => {
+      // @ts-ignore
+      document.removeEventListener('visibilitychange', visibilityChangeHandler);
+      router.events.off('routeChangeStart', handleRouteChange);
+    }
+  }, [seshId, seshStarted, workoutSecondsTotal, router.events])
 
   if (error) {
     console.error(error)
@@ -175,7 +276,9 @@ export default function WorkoutSesh({
                 <>
                   <SeshCounter
                     className="font-semibold text-right opacity-60"
-                    active={seshStarted}
+                    active={seshStarted && seshCounterIsActive}
+                    secondsTotal={workoutSecondsTotal}
+                    setSecondsTotal={setWorkoutSecondsTotal}
                   />
                   <span
                     onClick={finishWorkout}
@@ -234,61 +337,7 @@ export default function WorkoutSesh({
                     "relative flex ease-linear items-center bg-white overflow-hidden w-full",
                   )}>
                   </div>
-                  {/* <div className={classNames(
-                    "flex-1 ml-4 mr-2 my-1",
-                    {
-                      "hidden": expanded
-                    }
-                  )}>
-                    <div className="flex flex-col">
-                      <div
-                        className={classnames(
-                          "w-[calc(100vw - 251px)] sm:w-auto text-xs mt-0 mb-3 block overflow-hidden overflow-ellipsis whitespace-nowrap",
-                          {
-                            "text-navym1": seshStarted && isActiveSet,
-                            "text-pink": seshStarted && !isActiveSet,
-                            "text-gray-500": !seshStarted
-                          }
-                        )}>
-                        {workout.name}
-                      </div>
-                      <div className="flex-1 flex flex-col justify-center">
-                        <h1 className={classnames(
-                          "font-bold text-left text-lg leading-snug",
-                          {
-                            "text-white": seshStarted,
-                            "text-black": !seshStarted
-                          }
-                        )}>
-                          <Clamped clamp={2}>
-                            {activeExercise.name}
-                          </Clamped>
-                        </h1>
-                        <div className={classnames(
-                            "mt-1 text-base text-left",
-                            {
-                              "text-navym1": seshStarted && isActiveSet,
-                              "text-pink": seshStarted && !isActiveSet,
-                              "text-black": !seshStarted,
-                            }
-                          )}>
-                            <ExerciseDescription
-                              setsDescription={activeExercise.setsDescription}
-                              repsDescription={activeExercise.repsDescription}
-                            />
-                            <RestBetweenSetsDescription
-                              value={activeExercise.restBetweenSets}
-                              className={seshStarted ?
-                                isActiveSet ? 'text-navym1' : 'text-pink' :
-                                'text-black'
-                              }
-                            />
-                        </div>
-                      </div>
-                    </div>
-                  </div> */}
                 </div>
-
               </div>
             </div>
             <div className={classNames(
@@ -303,26 +352,28 @@ export default function WorkoutSesh({
             )}>
               <div className="flex flex-col justify-center">
                 <div className={classnames(
-                  "px-3 h-[260px] flex flex-col justify-center",
+                  "px-3 h-[200px] flex flex-col justify-center",
                   {
                     "pt-5 pb-2": !seshStarted,
                     "pt-3": seshStarted
                   })}>
                     <SeshCounter
-                    className={classNames(
-                      "pt-2 pb-2 font-semibold tracking-widest text-6xl text-center",
-                      {
-                        "hidden": !seshStarted
-                      }
-                    )}
-                    key={[
-                      workoutSetNum,
-                      isActiveSet,
-                      activeExerciseIdx
-                    ].join('-')}
-                    isActiveSet={isActiveSet}
-                    seshStarted={seshStarted}
-                    active={counterIsActive}
+                      className={classNames(
+                        "pt-2 pb-2 font-semibold tracking-widest text-6xl text-center",
+                        {
+                          "hidden": !seshStarted
+                        }
+                      )}
+                      key={[
+                        workoutSetNum,
+                        isActiveSet,
+                        activeExerciseIdx
+                      ].join('-')}
+                      isActiveSet={isActiveSet}
+                      seshStarted={seshStarted}
+                      active={activeIntervalCounterIsActive}
+                      secondsTotal={activeIntervalSecondsTotal}
+                      setSecondsTotal={setActiveIntervalSecondsTotal}
                   />
                   <h2 className="mx-auto mb-2 text-center text-xl font-normal w-[90%] overflow-hidden">
                     <span>
@@ -332,15 +383,21 @@ export default function WorkoutSesh({
                     </span>
                   </h2>
                   <div className={classNames(
-                    "text-center mb-4 mt-2 mx-2 p-2",
+                    "text-center mb-4 mt-2 mx-2 px-2",
                     "rounded-full text-sm font-bold uppercase tracking-wide",
                     {
                       "text-black": !seshStarted,
-                      "bg-white text-black": seshStarted && isActiveSet,
+                      "py-2 bg-white text-black": seshStarted && isActiveSet,
+                      "py-1": seshStarted && !isActiveSet,
+                      "hidden": !activeExercise.setsDescription &&
+                        !activeExercise.repsDescription && isActiveSet
                     }
                   )}>
                     {
-                      isActiveSet ?
+                      isActiveSet && (
+                        activeExercise.setsDescription ||
+                        activeExercise.repsDescription
+                      ) ?
                       <ExerciseDescription
                         fancy={false}
                         setsDescription={activeExercise.setsDescription}
@@ -348,14 +405,15 @@ export default function WorkoutSesh({
                         setNum={workoutSetNum}
                       />
                       :
-                      <span className="text-4xl tracking-widest">
-                        Rest
+                      <span className="text-xl tracking-widest">
+                        Resting...
                       </span>
                     }
                   </div>
                 </div>
               </div>
-              <div className="px-6 py-3 flex">
+              {/* set descriptor */}
+              <div className="px-5 py-3 flex">
                 <div>
                   <span className="uppercase opacity-50 tracking-wide text-sm mr-1">set</span>
                   <span className="font-bold mr-3 text-base text-brightGreen">#{workoutSetNum}</span>
@@ -368,10 +426,23 @@ export default function WorkoutSesh({
                   }
                   <StarIcon className="h-4 inline-block align-top mt-[2.5px] text-brightGreen" />
                 </div>
-                <div>
-                  <span className="uppercase opacity-50 tracking-wide text-sm mr-1">out of</span>
-                  <span className="uppercase text-sm font-semibold">{activeExercise.setsDescription}</span>
-                </div>
+                {
+                  activeExercise.setsDescription &&
+                  <div>
+                    <span className="uppercase opacity-50 tracking-wide text-sm mr-1">out of</span>
+                    <span className="uppercase text-sm font-semibold">{activeExercise.setsDescription}</span>
+                  </div>
+                }
+              </div>
+              <div className="bg-white0 p-2 relative">
+                <input
+                  type="text"
+                  value={activeExcNote}
+                  onChange={(e: any) => setActiveExcNote(e.target.value)}
+                  placeholder={`Set #${workoutSetNum} Note`}
+                  className="focus:outline-none w-full py-2 pl-10 pr-4 text-black border"
+                />
+                <PencilIcon className="h-5 inline-block absolute left-[18px] top-[19px] text-black z-2" />
               </div>
               <div
                 className={classnames(
@@ -417,12 +488,6 @@ export default function WorkoutSesh({
                           )}>
                           <div>
                             <div className="mx-5">
-                              {/* {
-                                isActiveSet ?
-                                <CheckCircleIcon className="inline-block h-[70px] text-green-600" />
-                                :
-                                <ArrowRightCircleIcon className="inline-block h-[65px] text-white" />
-                              } */}
                               <div className={classNames(
                                 "text-center",
                                 "py-3 px-3 rounded-full",
@@ -434,7 +499,7 @@ export default function WorkoutSesh({
                                 <p className="text-xl mb-0 mt-0 tracking-widest">
                                   {
                                     isActiveSet ?
-                                    <PauseCircleIcon className="h-14 text-center inline-block" />
+                                    <CheckCircleIcon className="h-14 text-center inline-block" />
                                     :
                                     <PlayCircleIcon className="h-14 text-center inline-block text-brightGreen" />
                                   }
@@ -494,12 +559,21 @@ export default function WorkoutSesh({
               "absolute left-0 right-0": seshStarted,
             },
             {
-              // "transform-y-[107px]": !expanded,
               "top-[55px] min-h-[100vh]": expanded,
             }
           )} style={{
             top: (seshStarted && !expanded) ? 'calc(100vh - 92px)' : '',
           }}>
+            {
+              workout.seshes && workout.seshes.length && seshId === undefined ?
+              <ActiveSeshes
+                seshes={unfinishedSeshes}
+                resumeSesh={resumeSesh}
+                stopSesh={stopSesh}
+                unstopSesh={unstopSesh}
+              />
+              : null
+            }
             <div className="pb-10 bg-transparent">
               <div className={classNames(
                 "bg-white rounded-xl overflow-hidden shadow-xl drop-shadow-xl",
@@ -515,17 +589,39 @@ export default function WorkoutSesh({
                     "rounded-full": !seshStarted || activeExerciseIdx === exercises.length - 1,
                     "bg-black text-white px-4": seshStarted && activeExerciseIdx === exercises.length - 1,
                   })} style={{
-                    lineHeight: '32px',
+                    lineHeight: seshStarted ? '32px' : '',
                   }}>
+                    <span
+                      onClick={() => setActiveBottomTab(BottomTab.Exercises)}
+                      className={classNames(
+                        "cursor-pointer ml-0.5", {
+                        "text-black font-bold": activeBottomTab === BottomTab.Exercises,
+                        "text-slate-500 font-normal": activeBottomTab !== BottomTab.Exercises,
+                      })}>
+                      {
+                        seshStarted ?
+                          activeExerciseIdx < exercises.length - 1 ? 'Next Exercises' : (
+                            seshStarted ?
+                            'Last Exercise! 💪' :
+                            'Cancel Workout'
+                          )
+                          :
+                          <h3 className="mx-3 text-xl font-bold normal-case text-center">
+                            Exercises
+                          </h3>
+                      }
+                    </span>
                     {
-                      seshStarted ?
-                        activeExerciseIdx < exercises.length - 1 ? 'Exercises' : (
-                          seshStarted ?
-                          'Last Exercise! 💪' :
-                          'Cancel Workout'
-                        )
-                        :
-                        'Exercises'
+                      seshStarted &&
+                      <span
+                        onClick={() => setActiveBottomTab(BottomTab.WorkoutLog)}
+                        className={classNames(
+                          "cursor-pointer ml-2", {
+                          "text-black font-bold": activeBottomTab === BottomTab.WorkoutLog,
+                          "text-slate-500 font-normal": activeBottomTab !== BottomTab.WorkoutLog,
+                        })}>
+                        History
+                      </span>
                     }
                   </div>
                   <div
@@ -557,7 +653,8 @@ export default function WorkoutSesh({
                 </div>
                 {
                   seshStarted &&
-                  <div className="px-3 pt-2 pb-2 bg-white">
+                  activeBottomTab === BottomTab.Exercises &&
+                  <div className="px-3 pt-0 pb-2 bg-white">
                     <h3 className="font-semibold text-base">
                       {
                         activeExerciseIdx < exercises.length - 1 ?
@@ -574,6 +671,7 @@ export default function WorkoutSesh({
                 }
                 {
                   winReady &&
+                  activeBottomTab === BottomTab.Exercises &&
                   <DragDropContext onDragEnd={onExerciseDragEnd}>
                     <Droppable droppableId="droppable">
                       {(provided: any, snapshot: any) => (
@@ -581,7 +679,12 @@ export default function WorkoutSesh({
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className="bg-white text-black"
+                          className={classNames(
+                            "bg-white text-black",
+                            {
+                              "mx-3": !seshStarted
+                            }
+                          )}
                         >
                             {
                               (
@@ -622,11 +725,20 @@ export default function WorkoutSesh({
                     </Droppable>
                   </DragDropContext>
                 }
-                <div className="rounded-b-xl overflow-hidden">
+                {
+                  activeBottomTab === BottomTab.WorkoutLog &&
+                  <SeshHistory exercises={pastIntervals} />
+                }
+                <div className={classNames(
+                  "mt-2 rounded-b-xl overflow-hidden",
+                )}>
                   <button
                     className={classNames(
                       "px-5 w-full font-bold",
-                      "text-gray-600 text-xl bg-gray-100 py-7"
+                      "text-gray-600 text-xl bg-gray-100 py-7",
+                      {
+                        "hidden": activeBottomTab !== BottomTab.Exercises
+                      }
                     )}
                   >
                     + Add Exercise
@@ -641,10 +753,12 @@ export default function WorkoutSesh({
                       seshStarted ?
                       <>
                         Finish Workout
-                      </> : <>
-                        <PlayCircleIcon className="h-7 inline-block align-top mr-2" />
-                        Start Workout
-                      </>
+                      </> : <div className="relative top-1">
+                        <PlayCircleIcon className="h-14 inline-block align-top mr-2 -mt-2.5" />
+                        <span className="inline-block text-2xl mt-0.5">
+                          Start Workout Sesh
+                        </span>
+                      </div>
                     }
                   </button>
                 </div>
@@ -674,7 +788,12 @@ export async function getServerSideProps(context: any) {
         },
         include: {
           exercises: true,
-        }
+          seshes: {
+            where: {
+              finishedAt: null,
+            }
+          }
+        },
       });
     }
     return {
@@ -692,3 +811,5 @@ export async function getServerSideProps(context: any) {
     }
   }
 }
+
+export default withSeshHistoryExercises(WorkoutSesh);

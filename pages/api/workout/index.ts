@@ -26,6 +26,7 @@ async function workoutRoute(req: NextApiRequest, res: NextApiResponse<any>) {
             },
             include: {
               exercises: true,
+              seshes: true,
             }
           });
           return res.json(workout);

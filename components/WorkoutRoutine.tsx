@@ -70,7 +70,7 @@ const WorkoutRoutine = ({
       {
         (isFirst && isLast) ?
         null :
-        <div className="leading-[90px] px-4 cursor-pointer">
+        <div className="leading-[110px] px-4 cursor-pointer">
           <ReorderIconSvg
             color={isDragging ? '#2454e0' : '#C2C2C2'}
           />

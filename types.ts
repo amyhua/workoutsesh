@@ -14,3 +14,11 @@ export type User = {
   image: string | null | undefined
   workouts?: any[]
 }
+
+export type SeshDto = {
+  id: number;
+  createdAt: string;
+  finishedAt?: string;
+  pausedAt?: string;
+  timeCompletedS: number;
+}

@@ -42,7 +42,7 @@ const MoreMenu = ({ workoutId }: { workoutId: string }) => {
           {
               ({ active }: { active: boolean }) => (
                 <div className="py-2 px-3 whitespace-nowrap">
-                    <TrashIcon className="inline-block h-4 align-top mt-0.5 mr-1" /> Delete
+                  <TrashIcon className="inline-block h-4 align-top mt-0.5 mr-1" /> Delete
                 </div>
               )
           }

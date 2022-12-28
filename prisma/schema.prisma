@@ -43,16 +43,20 @@ model Sesh {
   id  Int @id @default(autoincrement())
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
-  timeCompletedS Int // running total seconds completed
+  timeCompletedS Int @default(0) // running total seconds completed
   workoutId Int
   workout Workout @relation(fields: [workoutId], references: [id])
   userEmail String
   user  User  @relation(fields: [userEmail], references: [email])
   intervals SeshInterval[]
   note String? @db.VarChar(200)
+  workoutSeshNum  Int @default(1)
+  pausedAt      DateTime?
+  finishedAt    DateTime?
 }
 
 model SeshInterval {
+  // either a rest period or an active period
   id  Int @id @default(autoincrement())
   seshId Int
   sesh Sesh @relation(fields: [seshId], references: [id])
@@ -60,7 +64,7 @@ model SeshInterval {
   exercise Exercise @relation(fields: [exerciseId], references: [id])
   durationS Int
   setNo Int @default(1)
-  active Boolean
+  active Boolean // is an active set, or a 'rest' set
   note String?
 }
 

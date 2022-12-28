@@ -8,13 +8,16 @@ export default function SeshCounter({
   active,
   seshStarted,
   className,
+  secondsTotal,
+  setSecondsTotal,
 }: {
   active: boolean;
   isActiveSet?: boolean;
   seshStarted?: boolean;
   className?: string;
+  secondsTotal: number;
+  setSecondsTotal: (val: any) => void;
 }) {
-  const [secondsTotal, setSecondsTotal] = useState(0);
   const seconds = toSeconds(secondsTotal);
   const minutes = toMinutes(secondsTotal);
   let timerInterval: any;
@@ -26,6 +29,11 @@ export default function SeshCounter({
       timerInterval = setInterval(() => {
         setSecondsTotal((oldTotal: number) => oldTotal + 1);
       }, 1000)
+    } else {
+      if (timerInterval) clearInterval(timerInterval)
+    }
+    return () => {
+      if (timerInterval) clearInterval(timerInterval)
     }
   }, [active])
   return (
