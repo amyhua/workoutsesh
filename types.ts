@@ -18,6 +18,7 @@ export type User = {
 export type SeshDto = {
   id: number;
   createdAt: string;
+  updatedAt: string;
   finishedAt?: string;
   pausedAt?: string;
   timeCompletedS: number;

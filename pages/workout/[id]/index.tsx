@@ -67,7 +67,12 @@ function WorkoutSesh({
   workout = workout ? JSON.parse(workout) : undefined;
   error = error ? JSON.parse(error) : undefined;
   const { exercises: initialExercises = [] } = workout || {};
-  const [unfinishedSeshes, setUnfinishedSeshes] = useState<SeshDto[]>(workout.seshes);
+  const [unfinishedSeshes, setUnfinishedSeshes] = useState<SeshDto[]>(workout.seshes
+    .sort(
+      (a: SeshDto, b: SeshDto) =>
+        new Date (b.updatedAt).getTime() - new Date (a.updatedAt).getTime()
+    )
+  );
   const orderedInitialExercises = initialExercises
     .sort(
       (a: Exercise, b: Exercise) => a.workoutOrder - b.workoutOrder
@@ -623,7 +628,7 @@ function WorkoutSesh({
                       className={classNames(
                         "cursor-pointer ml-0.5", {
                         "text-black font-bold": activeBottomTab === BottomTab.Exercises,
-                        "text-slate-500 font-normal": activeBottomTab !== BottomTab.Exercises,
+                        "text-slate-600 font-normal": activeBottomTab !== BottomTab.Exercises,
                       })}>
                       {
                         seshStarted ?
@@ -786,7 +791,7 @@ function WorkoutSesh({
                       </> : <div className="relative top-1">
                         <PlayCircleIcon className="h-14 inline-block align-top mr-2 -mt-2.5" />
                         <span className="inline-block text-2xl mt-0.5">
-                          Start New Sesh
+                          Start Sesh
                         </span>
                       </div>
                     }
@@ -795,7 +800,7 @@ function WorkoutSesh({
               </div>
                 <div
                   onClick={cancelSesh}
-                  className="mt-5 text-base uppercase tracking-widest p-3 text-center text-gray-300 hover:text-white cursor-pointer">
+                  className="mt-5 text-lg p-3 text-center text-gray-600 hover:text-white cursor-pointer">
                   Cancel Workout
                 </div>
             </div>
