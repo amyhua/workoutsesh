@@ -10,6 +10,7 @@ export default function SeshCounter({
   className,
   secondsTotal,
   setSecondsTotal,
+  children,
 }: {
   active: boolean;
   isActiveSet?: boolean;
@@ -17,6 +18,7 @@ export default function SeshCounter({
   className?: string;
   secondsTotal: number;
   setSecondsTotal: (val: any) => void;
+  children?: any;
 }) {
   const seconds = toSeconds(secondsTotal);
   const minutes = toMinutes(secondsTotal);
@@ -42,10 +44,15 @@ export default function SeshCounter({
       "text-white",
       {
         "text-white": seshStarted !== undefined && seshStarted,
-        "text-black": seshStarted !== undefined && !seshStarted
+        "text-black": seshStarted !== undefined && !seshStarted,
       }
     )}>
-      {minutes.toFixed(0)}:{seconds <= 9 ? '0' + seconds : seconds}
+      <span className={classnames({
+        "opacity-50": !active,
+      })}>
+        {minutes.toFixed(0)}:{seconds <= 9 ? '0' + seconds : seconds}
+      </span>
+      {children}
     </div>
   )
 }

@@ -59,6 +59,7 @@ model Sesh {
 model SeshInterval {
   // either a rest period or an active period
   id  Int @id @default(autoincrement())
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
   seshId Int
   sesh Sesh @relation(fields: [seshId], references: [id])
   exerciseId Int

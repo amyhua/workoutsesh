@@ -1,33 +1,67 @@
-export type SeshIntervalDto = {
-  id?: number;
-  seshId: number;
-  exerciseId: number;
-  durationS: number;
-  setNo: number;
-  active?: boolean;
-  note?: string;
-}
+import { SeshInterval } from "@prisma/client";
+import { useState } from "react";
 
 const withSeshHistoryExercises = (Component: React.FC<any>) => {
-  const pastIntervals = [] as SeshIntervalDto[];
-  const saveCurrentInterval = (interval: SeshIntervalDto) => {
-    console.log('saveCurrentInterval', interval)
-    if (!interval.active && interval.note) {
-      // if note added during a rest period, then
-      // add it to the last active set's notes
-
-      // TODO
-    }
-    
+  const pastIntervals = [] as SeshInterval[];
+  const Comp = (props: any) => {
+    const [lastSavedInterval, setLastSavedInterval] = useState<any>();
+    const saveCurrentInterval = (interval: SeshInterval) => {
+      const promises = [];
+      let restNote: string | undefined = '';
+      if (!interval.active && interval.note) {
+        // if note added during a rest period, then
+        console.log('saving on rest', lastSavedInterval);
+        if (
+          lastSavedInterval &&
+          lastSavedInterval.exerciseId === interval.exerciseId &&
+          lastSavedInterval.seshId === interval.seshId &&
+          lastSavedInterval.active
+          // redundant check, given that a pre-rest period is always active,
+          // but why the heck not
+        ) {
+          // add it to the last active set's notes
+          promises.push(
+            fetch(`/api/interval/${lastSavedInterval.id}`, {
+              method: 'PUT',
+              body: JSON.stringify({
+                note: interval.note,
+              }),
+            })
+          );
+        } else {
+          // given that the active set was 'skipped', add it to the rest interval
+          restNote = interval.note;
+        }
+      }
+      promises.push(
+        fetch(`/api/interval`, {
+          method: 'POST',
+          body: JSON.stringify({
+            ...interval,
+            note: interval.active ? interval.note : restNote,
+          })
+        })
+      );
+      return Promise.all(promises)
+        .then((rs: any[]) => rs[rs.length - 1].json())
+        .then((data: any[]) => {
+          console.log('saved data...', data);
+          setLastSavedInterval(data);
+        })
+        .catch((errs: any[]) => {
+          console.error('Cannot save set', errs);
+          alert('Cannot save set: ' + errs[0]);
+        });
+    };
+    return (
+      <Component
+        pastIntervals={pastIntervals}
+        saveCurrentInterval={saveCurrentInterval}
+        {...props}
+      />
+    );
   };
-  const comp = (props: any) => (
-    <Component
-      pastIntervals={pastIntervals}
-      saveCurrentInterval={saveCurrentInterval}
-      {...props}
-    />
-  );
-  comp.displayName = 'WithSeshHistoryExercises';
-  return comp;
+  Comp.displayName = 'WithSeshHistoryExercises';
+  return Comp;
 }
 export default withSeshHistoryExercises;

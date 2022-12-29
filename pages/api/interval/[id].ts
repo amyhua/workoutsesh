@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
 
-async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
+async function intervalRoute(req: NextApiRequest, res: NextApiResponse<any>) {
   const session = await getSession({ req });
   if (!session || !session.user || !session.user.email) {
     res.status(401).send({
@@ -12,31 +12,20 @@ async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
   }
   const body = JSON.parse(req.body);
   switch (req.method) {
-    case 'POST':
-      const createdSesh = await prisma.sesh.create({
-        data: {
-          user: {
-            connect: {
-              email: session.user.email
-            }
-          },
-          workout: {
-            connect: {
-              id: Number(body.workoutId)
-            }
-          }
+    case 'PUT':
+      const interval = await prisma.seshInterval.update({
+        where: {
+          id: Number(req.query.id),
         },
-        include: {
-          intervals: true,
-        },
+        data: body,
       })
-      res.json(createdSesh);
+      res.json(interval);
       break;
     default:
-      res.setHeader('Allow', ['POST'])
+      res.setHeader('Allow', ['PUT'])
       res.status(405).end(`Method ${req.method} Not Allowed`)
       break;
   }
 }
 
-export default seshRoute;
+export default intervalRoute;

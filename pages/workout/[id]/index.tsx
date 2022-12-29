@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Layout from '../../../components/Layout'
 import SeshCounter from '../../../components/SeshCounter'
 import classnames from 'classnames'
@@ -17,7 +17,8 @@ import SeshHistory from '../../../components/SeshHistory'
 import withSeshHistoryExercises from '../../../components/withSeshHistoryExercises'
 import ActiveSeshes from '../../../components/ActiveSeshes'
 import { SeshDto } from '../../../types'
-import { Exercise } from '@prisma/client'
+import { Exercise, SeshInterval } from '@prisma/client'
+import { getNextIntervalProps } from '../../../lib/sesh-utils'
 // see: https://github.com/atlassian/react-beautiful-dnd/issues/2350#issuecomment-1242917371
 
 resetServerContext()
@@ -49,18 +50,10 @@ const reorder = (list: any[], startIndex: number, endIndex: number) => {
 
   return result;
 }
-
-const ACTIVE_ROUTINE_ID = 'active-workout-routine'
-
 const MILLISECONDS_IN_SEC = 1000;
-const fromNowSeconds = (date: Date) => {
-  const now = new Date();
-  return Math.round((now.getTime() - date.getTime()) / MILLISECONDS_IN_SEC);
-}
 function WorkoutSesh({
   workout,
   error,
-  pastIntervals,
   saveCurrentInterval,
 }: any) {
   const session = useSession();
@@ -80,12 +73,12 @@ function WorkoutSesh({
   const [exercises, setExercises] = useState(orderedInitialExercises);
   const [activeIntervalCounterIsActive, setActiveIntervalCounterIsActive] = useState(false);
   const [seshStarted, setSeshStarted] = useState(false);
+  const [pastIntervals, setPastIntervals] = useState<SeshInterval[]>([]);
   const [seshCounterIsActive, setSeshCounterIsActive] = useState(seshStarted);
   const [workoutSetNum, setWorkoutSetNum] = useState(1);
   const [currWorkoutSetType, setCurrWorkoutSetType] = useState(WorkoutSetType.Active);
   const [activeExerciseIdx, setActiveExerciseIdx] = useState(0);
   const activeExercise = exercises[activeExerciseIdx];
-  console.log('workout.seshes', workout.seshes, 'activeExercise', activeExercise);
   const [expanded, setExpanded] = useState(false);
   const [activeBottomTab, setActiveBottomTab] = useState(BottomTab.Exercises);
   const [winReady, setWinReady] = useState(false);
@@ -95,13 +88,16 @@ function WorkoutSesh({
   const [workoutSecondsTotal, setWorkoutSecondsTotal] = useState(0);
   const [seshId, setSeshId] = useState<number>();
   const router = useRouter();
-  const onStartSesh = (data: SeshDto) => {
+  const onStartSesh = useCallback((data: SeshDto & { intervals: SeshInterval[] }) => {
     setSeshId(data.id);
     setWorkoutSecondsTotal(data.timeCompletedS)
     setSeshStarted(true);
     setActiveIntervalCounterIsActive(true);
     setSeshCounterIsActive(true);
     setExpanded(false);
+    setPastIntervals(data.intervals.sort(
+
+    ));
     if (data.orderedExerciseIds.length) {
       const orderedExercises = exercises.sort(
         (a: Exercise, b: Exercise) => {
@@ -117,9 +113,15 @@ function WorkoutSesh({
         // start at first of ordered exercise IDs, since orderedExerciseIds: unfinished exercises, ordered
         orderedExercises.findIndex((exc: Exercise) => exc.id === data.orderedExerciseIds[0])
         : 0
-      )
+      );
     }
-  };
+    const { setNo: newSetNo, active: newIsActiveSet } = getNextIntervalProps(data.intervals || [], workout.restBetweenSets);
+    setWorkoutSetNum(newSetNo);
+    setCurrWorkoutSetType(newIsActiveSet ? WorkoutSetType.Active : WorkoutSetType.Rest);
+  }, [
+    exercises,
+    workout.restBetweenSets,
+  ]);
   const startSesh = (resumePrevSeshId: any) => {
     // start or resume sesh
     return (
@@ -157,13 +159,17 @@ function WorkoutSesh({
     return fetch(`/api/sesh/${seshId}?action=stop`)
   }
   const startNextSet = () => {
-    saveCurrentInterval({
-      exerciseId: activeExercise.id,
-      durationS: activeIntervalSecondsTotal,
-      setNo: workoutSetNum,
-      note: activeExcNote,
-      active: currWorkoutSetType === WorkoutSetType.Active,
-    });
+    // only save active intervals if they are not 'skips' (defined as > 4s)
+    if (!isActiveSet || activeIntervalSecondsTotal >= 4) {
+      saveCurrentInterval({
+        seshId: seshId,
+        exerciseId: activeExercise.id,
+        durationS: activeIntervalSecondsTotal,
+        setNo: workoutSetNum,
+        note: activeExcNote,
+        active: currWorkoutSetType === WorkoutSetType.Active,
+      });
+    }
     if (activeExercise.restBetweenSets && isActiveSet) {
       setCurrWorkoutSetType(WorkoutSetType.Rest)
     } else {
@@ -175,10 +181,21 @@ function WorkoutSesh({
     setActiveIntervalSecondsTotal(0);
   }
   const startNextExercise = () => {
-    setActiveExerciseIdx(idx => idx + 1)
-    setCurrWorkoutSetType(WorkoutSetType.Active)
-    setWorkoutSetNum(1)
-    setActiveIntervalSecondsTotal(0)
+    if (!activeIntervalCounterIsActive || !isActiveSet) {
+      saveCurrentInterval({
+        seshId: seshId,
+        exerciseId: activeExercise.id,
+        durationS: activeIntervalSecondsTotal,
+        setNo: workoutSetNum,
+        note: activeExcNote,
+        active: currWorkoutSetType === WorkoutSetType.Active,
+      });
+    }
+    setActiveExerciseIdx(idx => idx + 1);
+    setCurrWorkoutSetType(WorkoutSetType.Active);
+    setWorkoutSetNum(1);
+    setActiveIntervalCounterIsActive(false);
+    setActiveIntervalSecondsTotal(0);
   }
   const startPrevExercise = () => {
     setActiveExerciseIdx(idx => idx - 1)
@@ -187,12 +204,12 @@ function WorkoutSesh({
   }
   const finishWorkout = () => {
     // finish last running set, log workout data, and go to summary
-    const sure = alert('Are you sure you want to end this workout?');
-    if (sure as any) {
-      console.log('finishWorkout')
-    }
-    
-  }
+    alert('Are you sure you want to end this workout?');
+    return fetch(`/api/sesh/${seshId}?action=finish&duration=${workoutSecondsTotal}`)
+      .then(() => {
+        router.push(`/workout/${workout.id}/sesh/${seshId}?finished=true`);
+      })    
+  };
   const onExerciseDragEnd = (result: any) => {
     if (!result.destination) {
       return
@@ -213,11 +230,6 @@ function WorkoutSesh({
   }
   useEffect(() => {
     setWinReady(true);
-    // return () => {
-    //   console.log('unmount', seshStarted, seshId)
-    //   pauseOnUnmount();
-    // }
-    console.log('mount1')
   }, [])
 
   useEffect(() => {
@@ -361,7 +373,7 @@ function WorkoutSesh({
                       src={activeExercise.imageUrl}
                     />
                     :
-                    <h1 className="text-white text-lg">
+                    <h1 className="text-white text-3xl">
                       {activeExercise.name}
                     </h1>
                   }
@@ -383,7 +395,8 @@ function WorkoutSesh({
               }
             )}>
               <div className="flex flex-col justify-center">
-                <div className={classnames(
+                <div
+                  className={classnames(
                   "px-3 h-[200px] flex flex-col justify-center",
                   {
                     "pt-5 pb-2": !seshStarted,
@@ -391,9 +404,9 @@ function WorkoutSesh({
                   })}>
                     <SeshCounter
                       className={classNames(
-                        "pt-2 pb-2 font-semibold tracking-widest text-6xl text-center",
+                        "pt-2 pb-2 font-semibold tracking-widest text-6xl text-center relative",
                         {
-                          "hidden": !seshStarted
+                          "hidden": !seshStarted,
                         }
                       )}
                       key={[
@@ -408,39 +421,39 @@ function WorkoutSesh({
                       setSecondsTotal={setActiveIntervalSecondsTotal}
                   />
                   <h2 className="mx-auto mb-2 text-center text-xl font-normal w-[90%] overflow-hidden">
-                    <span>
-                      <Clamped clamp={2}>
-                        {activeExercise.name}
-                      </Clamped>
-                    </span>
+                    <Clamped clamp={2}>
+                      {isActiveSet ? activeExercise.name : 'Rest'}
+                    </Clamped>
                   </h2>
                   <div className={classNames(
                     "text-center mb-4 mt-2 mx-2 px-2",
                     "rounded-full text-sm font-bold uppercase tracking-wide",
                     {
                       "text-black": !seshStarted,
-                      "py-2 bg-white text-black": seshStarted && isActiveSet,
-                      "py-1": seshStarted && !isActiveSet,
-                      "hidden": !activeExercise.setsDescription &&
-                        !activeExercise.repsDescription && isActiveSet
+                      // "py-2 bg-white text-black": seshStarted && isActiveSet,
+                      "py-1": seshStarted,
                     }
                   )}>
-                    {
+                    {/* {
                       isActiveSet && (
                         activeExercise.setsDescription ||
                         activeExercise.repsDescription
-                      ) ?
+                      ) &&
                       <ExerciseDescription
                         fancy={false}
                         setsDescription={activeExercise.setsDescription}
                         repsDescription={activeExercise.repsDescription}
                         setNum={workoutSetNum}
                       />
-                      :
-                      <span className="text-xl tracking-widest">
-                        Resting...
-                      </span>
-                    }
+                    } */}
+                    <span className={classNames(
+                      "text-xl tracking-widest",
+                      {
+                        "collapse": isActiveSet,
+                      }
+                    )}>
+                      Next up: set {workoutSetNum + 1}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -479,7 +492,7 @@ function WorkoutSesh({
               <div
                 className={classnames(
                   "mt-0 flex-1 font-bold tracking-widest uppercase text-xl",
-                  "cursor-pointer transition-all",
+                  "transition-all",
                   "flex flex-col justify-center pb-[92px]",
                   {
                     "hidden": !seshStarted,
@@ -492,12 +505,13 @@ function WorkoutSesh({
                     "flex h-auto"
                   )}>
                     <div
-                      onClick={startPrevExercise}
+                      onClick={(!seshStarted || activeExerciseIdx === 0) ? undefined : startPrevExercise}
                       className={classNames(
                         "flex items-center px-5",
                         {
                           "bg-gray-100 text-gray-600 hover:text-gray-700": seshStarted && isActiveSet,
                           "bg-[#858df0] text-white": seshStarted && !isActiveSet,
+                          "cursor-pointer": seshStarted && activeExerciseIdx > 0,
                         }
                       )}>
                       <ArrowLeftCircleIcon className={classNames(
@@ -510,7 +524,10 @@ function WorkoutSesh({
                     {
                       seshStarted ? (
                         <div
-                          onClick={startNextSet}
+                          onClick={activeIntervalCounterIsActive ?
+                            startNextSet :
+                            () => setActiveIntervalCounterIsActive(true)
+                          }
                           className={classNames(
                             "flex-1 py-3 cursor-pointer text-center",
                             {
@@ -528,27 +545,28 @@ function WorkoutSesh({
                                   "bg-black text-white": !isActiveSet,
                                 }
                               )}>
-                                <p className="text-xl mb-0 mt-0 tracking-widest">
+                                <div className="text-xl mb-0 mt-0 tracking-widest">
                                   {
-                                    isActiveSet ?
-                                    <CheckCircleIcon className="h-14 text-center inline-block" />
+                                    isActiveSet ? (
+                                      activeIntervalCounterIsActive ?
+                                      <CheckCircleIcon className="h-14 text-center inline-block" /> :
+                                      <PlayCircleIcon className="h-14 text-center inline-block" />
+                                    )
                                     :
-                                    <PlayCircleIcon className="h-14 text-center inline-block text-brightGreen" />
+                                    // <PlayCircleIcon className="h-14 text-center inline-block text-brightGreen" />
+                                    <h2 className="text-3xl p-2">
+                                      Start
+                                    </h2>
                                   }
-                                  {
-                                    !isActiveSet &&
-                                    <span className="align-middle ml-1 opacity-50">#{workoutSetNum + 1}</span>
-                                  }
-                                </p>
+                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
                       ) : (
                         <div
-                          className="flex-1 text-2xl h-[56px] text-center">
+                          className="cursor-pointer flex-1 text-2xl h-[56px] text-center">
                           <PlayCircleIcon className="h-16 inline-block -mt-0.5" />
-                          {/* <span className="inline-block align-middle"></span> */}
                         </div>
                       )
                     }
@@ -559,7 +577,7 @@ function WorkoutSesh({
                           : startNextExercise
                       }
                       className={classNames(
-                        "flex items-center px-5",
+                        "flex items-center px-5 cursor-pointer",
                         {
                           "hidden": !seshStarted
                         },
@@ -588,7 +606,8 @@ function WorkoutSesh({
               "bg-active2": seshStarted && isActiveSet,
               "bg-[#353e94]": seshStarted && !isActiveSet,
               "bg-white": !seshStarted,
-              "absolute left-0 right-0": seshStarted,
+              "absolute left-0 right-0 bottom-0": seshStarted,
+              "overflow-auto": seshStarted && expanded,
             },
             {
               "top-[55px] min-h-[100vh]": expanded,
@@ -608,27 +627,27 @@ function WorkoutSesh({
             }
             <div className="pb-10 bg-transparent">
               <div className={classNames(
-                "bg-white rounded-xl overflow-hidden shadow-xl drop-shadow-xl",
+                "shadow-xl drop-shadow-xl",
               )} style={{
                 filter: 'drop-shadow(0 -5px 25px rgb(0 0 0 / 4%)) drop-shadow(0 0px 40px rgb(0 0 0 / 0.1))',
               }}>
                 <div className={classnames(
                   "flex bg-white pt-2 pb-0 px-3 uppercase tracking-wider font-bold",
-                  "text-sm",
+                  "text-sm rounded-t-2xl",
                 )}>
                   <div className={classNames(
                     {
-                    "rounded-full": !seshStarted || activeExerciseIdx === exercises.length - 1,
-                    "bg-black text-white px-4": seshStarted && activeExerciseIdx === exercises.length - 1,
+                    "rounded-full": !seshStarted,
                   })} style={{
                     lineHeight: seshStarted ? '32px' : '',
                   }}>
                     <span
                       onClick={() => setActiveBottomTab(BottomTab.Exercises)}
                       className={classNames(
-                        "cursor-pointer ml-0.5", {
+                        "cursor-pointer ml-0.5 mr-2", {
                         "text-black font-bold": activeBottomTab === BottomTab.Exercises,
                         "text-slate-600 font-normal": activeBottomTab !== BottomTab.Exercises,
+                        "hidden": activeExerciseIdx === exercises.length - 1,
                       })}>
                       {
                         seshStarted ?
@@ -648,7 +667,7 @@ function WorkoutSesh({
                       <span
                         onClick={() => setActiveBottomTab(BottomTab.WorkoutLog)}
                         className={classNames(
-                          "cursor-pointer ml-2", {
+                          "cursor-pointer", {
                           "text-black font-bold": activeBottomTab === BottomTab.WorkoutLog,
                           "text-slate-500 font-normal": activeBottomTab !== BottomTab.WorkoutLog,
                         })}>
@@ -696,7 +715,7 @@ function WorkoutSesh({
                           </strong> {exercises[activeExerciseIdx + 1].name}
                         </Clamped>
                         :
-                        null
+                        'No exercises remaining.'
                       }
                     </h3>
                   </div>
@@ -762,10 +781,10 @@ function WorkoutSesh({
                 }
                 {
                   activeBottomTab === BottomTab.WorkoutLog &&
-                  <SeshHistory exercises={pastIntervals} />
+                  <SeshHistory intervals={pastIntervals} />
                 }
                 <div className={classNames(
-                  "mt-2 rounded-b-xl overflow-hidden",
+                  "rounded-b-xl overflow-hidden",
                 )}>
                   <button
                     className={classNames(
@@ -838,6 +857,7 @@ export async function getServerSideProps(context: any) {
         params: context.params
       }
     }
+    // TODO: handle not logged in user
   } catch(error) {
     return {
       props : {

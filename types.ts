@@ -24,3 +24,12 @@ export type SeshDto = {
   timeCompletedS: number;
   orderedExerciseIds: number[];
 }
+
+export type SeshIntervalDto = {
+  seshId: number;
+  exerciseId: number;
+  durationS: number;
+  setNo: number;
+  note?: string;
+  active: boolean;
+}

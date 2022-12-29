@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
 
-async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
+async function intervalRoute(req: NextApiRequest, res: NextApiResponse<any>) {
   const session = await getSession({ req });
   if (!session || !session.user || !session.user.email) {
     res.status(401).send({
@@ -13,24 +13,25 @@ async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
   const body = JSON.parse(req.body);
   switch (req.method) {
     case 'POST':
-      const createdSesh = await prisma.sesh.create({
+      const createdSeshInterval = await prisma.seshInterval.create({
         data: {
-          user: {
+          durationS: Number(body.durationS),
+          setNo: Number(body.setNo),
+          note: body.note,
+          active: body.active,
+          exercise: {
             connect: {
-              email: session.user.email
+              id: Number(body.exerciseId)
             }
           },
-          workout: {
+          sesh: {
             connect: {
-              id: Number(body.workoutId)
+              id: Number(body.seshId)
             }
           }
-        },
-        include: {
-          intervals: true,
-        },
+        }
       })
-      res.json(createdSesh);
+      res.json(createdSeshInterval);
       break;
     default:
       res.setHeader('Allow', ['POST'])
@@ -39,4 +40,4 @@ async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
   }
 }
 
-export default seshRoute;
+export default intervalRoute;

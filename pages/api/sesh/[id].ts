@@ -1,3 +1,4 @@
+import { Sesh, SeshInterval } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
@@ -12,13 +13,32 @@ async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
   }
   switch (req.method) {
     case 'GET':
-      console.log('!req.query', req.query)
       let sesh = await prisma.sesh.findFirstOrThrow({
         where: {
           id: Number(req.query.id),
           userEmail: session.user.email,
-        }
-      });
+        },
+        include: {
+          intervals: {
+            orderBy: {
+              createdAt: 'desc',
+            },
+            select: {
+              id: true,
+              createdAt: true,
+              active: true,
+              durationS: true,
+              note: true,
+              setNo: true,
+              exercise: {
+                select: {
+                  name: true,
+                }
+              }
+            },
+          },
+        },
+      }) as Sesh | Sesh & { intervals: SeshInterval[]; };
       if (req.query.action) {
         const now = new Date();
          switch (String(req.query.action).toLowerCase()) {
@@ -56,6 +76,9 @@ async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
               data: {
                 pausedAt: null,
               },
+              include: {
+                intervals: true,
+              },
             });
             break;
           case 'unstop':
@@ -65,6 +88,18 @@ async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
               },
               data: {
                 finishedAt: null,
+              },
+            });
+            break;
+          case 'finish':
+            sesh = await prisma.sesh.update({
+              where: {
+                id: Number(req.query.id),
+              },
+              data: {
+                finishedAt: now,
+                timeCompletedS: Number(req.query.duration),
+                pausedAt: now,
               },
             });
             break;
