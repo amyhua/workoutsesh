@@ -59,9 +59,9 @@ function SeshExerciseSummary({
 }) {
   const [showNotes, setShowNotes] = useState(false);
   return (
-    <section className="mb-10 mt-7">
+    <section className="mb-2 mt-2 py-6 border-b border-white0 last:border-transparent">
       <header className="mb-2">
-        <h3 className="font-semibold text-xl mb-1">
+        <h3 className="font-semibold text-2xl mb-1">
           {exerciseName}
         </h3>
         <div className="mb-4 mt-3 text-sm uppercase tracking-widest">
@@ -85,7 +85,7 @@ function SeshExerciseSummary({
                 "border-white": showNotes,
               }
             )}>
-            Notes
+            Notes ({Object.keys(intervalsMeta.noteBySetNo).length})
           </span>
         </div>
       </header>
@@ -139,12 +139,13 @@ function SeshExerciseSummary({
 function SeshPage({
   sesh,
 }: {
-  sesh: Sesh & { intervals: SeshInterval[] } | null
+  sesh: Sesh & { intervals: SeshInterval[] } & { workout: { name: string; } } | null
 }) {
   sesh = typeof sesh === 'string' ? JSON.parse(sesh) : null;
 
   if (!sesh) return null; // TODO: handle
 
+  const workoutName = sesh.workout.name;
   const totalTimeM = moment.duration(sesh.timeCompletedS, 'seconds');
   const activePeriods = sesh.intervals.filter((int: SeshInterval) => int.active);
   const restPeriods = sesh.intervals.filter((int: SeshInterval) => !int.active);
@@ -176,12 +177,20 @@ function SeshPage({
         <h1 className="text-4xl font-bold">
           Great Job!
         </h1>
-        <h2 className="tracking-wide mt-5 text-xl font-semibold">
-          Workout Summary
+        <h2 className="tracking-wide mt-5">
+          <div className="font-bold text-2xl">Summary</div>
         </h2>
         {/* overall stats */}
         <div className="mb-8">
           <ul className="list-style-none p-0 mt-4">
+            <li className="mb-2">
+              <span className="inline-block opacity-70 w-[130px]">
+                Name
+              </span>
+              <span className="ml-1 font-semibold text-lg">
+                {workoutName}
+              </span>
+            </li>
             <li className="mb-1">
               <span className="inline-block opacity-70 w-[130px]">
                 Total Time
@@ -190,7 +199,9 @@ function SeshPage({
                 <DurationText durationM={totalTimeM} />
               </span>
             </li>
-            <li className="mb-1">
+            <li className={classNames("mb-1", {
+              "hidden": activePeriods.length === 0,
+            })}>
               <span className="inline-block opacity-70 w-[130px]">
                 Average Set
               </span>
@@ -210,10 +221,17 @@ function SeshPage({
             </li>
           </ul>
         </div>
-        <div className="font-mono text-sm mb-2">
-          <span className="mr-4">S = Set</span>
-          R = Rest
-        </div>
+        {
+          Object.keys(intervalsByExerciseName).length ?
+          <div className="font-mono text-sm mb-2">
+            <span className="mr-4">S = Set</span>
+            R = Rest
+          </div>
+          :
+          <div className="text-lg">
+            This workout sesh is empty.
+          </div>
+        }
         {
           Object.keys(intervalsByExerciseName).map((exerciseName: string, i: number) => (
             <SeshExerciseSummary
@@ -241,6 +259,11 @@ export async function getServerSideProps(context: any) {
           userEmail: String(email),
         },
         include: {
+          workout: {
+            select: {
+              name: true
+            }
+          },
           intervals: {
             orderBy: {
               createdAt: 'asc',
