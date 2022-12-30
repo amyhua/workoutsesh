@@ -638,17 +638,13 @@ function WorkoutSesh({
               </div>
               {/* set descriptor */}
               <div className={classNames(
-                "px-5 flex min-h-[28px]",
-                {
-                  "mb-0": !activeExerciseActiveNotedPeriodsByMostRecent[0],
-                  "mb-1": !!activeExerciseActiveNotedPeriodsByMostRecent[0],
-                }
+                "px-5 flex min-h-[36px]"
               )}>
                 <div className="flex-1">
                   {
                     activeIntervalCounterIsActive ?
                       (activeExercise.isRest || !isActiveSet) ?
-                      <div className="mt-2">
+                      <div className="mt-1.5">
                         <Clamped clamp={1}>
                           <span className="mr-2 text-white/60 flex">
                             <span className="text-white text-right flex-1">
@@ -671,7 +667,7 @@ function WorkoutSesh({
                         </Clamped>
                       </div>
                       :
-                      <div className="flex">
+                      <div className="flex relative top-1.5">
                         {/* <div className="inline-block -mt-1.5 mr-2">
                           <span className="mt-1.5 text-lg align-bottom font-bold inline-block">Set #{workoutSetNum}</span>
                         </div> */}
@@ -713,11 +709,11 @@ function WorkoutSesh({
                     setShowAddNote(!showAddNote);
                   }}
                   className={classNames(
-                    "px-1 py-1.5 inline-block align-top cursor-pointer",
-                    {
-                      "-mt-[2px]": isActiveSet && !activeIntervalCounterIsActive,
-                      "-mt-2": isActiveSet && activeIntervalCounterIsActive,
-                    }
+                    "-mt-[2px] px-1 py-1.5 inline-block align-top cursor-pointer",
+                    // {
+                    //   "-mt-[2px]": isActiveSet && !activeIntervalCounterIsActive,
+                    //   "-mt-2": isActiveSet && activeIntervalCounterIsActive,
+                    // }
                   )}>
                   + <ChatBubbleLeftIcon className="h-4 inline-block align-middle" />
                 </div>
