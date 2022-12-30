@@ -21,6 +21,7 @@ model Exercise {
   setsDescription String?
   repsDescription String?
   restBetweenSets Boolean @default(true)
+  betweenSetsRestTimeLimitS Int?
   intervals SeshInterval[]
 }
 
@@ -34,8 +35,7 @@ model Workout {
   exercises Exercise[]
   userEmail String
   user User @relation(fields: [userEmail], references: [email])
-  averageDurationS Int? // average duration in seconds
-  countCompleted Int @default(0) // count of completed seshes
+  averageDurationS Float? // average duration in seconds
   seshes Sesh[]
 }
 

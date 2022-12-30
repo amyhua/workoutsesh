@@ -1,3 +1,4 @@
+import { ChatBubbleLeftIcon } from "@heroicons/react/20/solid";
 import {  SeshInterval } from "@prisma/client";
 import classNames from "classnames";
 import moment from "moment";
@@ -14,7 +15,7 @@ function SeshExerciseSummary({
 }) {
   const [showNotes, setShowNotes] = useState(false);
   return (
-    <section className="mb-2 mt-0 py-6 border-b border-white0 last:border-none">
+    <section className="mb-2 mt-0 py-4 border-b border-white0 last:border-none">
       <header className="mb-2">
         <h3 className="font-semibold text-2xl mb-1">
           {exerciseName}
@@ -37,13 +38,13 @@ function SeshExerciseSummary({
           <span
             onClick={() => setShowNotes(true)}
             className={classNames(
-              "pb-1 border-b",
+              "ml-1 pb-1 border-b",
               {
                 "opacity-50 border-transparent": !showNotes, 
                 "border-white": showNotes,
               }
             )}>
-            Notes ({Object.keys(intervalsMeta.noteBySetNo).length})
+            <ChatBubbleLeftIcon className="inline-block h-3 -mt-0.5 mr-1" /> Notes ({Object.keys(intervalsMeta.noteBySetNo).length})
           </span>
         </div>
       </header>

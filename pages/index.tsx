@@ -10,7 +10,7 @@ export default function IndexPage({ user, workouts }: any) {
     <AuthenticatedPageWrapper>
       <IndexDashboard workouts={workouts} />
     </AuthenticatedPageWrapper>
-  )
+)
 }
 
 export async function getServerSideProps(context: any) {
@@ -21,9 +21,15 @@ export async function getServerSideProps(context: any) {
       workouts = await prisma.workout.findMany({
         where: {
           userEmail: session.user.email,
+
         },
         include: {
           exercises: true,
+          seshes: {
+            orderBy: {
+              createdAt: 'asc',
+            }
+          }
         },
       })
     }

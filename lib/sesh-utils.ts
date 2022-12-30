@@ -4,10 +4,8 @@ export const getNextIntervalProps = (intervals: (SeshInterval & { exercise: { re
   setNo: number;
   active: boolean;
 } => {
-  const intervalsByLastCreated = intervals.sort((intA: SeshInterval, intB: SeshInterval) => (
-    new Date(intB.createdAt).getTime() - new Date(intA.createdAt).getTime()
-  ));
-  const lastCreatedFinishedInterval = intervalsByLastCreated[0];
+  // assume intervals are ordered by most recently created
+  const lastCreatedFinishedInterval = intervals[0];
   if (!lastCreatedFinishedInterval) {
     return {
       setNo: 1,
@@ -15,6 +13,7 @@ export const getNextIntervalProps = (intervals: (SeshInterval & { exercise: { re
     };
   }
   if (
+    lastCreatedFinishedInterval.exercise &&
     lastCreatedFinishedInterval.exercise.restBetweenSets &&
     lastCreatedFinishedInterval &&
     lastCreatedFinishedInterval.active

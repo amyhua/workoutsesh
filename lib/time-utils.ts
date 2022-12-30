@@ -12,3 +12,10 @@ export const getShortDurationFormat = (durationM: moment.Duration) => (
   (getMins(durationM) ? getZeroPrefixedNum(getMins(durationM)) + ':' : '00:') +
   (getSeconds(durationM) ? getZeroPrefixedNum(getSeconds(durationM)) : '00')
 );
+
+export const formatShortFromNow = (str: string) => (
+  str
+    .replace('minute', 'min')
+    .replace('hour', 'hr')
+    .replace('a few', '')
+)

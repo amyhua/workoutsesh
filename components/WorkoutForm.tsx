@@ -1,4 +1,4 @@
-import { Bars2Icon, CheckCircleIcon, CheckIcon, ChevronLeftIcon, PencilIcon, PencilSquareIcon, PlusCircleIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { Bars2Icon, CheckCircleIcon, CheckIcon, ChevronLeftIcon, ClockIcon, PencilIcon, PencilSquareIcon, PlusCircleIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import classNames from "classnames";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -6,243 +6,13 @@ import { useContext, useEffect, useState } from "react";
 import Clamped from "./Clamped";
 import { resetServerContext, DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import AppContext from "../contexts/app-context";
-
-type Exercise = {
-  name: string;
-  imageUrl: string;
-  setsDescription: string;
-  id?: string;
-  // "5" or "2-3"
-  repsDescription: string;
-  // "15" or "12-15" or "15-20 each leg"
-  restBetweenSets: boolean;
-}
-
-const RestBetweenSetsDescription = ({
-  value
-}: {
-  value: boolean;
-}) => (
-  <div className="text-gray-700">
-    {
-      value ?
-      <span>
-        <CheckIcon className="-ml-0.5 inline-block h-5 align-top mt-0.5 text-green-500" /> Rest between sets
-      </span> : (
-        <span>
-          <XMarkIcon className="-ml-1.5 inline-block h-5 align-top mt-0.5 text-red-500" /> No rest between sets
-        </span>
-      )
-    }
-  </div>
-)
-
-const ExerciseDescription = ({ setsDescription, repsDescription }: { setsDescription: string; repsDescription: string; }) => (
-  <Clamped clamp={1}>
-      {setsDescription || '<Sets>'} sets of {repsDescription || '<Reps>'}
-  </Clamped>
-)
-
-const OptionalText = () => (
-  <span className="text-gray-400 ml-1">optional</span>
-)
+import { ExerciseDescription, OptionalText, RestBetweenSetsDescription } from "./FormComponents";
+import ExerciseForm from "./ExerciseForm";
+import { Exercise } from "@prisma/client";
+import DurationText from "./DurationText";
+import moment from "moment";
 
 resetServerContext()
-
-function ExerciseForm({
-  open,
-  onClose,
-  setExercise,
-  exercise={
-    name: '',
-    imageUrl: '',
-    repsDescription: '',
-    setsDescription: '',
-    restBetweenSets: true,
-  },
-  editing,
-  onRemove,
-}: {
-  open: boolean;
-  onClose: () => void;
-  setExercise: any;
-  exercise: Exercise;
-  editing: boolean;
-  onRemove?: () => void;
-}) {
-  const [name, setName] = useState(exercise.name)
-  const [imageUrl, setImageUrl] = useState(exercise.imageUrl)
-  const [repsDescription, setRepsDescription] = useState(exercise.repsDescription)
-  const [setsDescription, setSetsDescription] = useState(exercise.setsDescription)
-  const [restBetweenSets, setRestBetweenSets] = useState(true)
-  const onSubmit = () => {
-    setExercise({
-      name,
-      imageUrl,
-      setsDescription,
-      repsDescription,
-      restBetweenSets,
-    })
-    onClose()
-  };
-  return (!open ? null :
-    <form
-      className="z-50 relative rounded-md bg-white shadow-xl sm:mt-[90px] border border-slate-800 py-8 px-7 border-3 max-w-md mx-auto mb-5"
-      onSubmit={onSubmit}>
-      <div onClick={onClose} className="absolute top-0 right-0 p-3 text-gray-200 cursor-pointer hover:text-gray-600 text-2xl">
-        ✖
-      </div>
-      <h2 className="font-bold text-2xl">
-        { editing ? 'Edit' : 'Add'} {name ?
-          <em className="italic">{name}</em> :
-          'Exercise'
-        }
-      </h2>
-      <label htmlFor="name" className="mt-3 mb-2 block font-semibold">
-        Name
-      </label>
-      <input
-        className="rounded-lg text-base w-full p-3 mb-3 border-2 border-black focus:border-black focus:outline-none"
-        type="text"
-        name="name"
-        required
-        value={name}
-        onChange={(e: any) => setName(e.target.value)}
-        placeholder="Chest Press"
-      />
-
-      <label
-        htmlFor="imageUrl"
-        className="mt-3 mb-2 block font-semibold">
-        Image URL <OptionalText />
-      </label>
-      <input
-        className="rounded-lg text-base w-full p-3 mb-3 border-2 border-black focus:border-black focus:outline-none"
-        type="url"
-        name="imageUrl"
-        value={imageUrl}
-        onChange={(e: any) => setImageUrl(e.target.value)}
-        placeholder="https://..."
-      />
-
-      <label htmlFor="setsDescription" className="mt-3 mb-2 block font-semibold">
-        Sets <OptionalText />
-      </label>
-      <input
-        className="rounded-lg text-base w-full p-3 mb-3 border-2 border-black focus:border-black focus:outline-none"
-        type="text"
-        name="setsDescription"
-        value={setsDescription}
-        onChange={(e: any) => setSetsDescription(e.target.value)}
-        placeholder='"5-8" or "10"'
-      />
-
-      <label htmlFor="repsDescription" className="mt-3 mb-2 block font-semibold">
-        Reps <OptionalText />
-      </label>
-      <input
-        className="rounded-lg text-base w-full p-3 mb-3 border-2 border-black focus:border-black focus:outline-none"
-        type="text"
-        name="repsDescription"
-        value={repsDescription}
-        onChange={(e: any) => setRepsDescription(e.target.value)}
-        placeholder='"5-8", "10", or "15 each leg"'
-      />
-      <label htmlFor="repsDescription" className="mt-3 mb-2 block font-semibold">
-        Rest between Sets?
-      </label>
-      <div
-        className="flex rounded-lg text-base w-full mb-3 border-2 border-black focus:border-black focus:outline-none"
-      >
-        <div
-          onClick={() => setRestBetweenSets(true)}
-          className={classNames(
-            "cursor-pointer flex-1 relative border-r-2 border-black p-3",
-            {
-              "font-semibold text-black": restBetweenSets === true,
-              "text-gray-500": restBetweenSets !== true,
-            }
-          )}>
-          Include Rest
-          <span className={classNames({
-            "hidden": restBetweenSets !== true
-          })}>
-            <CheckCircleIcon className="absolute right-3 h-6 inline-block align-top text-right" />
-          </span>
-        </div>
-        <div
-          onClick={() => setRestBetweenSets(false)}
-          className={classNames(
-            "cursor-pointer flex-1 relative p-3",
-            {
-              "font-semibold text-black": restBetweenSets === false,
-              "text-gray-500": restBetweenSets !== false,
-            }
-          )}>
-          Skip Rest
-          <span className={classNames({
-            "hidden": restBetweenSets !== false,
-          })}>
-            <CheckCircleIcon className="absolute right-3 h-6 inline-block align-top text-right" />
-          </span>
-        </div>
-      </div>
-      <div>
-        <label htmlFor="repsDescription" className="mt-3 mb-2 block font-semibold">
-          Preview
-        </label>
-        <div className="flex rounded-lg border-2 border-black">
-          <div className="relative h-[125px] w-[125px] bg-slate-200 flex border-r-2 border-black items-center rounded-tl-lg rounded-bl-lg overflow-hidden">
-            {
-              imageUrl &&
-              <Image
-                src={imageUrl}
-                alt="Exercise Image"
-                priority
-                height={125}
-                width={125}
-                placeholder={require('./routine-placeholder.png')}
-                className="inline-block bg-slate-200"
-              />
-            }
-          </div>
-          <div className="flex-1 ml-4 mr-2 my-3">
-            <div className="flex flex-col">
-              <h2 className="font-semibold text-md leading-snug mb-0.5">
-                <Clamped clamp={2}>
-                  {name || '<Name>'}
-                </Clamped>
-              </h2>
-              <div className="text-gray-700 text-base">
-                <ExerciseDescription
-                  setsDescription={setsDescription}
-                  repsDescription={repsDescription}
-                />
-              </div>
-              <RestBetweenSetsDescription
-                value={restBetweenSets}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-      <button
-        type="submit"
-        className="cursor-pointer text-lg font-bold mt-9 p-3 rounded-md border-2 border-black hover:bg-brightGreen text-black w-full">
-        { editing ? 'Update' : 'Add'} <em className="italic">{name || 'New Exercise'}</em>
-      </button>
-      <div onClick={editing ? onRemove : onClose} className={classNames(
-        "mt-5 py-1 cursor-pointer text-slate-400 hover:text-red-300 text-center",
-        {
-          "text-slate-400": !editing,
-          "text-red-400": editing,
-        }
-      )}>
-        { editing ? 'Remove from Workout' : 'Cancel'}
-      </div>
-    </form>
-  )
-}
 
 export enum FormMode {
   Edit = 'Edit',
@@ -264,7 +34,6 @@ function WorkoutForm({
   mode: FormMode
   workout?: any
 }) {
-  console.log('form workout', workout);
   const router = useRouter()
   const { setIndexError, setIndexSuccess } = useContext(AppContext)
   const [submitting, setSubmitting] = useState(false)
@@ -353,13 +122,13 @@ function WorkoutForm({
           editing={editingExerciseIdx !== undefined}
           open={showExerciseForm}
           exercise={editingExerciseIdx !== undefined ?
-            exercises[editingExerciseIdx] : {
+            exercises[editingExerciseIdx] as Exercise : {
               name: '',
               imageUrl: '',
               setsDescription: '',
               repsDescription: '',
               restBetweenSets: true,
-            }
+            } as Partial<Exercise>
           }
           onClose={
             () => {
@@ -481,19 +250,30 @@ function WorkoutForm({
                                   />
                                 }
                               </div>
-                              <div className="flex-1 p-3">
+                              <div className="flex-1 py-3 pl-3 pr-8">
                                 <h3 className="font-semibold text-base">
                                   {exc.name}
                                 </h3>
-                                <div className="text-slate-600">
+                                <div className="text-sm text-slate-600">
                                   <ExerciseDescription
                                     setsDescription={exc.setsDescription}
                                     repsDescription={exc.repsDescription}
                                   />
-                                  <RestBetweenSetsDescription
-                                    value={exc.restBetweenSets}
-                                  />
+                                  <span className="text-sm">
+                                    <RestBetweenSetsDescription
+                                      value={exc.restBetweenSets}
+                                    />
+                                  </span>
                                 </div>
+                                {
+                                  exc.betweenSetsRestTimeLimitS &&
+                                  <div className="text-sm text-slate-600">
+                                    <ClockIcon className="h-3.5 text-gray-500 -mt-0.5 inline-block" /> Rest Period: <DurationText durationM={moment.duration(
+                                      exc.betweenSetsRestTimeLimitS,
+                                      'seconds'
+                                    )} /> / Set
+                                  </div>
+                                }
                               </div>
                               <div className="pl-2 relative">
                                 <div

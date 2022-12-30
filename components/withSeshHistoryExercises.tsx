@@ -20,7 +20,7 @@ const withSeshHistoryExercises = (Component: React.FC<any>) => {
         ) {
           // add it to the last active set's notes
           promises.push(
-            fetch(`/api/interval/${lastSavedInterval.id}`, {
+            fetch(`/api/intervals/${lastSavedInterval.id}`, {
               method: 'PUT',
               body: JSON.stringify({
                 note: interval.note,
@@ -30,7 +30,7 @@ const withSeshHistoryExercises = (Component: React.FC<any>) => {
         }
       }
       promises.push(
-        fetch(`/api/interval`, {
+        fetch(`/api/intervals`, {
           method: 'POST',
           body: JSON.stringify({
             ...interval,
@@ -41,7 +41,7 @@ const withSeshHistoryExercises = (Component: React.FC<any>) => {
       return Promise.all(promises)
         .then((rs: any[]) => rs[rs.length - 1].json())
         .then((data: any[]) => {
-          console.log('saved data...', data);
+          console.log('!!saved data...', data, interval.note);
           setLastSavedInterval(data);
           return {
             ...data,

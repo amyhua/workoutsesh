@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, PlayIcon } from "@heroicons/react/20/solid";
+import { ArrowLeftIcon, BoltIcon, ChatBubbleLeftIcon, CheckIcon, PlayIcon } from "@heroicons/react/20/solid";
 import { Exercise, Sesh, SeshInterval } from "@prisma/client";
 import classNames from "classnames";
 import moment from "moment";
@@ -6,6 +6,8 @@ import { IntervalsMeta } from "../types";
 import DurationText from "./DurationText";
 import SeshExerciseSummary from "./SeshExerciseSummary";
 import Link from "next/link";
+import { getShortDurationFormat } from "../lib/time-utils";
+import { useState } from "react";
 
 function SeshHistoryContainer({
   intervals,
@@ -29,6 +31,7 @@ function SeshHistoryContainer({
   const activePeriodDurationAvgM = moment.duration(activePeriodDurationAvg, 'seconds');
   const restPeriodDurationAvg = restPeriodsTotalDur / restPeriods.length;
   const restPeriodDurationAvgM = moment.duration(restPeriodDurationAvg, 'seconds');
+  const [lastShownRowIdx, setLastShownRowIdx] = useState(4);
   const intervalsByExerciseName: any = {};
   intervals.forEach((interval: any) => {
     if (!interval.exercise) {
@@ -77,52 +80,57 @@ function SeshHistoryContainer({
           </h2>
         }
         {/* overall stats */}
-        <div className="mb-3">
+        <div>
           <ul className={classNames(
             "list-style-none p-0",
             {
-              "mt-4": isSeshPage,
+              "mt-4 mb-3": isSeshPage,
             }
           )}>
-            <li className="mb-2">
-              <span className="inline-block opacity-70 w-[110px]">
-                Name
-              </span>
-              <span className="ml-1 font-semibold text-lg">
-                {workoutName}
-              </span>
-            </li>
             {
-              sesh && sesh.timeCompletedS &&
-              <li className="mb-1">
-                <span className="inline-block opacity-70 w-[110px]">
-                  Total Time
-                </span>
-                <span className="ml-1 font-semibold text-lg">
-                  <DurationText durationM={totalTimeM} />
-                </span>
-              </li>
+              isSeshPage &&
+              <>
+                <li className="mb-2">
+                  <span className="inline-block opacity-70 w-[110px]">
+                    Name
+                  </span>
+                  <span className="ml-1 font-semibold text-lg">
+                    {workoutName}
+                  </span>
+                </li>
+                {
+                  sesh && sesh.timeCompletedS &&
+                  <li className="mb-1">
+                    <span className="inline-block opacity-70 w-[110px]">
+                      Total Time
+                    </span>
+                    <span className="ml-1 font-semibold text-lg">
+                      <DurationText durationM={totalTimeM} />
+                    </span>
+                  </li>
+                }
+                <li className={classNames("mb-1", {
+                  "hidden": activePeriods.length === 0,
+                })}>
+                  <span className="inline-block opacity-70 w-[110px]">
+                    Average Set
+                  </span>
+                  <span className="ml-1 font-semibold text-lg">
+                    <DurationText durationM={activePeriodDurationAvgM} />
+                  </span>
+                </li>
+                <li className={classNames("mb-1", {
+                  "hidden": restPeriods.length === 0,
+                })}>
+                  <span className="inline-block opacity-70 w-[110px]">
+                    Average Rest
+                  </span>
+                  <span className="ml-1 font-semibold text-lg">
+                    <DurationText durationM={restPeriodDurationAvgM} />
+                  </span>
+                </li>
+              </>
             }
-            <li className={classNames("mb-1", {
-              "hidden": activePeriods.length === 0,
-            })}>
-              <span className="inline-block opacity-70 w-[110px]">
-                Average Set
-              </span>
-              <span className="ml-1 font-semibold text-lg">
-                <DurationText durationM={activePeriodDurationAvgM} />
-              </span>
-            </li>
-            <li className={classNames("mb-1", {
-              "hidden": restPeriods.length === 0,
-            })}>
-              <span className="inline-block opacity-70 w-[110px]">
-                Average Rest
-              </span>
-              <span className="ml-1 font-semibold text-lg">
-                <DurationText durationM={restPeriodDurationAvgM} />
-              </span>
-            </li>
           </ul>
         </div>
         {
@@ -132,9 +140,49 @@ function SeshHistoryContainer({
             R = Rest
           </div>
           :
-          <div className="text-lg">
-            This workout sesh is empty.
+          <div className="mt-1 text-lg">
+            Nothing yet.
           </div>
+        }
+        {
+          !isSeshPage && activePeriods.length ?
+          <>
+            <h2 className="font-semibold mb-2 mt-5">Most recent</h2>
+            {
+              activePeriods
+              .slice(0, lastShownRowIdx + 1)
+              .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .map((int: any, i: number) => (
+                <article className={classNames(
+                  "flex text-base mb-2 py-1.5 border-b",
+                  {
+                    "border-white0": i < Math.min(lastShownRowIdx, activePeriods.length - 1),
+                    "border-none": i >= Math.min(lastShownRowIdx, activePeriods.length - 1),
+                  }
+                )} key={i}>
+                  <div>
+                    <span className="opacity-60 mr-3">{getShortDurationFormat(moment.duration(int.durationS, 'seconds'))}</span>
+                    <span className="whitespace-nowrap">{int.exercise.name}</span>
+                    {
+                      int.note &&
+                      <div className="ml-[28px] text-yellow-100 italic">
+                        <ChatBubbleLeftIcon className="inline-block h-3 text-yellow-200 -mt-0.5 mr-3" /> {int.note}
+                      </div>
+                    }
+                  </div>
+                </article>
+              ))
+            }
+            {
+              lastShownRowIdx < activePeriods.length - 1 &&
+              <div
+                onClick={() => setLastShownRowIdx((idx:number) => idx + 5)}
+                className="inline-block my-2 cursor-pointer text-sm italic">
+                Show more
+              </div>
+            }
+          </>
+          : null
         }
         {
           Object.keys(intervalsByExerciseName).map((exerciseName: string, i: number) => (

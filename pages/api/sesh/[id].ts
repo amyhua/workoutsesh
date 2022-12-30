@@ -35,6 +35,7 @@ async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
               durationS: true,
               note: true,
               setNo: true,
+              exerciseId: true,
               exercise: {
                 select: {
                   name: true,
@@ -121,10 +122,10 @@ async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
                 id: workout.id,
               },
               data: {
-                averageDurationS: getAverage([
+                averageDurationS: Number(getAverage([
                   ...(workout.seshes || []).map((s: Sesh) => s.timeCompletedS),
                   sesh.timeCompletedS,
-                ]),
+                ]).toFixed(3)),
               }
             })
             break;

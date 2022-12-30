@@ -9,8 +9,10 @@ import { useContext, useEffect, useState } from 'react'
 import AvatarMenu from './AvatarMenu'
 import MoreMenu from './MoreMenu'
 import { Exercise, Workout } from '@prisma/client'
-import { CheckCircleIcon, ExclamationCircleIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
+import { CheckCircleIcon, ClockIcon, ExclamationCircleIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
 import AppContext from '../contexts/app-context'
+import moment from 'moment'
+import DurationText from './DurationText'
 
 type Stat = { value: number | string; label: string; }
 
@@ -156,40 +158,63 @@ export default function IndexDashboard({
                     <article
                       className="group cursor-pointer px-6 pt-5 sm:pb-8 pb-3"
                       onClick={onStartWorkout && onStartWorkout(workout)}>
-                      <h3 className="font-bold text-2xl mt-4 pb-1">
+                      <h3 className="font-bold text-2xl mt-4">
                         <PlayCircleIcon className="inline-block h-14 align-middle -ml-1 -mt-1 group-hover:text-green-500" /> {workout.name}
                       </h3>
-                      <div className="py-0">
-                        <ImageTileRow
-                          size={75}
-                          imageUrls={workout.exercises
-                            .sort(
-                              (a: any, b: any) => a.workoutOrder - b.workoutOrder
-                            )
-                            .filter((exc: any) => !!exc.imageUrl)
-                            .map((exc: any) => exc.imageUrl)
+                      <div className="ml-5 mt-2">
+                        <div className="font-semibold text-gray-800 mb-3">
+                          {
+                            workout.seshes.length ?
+                            <>
+                              <strong className="font-bold">{workout.seshes.length}</strong> seshes total
+                            </> :
+                            <span className="text-green-600 font-semibold">New!</span>
                           }
-                          className="border rounded-sm"
-                        />
-                      </div>
-                      <div className="flex sm:flex-row flex-col ml-1">
-                        <div className="ml-0.25 flex-1 flex sm:flex-row-reverse">
-                          <div className="flex-1">
-                            <p className="font-semibold text-base my-2">
-                              {workout.description}
-                            </p>
-                            <p className="text-sm mt-3 text-gray-500">
-                              {/* <div className="font-semibold text-black mr-2 mb-3">{workout.exercises.length} exercise{workout.exercises.length !== 1 ? 's' : ''}</div> */}
-                              {workout.exercises.map((exc: Exercise, i: number) => (
-                                <span key={i} className="inline-block mr-2 mb-2 text-xs py-1 px-2 rounded-xl bg-gray-100 text-black border">
-                                  {exc.name}
-                                </span>
-                              ))}
-                            </p>
-                          </div>
+                          {
+                            workout.seshes.length ?
+                            <div className="text-sm text-gray-500 mt-0.5">
+                              <span className="text-black">Last sesh:</span> <span>
+                                {moment(workout.seshes[workout.seshes.length - 1].updatedAt).fromNow()}
+                              </span> <ClockIcon className="inline-block h-4 relative -top-[1px] text-gray-400 ml-1" /><DurationText durationM={moment.duration(workout.seshes[workout.seshes.length - 1].timeCompletedS)} />
+                            </div>
+                            : null
+                          }
+                          {/* <div className="text-sm text-gray-400 mt-0.5">
+                            {workout.seshes.length ? 'Created ' + moment(workout.seshes[0].createdAt).fromNow() : ''}
+                          </div> */}
                         </div>
-                        <div onClick={e => e.stopPropagation()} className="text-left text-gray-500 hover:text-black cursor-pointer">
-                          <MoreMenu workoutId={workout.id} />
+                        <div className="py-0">
+                          <ImageTileRow
+                            size={75}
+                            imageUrls={workout.exercises
+                              .sort(
+                                (a: any, b: any) => a.workoutOrder - b.workoutOrder
+                              )
+                              .filter((exc: any) => !!exc.imageUrl)
+                              .map((exc: any) => exc.imageUrl)
+                            }
+                            className="border rounded-sm"
+                          />
+                        </div>
+                        <div className="flex sm:flex-row flex-col ml-1">
+                          <div className="ml-0.25 flex-1 flex sm:flex-row-reverse">
+                            <div className="flex-1">
+                              <p className="font-semibold text-base my-2">
+                                {workout.description}
+                              </p>
+                              <p className="text-sm mt-3 text-gray-500">
+                                {/* <div className="font-semibold text-black mr-2 mb-3">{workout.exercises.length} exercise{workout.exercises.length !== 1 ? 's' : ''}</div> */}
+                                {workout.exercises.map((exc: Exercise, i: number) => (
+                                  <span key={i} className="inline-block mr-2 mb-2 text-xs py-1 px-2 rounded-xl bg-gray-100 text-black border">
+                                    {exc.name}
+                                  </span>
+                                ))}
+                              </p>
+                            </div>
+                          </div>
+                          <div onClick={e => e.stopPropagation()} className="text-left text-gray-500 hover:text-black cursor-pointer">
+                            <MoreMenu workoutId={workout.id} />
+                          </div>
                         </div>
                       </div>
                     </article>    
