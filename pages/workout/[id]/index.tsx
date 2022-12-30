@@ -633,7 +633,7 @@ function WorkoutSesh({
                   value={activeExcNote}
                   onChange={(e: any) => setActiveExcNote(e.target.value)}
                   placeholder={`Add a Note for Set #${workoutSetNum}`}
-                  className="focus:outline-none w-full py-2 pl-[90px] pr-4 text-black border"
+                  className="focus:outline-none w-full py-2 pl-[100px] pr-4 text-black border"
                 />
                 <span className="inline-block text-black font-bold align-middle absolute left-[18px] top-[13px] z-2">
                   <span className="mt-1 align-bottom inline-block">Set #{workoutSetNum}</span>
