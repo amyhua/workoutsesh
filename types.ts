@@ -1,4 +1,4 @@
-import { SeshInterval } from "@prisma/client";
+import { Sesh, SeshInterval } from "@prisma/client";
 
 export type Error = {
   error: boolean;
@@ -40,3 +40,5 @@ export type IntervalsMeta = {
   intervalsBySetNo: Record<string, SeshInterval[]>;
   noteBySetNo: Record<string, string>;
 }
+
+export type SeshDatum = Sesh & { intervals: (SeshInterval & { exercise: Exercise })[] } & { workout: { name: string; id: number; } };

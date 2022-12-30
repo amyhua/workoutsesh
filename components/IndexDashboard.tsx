@@ -151,7 +151,7 @@ export default function IndexDashboard({
             <ul className="mx-auto pb-14">
               {
                 workouts.length ?
-                workouts.map((workout: any, i) => (
+                workouts.map((workout: any, i: number) => (
                   <li
                     key={i}
                     className="bg-white text-black shadow-xl rounded-lg my-5">
@@ -173,9 +173,9 @@ export default function IndexDashboard({
                           {
                             workout.seshes.length ?
                             <div className="text-sm text-gray-500 mt-0.5">
-                              <span className="text-black">Last sesh:</span> <span>
+                              <span className="text-black font-semibold mr-2">Last session:</span> <span className="mr-3">
                                 {moment(workout.seshes[workout.seshes.length - 1].updatedAt).fromNow()}
-                              </span> <ClockIcon className="inline-block h-4 relative -top-[1px] text-gray-400 ml-1" /><DurationText durationM={moment.duration(workout.seshes[workout.seshes.length - 1].timeCompletedS)} />
+                              </span>Duration: <DurationText durationM={moment.duration(workout.seshes[workout.seshes.length - 1].timeCompletedS, 'seconds')} />
                             </div>
                             : null
                           }

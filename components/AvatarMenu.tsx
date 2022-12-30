@@ -34,11 +34,8 @@ const AvatarMenu = ({
               }
               <div className="ml-3 text-left">
                 <p className="text-base font-semibold text-white group-hover:text-gray-900">
-                  {user.name || user.email}
+                  {user.name || user.email.replace(/\@.+$/, '')}
                   <ChevronDownIcon className="text-gray-300 inline-block -mr-1 ml-1 -mt-0.5 h-5 w-5" aria-hidden="true" />
-                </p>
-                <p className="text-xs font-medium text-gray-200 group-hover:text-white">
-                  Athlete
                 </p>
               </div>
             </div>
@@ -55,7 +52,7 @@ const AvatarMenu = ({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="bg-white text-black absolute -ml-1 right-0 z-10 mt-2 w-56 origin-top-right rounded-md shadow-lg border-2 border-black ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="bg-white text-black absolute -ml-1 left-0 right-0 z-10 mt-2 w-56 origin-top-right rounded-md shadow-lg border-2 border-black ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
             <Menu.Item>
             {

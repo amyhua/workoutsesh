@@ -2,7 +2,7 @@ import { ArrowLeftIcon, BoltIcon, ChatBubbleLeftIcon, CheckIcon, PlayIcon } from
 import { Exercise, Sesh, SeshInterval } from "@prisma/client";
 import classNames from "classnames";
 import moment from "moment";
-import { IntervalsMeta } from "../types";
+import { IntervalsMeta, SeshDatum } from "../types";
 import DurationText from "./DurationText";
 import SeshExerciseSummary from "./SeshExerciseSummary";
 import Link from "next/link";
@@ -20,7 +20,7 @@ function SeshHistoryContainer({
   workoutName?: string | null;
   workoutId?: number | null;
   isSeshPage?: boolean;
-  sesh?: Sesh;
+  sesh?: Sesh | SeshDatum;
 }) {
   const totalTimeM = moment.duration(sesh ? sesh.timeCompletedS : 0, 'seconds');
   const activePeriods = intervals.filter((int: SeshInterval) => int.active);
@@ -52,7 +52,6 @@ function SeshHistoryContainer({
       noteBySetNo: {},
     } as IntervalsMeta)
   });
-  console.log('intervalsByExerciseName', intervalsByExerciseName)
   return (
     <>
       <div className={classNames(

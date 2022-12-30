@@ -75,12 +75,26 @@ function WorkoutSesh({
   const activeExercise = exercises[activeExerciseIdx];
   const [showAdditionalActiveExerciseNotes, setShowAdditionalActiveExerciseNotes] = useState(false);
   const [activeExerciseActivePeriodsByMostRecent, setActiveExerciseActivePeriodsByMostRecent] = useState<SeshInterval[]>([]);
-  const loadActiveExercisePastActivePeriods = useCallback((exercise: Exercise = activeExercise) => {
+  const loadActiveExercisePastActivePeriods = useCallback((
+    exercise: Exercise = activeExercise,
+    activeExcLastSavedInterval?: SeshInterval,
+  ) => {
     if (!exercise) throw new Error('Active exercise required');
     return fetch(`/api/intervals?exerciseId=${exercise.id}&notesOnly=true`)
       .then((r: any) => r.json())
       .then((intervals: SeshInterval[]) => {
-        setActiveExerciseActivePeriodsByMostRecent(intervals);
+        if (activeExcLastSavedInterval &&
+          intervals[0].id !== activeExcLastSavedInterval.id) {
+          // we are fetching records that are old compared to
+          // the (pending) last saved interval.
+          // -> add it here
+          setActiveExerciseActivePeriodsByMostRecent([
+            activeExcLastSavedInterval,
+            ...intervals
+          ]);
+        } else {
+          setActiveExerciseActivePeriodsByMostRecent(intervals);
+        }
       })
   }, [activeExercise]);
   const toggleShowActiveExerciseNotes = () => {
@@ -97,6 +111,7 @@ function WorkoutSesh({
   const [activeExcNote, setActiveExcNote] = useState('');
   const [activeIntervalSecondsTotal, setActiveIntervalSecondsTotal] = useState(0);
   const [workoutSecondsTotal, setWorkoutSecondsTotal] = useState(0);
+  const [preExerciseRestS, setPreExerciseRestS] = useState(0);
   const [seshId, setSeshId] = useState<number>();
   const router = useRouter();
   const onStartSesh = useCallback((data: Sesh & { intervals: (SeshInterval & { exercise: Exercise })[] }) => {
@@ -189,8 +204,8 @@ function WorkoutSesh({
         },
         ...pastIntervals,
       ])
+      loadActiveExercisePastActivePeriods(undefined, interval);
     });
-    loadActiveExercisePastActivePeriods();
     if (activeExercise.restBetweenSets && isActiveSet) {
       setCurrWorkoutSetType(WorkoutSetType.Rest)
     } else {
@@ -200,6 +215,7 @@ function WorkoutSesh({
       setActiveExcNote('');
     }
     setActiveIntervalSecondsTotal(0);
+    setPreExerciseRestS(0);
   }
   const startNextExercise = () => {
     if (!activeIntervalCounterIsActive || !isActiveSet) {
@@ -219,13 +235,16 @@ function WorkoutSesh({
     setWorkoutSetNum(1);
     setActiveIntervalCounterIsActive(false);
     setActiveIntervalSecondsTotal(0);
+    setPreExerciseRestS(0);
   }
   const startPrevExercise = () => {
     const newActiveExerciseIdx = activeExerciseIdx - 1;
     setActiveExerciseIdx(newActiveExerciseIdx);
     loadActiveExercisePastActivePeriods(exercises[newActiveExerciseIdx]);
     setCurrWorkoutSetType(WorkoutSetType.Active)
-    setWorkoutSetNum(1)
+    setWorkoutSetNum(1);
+    setActiveIntervalSecondsTotal(0);
+    setPreExerciseRestS(0);
   }
   const finishWorkout = () => {
     // finish last running set, log workout data, and go to summary
@@ -554,23 +573,41 @@ function WorkoutSesh({
                   "mb-1": !!activeExerciseActivePeriodsByMostRecent[0],
                 }
               )}>
-                <div>
-                  <span className="opacity-50 tracking-wide text-sm mr-1">Set</span>
-                  <span className="font-bold mr-3 text-base text-white">#{workoutSetNum}</span>
-                </div>
-                <div className="flex-1">
-                  {
-                    new Array(workoutSetNum - 1).fill(0).map((_, i) => (
-                      <CheckIcon key={i} className="h-5 inline-block align-top mt-[2.5px]" />
-                    ))
-                  }
-                  <CheckIcon className="h-5 inline-block align-top mt-[2.5px] text-brightGreen" />
-                </div>
                 {
-                  activeExercise.setsDescription &&
-                  <div>
-                    <span className="opacity-50 text-sm mr-1.5">out of</span>
-                    <span className="text-sm font-semibold">{activeExercise.setsDescription}</span>
+                  activeIntervalCounterIsActive ?
+                  <>
+                    <div>
+                      <span className="opacity-50 tracking-wide text-sm mr-1">Set</span>
+                      <span className="font-bold mr-3 text-base text-white">#{workoutSetNum}</span>
+                    </div>
+                    <div className="flex-1">
+                      {
+                        new Array(workoutSetNum - 1).fill(0).map((_, i) => (
+                          <CheckIcon key={i} className="h-5 inline-block align-top mt-[2.5px]" />
+                        ))
+                      }
+                      <CheckIcon className="h-5 inline-block align-top mt-[2.5px] text-brightGreen" />
+                    </div>
+                    {
+                      activeExercise.setsDescription &&
+                      <div>
+                        <span className="opacity-50 text-sm mr-1.5">out of</span>
+                        <span className="text-sm font-semibold">{activeExercise.setsDescription}</span>
+                      </div>
+                    }
+                  </>
+                  :
+                  <div className="m-1">
+                    <SeshCounter
+                      active={!activeIntervalCounterIsActive}
+                      seshStarted={true}
+                      className="inline-block font-semibold text-lg"
+                      secondsTotal={preExerciseRestS}
+                      setSecondsTotal={setPreExerciseRestS}
+                    />
+                    <span className="ml-2 opacity-60">
+                      Pre-Exercise Rest
+                    </span>
                   </div>
                 }
               </div>

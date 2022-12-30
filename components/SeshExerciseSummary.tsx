@@ -1,5 +1,5 @@
 import { ChatBubbleLeftIcon } from "@heroicons/react/20/solid";
-import {  SeshInterval } from "@prisma/client";
+import {  Sesh, SeshInterval } from "@prisma/client";
 import classNames from "classnames";
 import moment from "moment";
 import { useState } from "react";
@@ -13,7 +13,6 @@ function SeshExerciseSummary({
   intervalsMeta: IntervalsMeta;
   exerciseName: string;
 }) {
-  const [showNotes, setShowNotes] = useState(false);
   return (
     <section className="mb-2 mt-0 py-4 border-b border-white0 last:border-none">
       <header className="mb-2">
@@ -23,30 +22,6 @@ function SeshExerciseSummary({
         <h4>
           {Object.keys(intervalsMeta.intervalsBySetNo).length} sets
         </h4>
-        <div className="mb-4 mt-3 text-sm uppercase tracking-widest">
-          <span
-            onClick={() => setShowNotes(false)}
-            className={classNames(
-              "mr-3 pb-1 border-b",
-              {
-                "opacity-50 border-transparent": showNotes,
-                "border-white": !showNotes,
-              }
-            )}>
-            Times
-          </span>
-          <span
-            onClick={() => setShowNotes(true)}
-            className={classNames(
-              "ml-1 pb-1 border-b",
-              {
-                "opacity-50 border-transparent": !showNotes, 
-                "border-white": showNotes,
-              }
-            )}>
-            <ChatBubbleLeftIcon className="inline-block h-3 -mt-0.5 mr-1" /> Notes ({Object.keys(intervalsMeta.noteBySetNo).length})
-          </span>
-        </div>
       </header>
       <ul className="list-style-none p-0 whitespace-nowrap">
         {
@@ -57,15 +32,12 @@ function SeshExerciseSummary({
                 <div className="mr-4 min-w-[28px]">#{setNo}</div>  
                 <div className="flex">
                   {
-                    showNotes ?
-                    <span className="text-base">
-                      {intervalsMeta.noteBySetNo[setNo]}
-                    </span> :
                     intervalsMeta.intervalsBySetNo[setNo]
+                    .sort((a: SeshInterval, b: SeshInterval) => (b.active ? 1 : 0) - (a.active ? 1 : 0))
                     .map((interval: SeshInterval, l: number) => (
-                      <div key={l} className="mr-4">
+                      <div key={l} className="mr-2">
                         <span className={classNames(
-                          "mr-4 w-[7px] inline-block",
+                          "mr-3 w-[7px] inline-block",
                           {
                             "text-yellow-100": interval.active,
                             "text-gray-400": !interval.active,
@@ -84,6 +56,12 @@ function SeshExerciseSummary({
                         </span>
                       </div>
                     ))
+                  }
+                  {
+                    intervalsMeta.noteBySetNo[setNo] &&
+                    <span>
+                      <ChatBubbleLeftIcon className="inline-block h-3 -mt-0.5 mr-1" /> {intervalsMeta.noteBySetNo[setNo]}
+                    </span>
                   }
                 </div>
               </div>

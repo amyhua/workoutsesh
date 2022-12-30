@@ -3,18 +3,18 @@ import { getSession } from "next-auth/react";
 import Layout from "../../../../components/Layout";
 import SeshHistoryContainer from "../../../../components/SeshHistoryContainer";
 import { prisma } from '../../../../lib/prismadb'
-
-type SeshDatum = Sesh & { intervals: (SeshInterval & { exercise: Exercise })[] } & { workout: { name: string; id: number; } };
+import { SeshDatum } from "../../../../types";
 
 const SeshPage = ({
   sesh,
 }: {
-  sesh: string | SeshDatum | null
+  sesh: string | SeshDatum
 }) => {
   if (typeof sesh === 'string') sesh = JSON.parse(sesh) as SeshDatum;
   return (
     <Layout title="Sesh Summary" background="#345537">
       <SeshHistoryContainer
+        sesh={sesh}
         intervals={sesh ? sesh.intervals : []}
         workoutName={sesh && sesh.workout.name}
         workoutId={sesh && sesh.workout.id}
