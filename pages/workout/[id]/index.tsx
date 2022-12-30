@@ -84,6 +84,7 @@ function WorkoutSesh({
       .then((r: any) => r.json())
       .then((intervals: SeshInterval[]) => {
         if (activeExcLastSavedInterval &&
+          intervals[0] &&
           intervals[0].id !== activeExcLastSavedInterval.id) {
           // we are fetching records that are old compared to
           // the (pending) last saved interval.
@@ -181,9 +182,30 @@ function WorkoutSesh({
   };
   const stopSesh = (seshId: number) => {
     return fetch(`/api/sesh/${seshId}?action=stop`)
-  }
+  };
+  const onSaveCurrentInterval = (
+    justSavedInterval: SeshInterval,
+    savedIntervalExc: Exercise = activeExercise,
+    activeExc: Exercise = activeExercise
+  ) => {
+    setPastIntervals([
+      // save by most recent order
+      {
+        ...justSavedInterval,
+        exercise: {
+          ...savedIntervalExc,
+          name: savedIntervalExc.name,
+        }
+      },
+      ...pastIntervals,
+    ]);
+    loadActiveExercisePastActivePeriods(
+      activeExc,
+      justSavedInterval.exerciseId === activeExc.id ?
+        justSavedInterval : undefined
+    );
+  };
   const startNextSet = () => {
-    // only save active intervals if they are not 'skips' (defined as > 2s)
     saveCurrentInterval({
       seshId: seshId,
       exerciseId: activeExercise.id,
@@ -193,18 +215,11 @@ function WorkoutSesh({
       active: currWorkoutSetType === WorkoutSetType.Active,
     })
     .then((interval: SeshInterval) => {
-      setPastIntervals([
-        // save by most recent order
-        {
-          ...interval,
-          exercise: {
-            ...activeExercise,
-            name: activeExercise.name,
-          }
-        },
-        ...pastIntervals,
-      ])
-      loadActiveExercisePastActivePeriods(undefined, interval);
+      onSaveCurrentInterval(
+        interval,
+        activeExercise,
+        activeExercise
+      );
     });
     if (activeExercise.restBetweenSets && isActiveSet) {
       setCurrWorkoutSetType(WorkoutSetType.Rest)
@@ -217,8 +232,20 @@ function WorkoutSesh({
     setActiveIntervalSecondsTotal(0);
     setPreExerciseRestS(0);
   }
-  const startNextExercise = () => {
-    if (!activeIntervalCounterIsActive || !isActiveSet) {
+  const startNearbyExercise = (delta: number) => {
+    const newActiveExerciseIdx = activeExerciseIdx + delta;
+    const newActiveExc = exercises[newActiveExerciseIdx];
+    const setNewExerciseParams = (loadedNotes = false) => {
+      setActiveExerciseIdx(newActiveExerciseIdx);
+      setCurrWorkoutSetType(WorkoutSetType.Active);
+      setWorkoutSetNum(1);
+      setActiveIntervalCounterIsActive(false);
+      setActiveIntervalSecondsTotal(0);
+      setPreExerciseRestS(0);
+      setActiveExcNote('');
+      if (!loadedNotes) loadActiveExercisePastActivePeriods(newActiveExc);
+    };
+    if (activeIntervalCounterIsActive) {
       saveCurrentInterval({
         seshId: seshId,
         exerciseId: activeExercise.id,
@@ -226,26 +253,23 @@ function WorkoutSesh({
         setNo: workoutSetNum,
         note: activeExcNote,
         active: currWorkoutSetType === WorkoutSetType.Active,
+      })
+      .then((interval: SeshInterval) => {
+        onSaveCurrentInterval(
+          interval,
+          activeExercise,
+          newActiveExc,
+        );
+      })
+      .finally(() => {
+        setNewExerciseParams();
       });
+    } else {
+      setNewExerciseParams();
     }
-    const newActiveExerciseIdx = activeExerciseIdx + 1;
-    setActiveExerciseIdx(newActiveExerciseIdx);
-    loadActiveExercisePastActivePeriods(exercises[newActiveExerciseIdx]);
-    setCurrWorkoutSetType(WorkoutSetType.Active);
-    setWorkoutSetNum(1);
-    setActiveIntervalCounterIsActive(false);
-    setActiveIntervalSecondsTotal(0);
-    setPreExerciseRestS(0);
-  }
-  const startPrevExercise = () => {
-    const newActiveExerciseIdx = activeExerciseIdx - 1;
-    setActiveExerciseIdx(newActiveExerciseIdx);
-    loadActiveExercisePastActivePeriods(exercises[newActiveExerciseIdx]);
-    setCurrWorkoutSetType(WorkoutSetType.Active)
-    setWorkoutSetNum(1);
-    setActiveIntervalSecondsTotal(0);
-    setPreExerciseRestS(0);
-  }
+  };
+  const startNextExercise = () => startNearbyExercise(1);
+  const startPrevExercise = () => startNearbyExercise(-1);
   const finishWorkout = () => {
     // finish last running set, log workout data, and go to summary
     return fetch(`/api/sesh/${seshId}?action=finish&duration=${workoutSecondsTotal}`)
@@ -389,7 +413,7 @@ function WorkoutSesh({
                   />
                   <span
                     onClick={() => setIsConfirmingStop(true)}
-                    className="inline-block mt-1.5 ml-2 text-red-300 text-sm rounded-full">
+                    className="cursor-pointer inline-block mt-1.5 ml-2 text-red-300 text-sm rounded-full">
                     <StopIcon className="inline-block h-4 align-middle relative -top-0.5" />
                   </span>
                 </>
@@ -617,7 +641,7 @@ function WorkoutSesh({
                   <div className="flex-1 max-h-[80px] overflow-y-auto">
                     <div className="flex">
                       <div className="whitespace-nowrap opacity-60 mr-3">
-                        <ChatBubbleLeftIcon className="h-3 inline-block relative -top-[1px] mr-1.5" />
+                        <ChatBubbleLeftIcon className="h-3 inline-block relative -top-0.25 mr-1.5" />
                         {formatShortFromNow(moment(activeExerciseActivePeriodsByMostRecent[0].createdAt).fromNow())}
                       </div>
                       <div className={classNames(

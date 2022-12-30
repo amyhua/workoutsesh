@@ -22,6 +22,7 @@ function SeshHistoryContainer({
   isSeshPage?: boolean;
   sesh?: Sesh | SeshDatum;
 }) {
+  console.log('sesh', sesh)
   const totalTimeM = moment.duration(sesh ? sesh.timeCompletedS : 0, 'seconds');
   const activePeriods = intervals.filter((int: SeshInterval) => int.active);
   const restPeriods = intervals.filter((int: SeshInterval) => !int.active);
@@ -32,14 +33,29 @@ function SeshHistoryContainer({
   const restPeriodDurationAvg = restPeriodsTotalDur / restPeriods.length;
   const restPeriodDurationAvgM = moment.duration(restPeriodDurationAvg, 'seconds');
   const [lastShownRowIdx, setLastShownRowIdx] = useState(4);
+  const exerciseHeaderCount: any = {};
   const intervalsByExerciseName: any = {};
-  intervals.forEach((interval: any) => {
+  intervals.forEach((interval: any, i: number) => {
     if (!interval.exercise) {
       console.log('in!', interval);
       debugger
     }
-    intervalsByExerciseName[interval.exercise.name] = intervalsByExerciseName[interval.exercise.name]|| [];
-    intervalsByExerciseName[interval.exercise.name].push(interval);
+    // at every interval with setNo = 1,
+    // specify new group, where group prefix (none, '#2', '#3', etc)
+    // is determined by a count of where it previously appeared.
+
+    // we know that set numbers are chronological
+    if (interval.setNo === 1) {
+      exerciseHeaderCount[interval.exercise.name] = (
+        exerciseHeaderCount[interval.exercise.name] || 0
+      ) + 1;
+    }
+    let groupName = interval.exercise.name + (
+      exerciseHeaderCount[interval.exercise.name] > 1 ?
+        ' #' + exerciseHeaderCount[interval.exercise.name] : ''
+    );
+    intervalsByExerciseName[groupName] = intervalsByExerciseName[groupName]|| [];
+    intervalsByExerciseName[groupName].push(interval);
   });
   Object.keys(intervalsByExerciseName).forEach((name: string) => {
     intervalsByExerciseName[name] = intervalsByExerciseName[name].reduce((meta: IntervalsMeta, interval: any) => {
