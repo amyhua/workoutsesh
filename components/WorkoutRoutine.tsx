@@ -16,18 +16,24 @@ const WorkoutRoutine = ({
   isFirst,
   isLast,
   isDragging,
+  expanded,
 }: {
   exercise: any;
   isFirst?: boolean;
   isLast?: boolean;
   isDragging?: boolean;
+  expanded: boolean;
 }) => {
   return (
     <div className={classnames(
-      "flex bg-white border-b-gray-300",
+      "flex border-b-gray-300",
       isDragging ?
         "border-t border-b" :
-        isLast ? "border-none" : "border-b"
+        isLast ? "border-none" : "border-b",
+      {
+        "bg-white/90": !expanded,
+        "bg-white": expanded
+      }
     )}>
       <div className="mr-1 mt-2">
         <div className={classnames(
