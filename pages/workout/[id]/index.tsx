@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Layout from '../../../components/Layout'
 import SeshCounter from '../../../components/SeshCounter'
 import classnames from 'classnames'
@@ -22,6 +22,7 @@ import moment from 'moment'
 import { formatShortFromNow } from '../../../lib/time-utils'
 import DurationText from '../../../components/DurationText'
 import RestCounterBadge from '../../../components/RestCounterBadge'
+import IntervalNote from '../../../components/IntervalNote'
 // see: https://github.com/atlassian/react-beautiful-dnd/issues/2350#issuecomment-1242917371
 
 resetServerContext()
@@ -98,7 +99,7 @@ function WorkoutSesh({
     }
   }
   const [showAdditionalActiveExerciseNotes, setShowAdditionalActiveExerciseNotes] = useState(false);
-  const [activeExerciseActivePeriodsByMostRecent, setActiveExerciseActivePeriodsByMostRecent] = useState<SeshInterval[]>([]);
+  const [activeExerciseActiveNotedPeriodsByMostRecent, setActiveExerciseActiveNotedPeriodsByMostRecent] = useState<SeshInterval[]>([]);
   const loadActiveExercisePastActivePeriods = useCallback((
     exercise: Exercise = activeExercise,
     activeExcLastSavedInterval?: SeshInterval,
@@ -108,17 +109,18 @@ function WorkoutSesh({
       .then((r: any) => r.json())
       .then((intervals: SeshInterval[]) => {
         if (activeExcLastSavedInterval &&
+          activeExcLastSavedInterval.note &&
           intervals[0] &&
           intervals[0].id !== activeExcLastSavedInterval.id) {
           // we are fetching records that are old compared to
           // the (pending) last saved interval.
           // -> add it here
-          setActiveExerciseActivePeriodsByMostRecent([
+          setActiveExerciseActiveNotedPeriodsByMostRecent([
             activeExcLastSavedInterval,
             ...intervals
           ]);
         } else {
-          setActiveExerciseActivePeriodsByMostRecent(intervals);
+          setActiveExerciseActiveNotedPeriodsByMostRecent(intervals);
         }
       })
   }, [activeExercise]);
@@ -138,7 +140,9 @@ function WorkoutSesh({
   const [workoutSecondsTotal, setWorkoutSecondsTotal] = useState(0);
   const [preExerciseRestS, setPreExerciseRestS] = useState(0);
   const [seshId, setSeshId] = useState<number>();
+  const [showAddNote, setShowAddNote] = useState(false);
   const router = useRouter();
+  const addNoteEl = useRef(null);
   const onStartSesh = useCallback((data: Sesh & { intervals: (SeshInterval & { exercise: Exercise })[] }) => {
     setSeshId(data.id);
     setWorkoutSecondsTotal(data.timeCompletedS)
@@ -271,6 +275,7 @@ function WorkoutSesh({
     const newActiveExc = exercises[newActiveExerciseIdx];
     const setNewExerciseParams = (newActiveExc: Exercise, loadedNotes = false) => {
       setActiveExerciseIdx(newActiveExerciseIdx);
+      setShowAddNote(false);
       setWorkoutSetNum(getNewExcWorkoutSetNum(newActiveExc));
       setCurrWorkoutSetType(newActiveExc.isRest ? WorkoutSetType.Rest : WorkoutSetType.Active);
       setActiveIntervalCounterIsActive(newActiveExc.isRest);
@@ -429,7 +434,7 @@ function WorkoutSesh({
               </div>
             }
             <div className={classNames(
-              "z-50 flex text-base font-normal px-4 py-3"
+              "z-50 flex text-base font-normal px-4 pt-3"
             )}>
               <div className="flex-1">
                 <span className='overflow-hidden text-ellipsis w-full inline-block mt-1'>
@@ -463,7 +468,7 @@ function WorkoutSesh({
                 }
               )}
               style={{
-                height: 'calc(100vh - 430px)'
+                height: 'calc(100vh - 475px)'
               }}>
               <div className={classnames(
                 "mt-0 sm:mt-5 w-full flex flex-col justify-center",
@@ -634,104 +639,120 @@ function WorkoutSesh({
               <div className={classNames(
                 "px-5 flex min-h-[28px]",
                 {
-                  "mb-0": !activeExerciseActivePeriodsByMostRecent[0],
-                  "mb-1": !!activeExerciseActivePeriodsByMostRecent[0],
+                  "mb-0": !activeExerciseActiveNotedPeriodsByMostRecent[0],
+                  "mb-1": !!activeExerciseActiveNotedPeriodsByMostRecent[0],
                 }
               )}>
-                {
-                  activeIntervalCounterIsActive ?
-                    (activeExercise.isRest || !isActiveSet) ?
-                    <div className="mb-1">
-                      <Clamped clamp={1}>
-                        <span className="mr-2 text-white/60">
-                          <span className="mr-2">Next:</span>
-                          <span className="text-white">
-                            {getNextPeriodText().setText}
-                            </span>{
-                            getNextPeriodText().isSameExercise ? (
-                              <span className="ml-3">{activeExercise.name}</span>
-                            ) : ''
-                          }</span>
-                      </Clamped>
-                    </div>
-                    :
-                    <>
-                      <div className="flex-1">
-                        {
-                          new Array(workoutSetNum - 1).fill(0).map((_, i) => (
-                            <CheckIcon key={i} className="h-5 inline-block align-top mt-[2.5px]" />
-                          ))
-                        }
-                        <CheckIcon className="h-5 inline-block align-top mt-[2.5px] text-brightGreen" />
+                <div className="flex-1">
+                  {
+                    activeIntervalCounterIsActive ?
+                      (activeExercise.isRest || !isActiveSet) ?
+                      <div className="mt-1.5">
+                        <Clamped clamp={1}>
+                          <span className="mr-2 text-white/60">
+                            <span className="mr-2">Next:</span>
+                            <span className="text-white">
+                              {getNextPeriodText().setText}
+                              </span>{
+                              getNextPeriodText().isSameExercise ? (
+                                <span className="ml-3">{activeExercise.name}</span>
+                              ) : ''
+                            }</span>
+                        </Clamped>
                       </div>
-                      {
-                        activeExercise.setsDescription &&
-                        <div>
-                          <span className="text-base font-semibold mr-1">{workoutSetNum}</span>
-                          <span className="opacity-50 text-base mr-1.5">out of</span>
-                          <span className="text-base font-semibold">{activeExercise.setsDescription}</span>
+                      :
+                      <div className="flex">
+                        {/* <div className="inline-block -mt-1.5 mr-2">
+                          <span className="mt-1.5 text-lg align-bottom font-bold inline-block">Set #{workoutSetNum}</span>
+                        </div> */}
+                        <div className="flex-1">
+                          {
+                            new Array(workoutSetNum - 1).fill(0).map((_, i) => (
+                              <CheckIcon key={i} className="h-5 inline-block align-top mt-[2.5px]" />
+                            ))
+                          }
+                          <CheckIcon className="h-5 inline-block align-top mt-[2.5px] text-brightGreen" />
                         </div>
-                      }
-                    </>
-                  :
-                  <div className="m-1">
-                    <SeshCounter
-                      active={!activeIntervalCounterIsActive}
-                      seshStarted={true}
-                      className="inline-block font-semibold text-lg"
-                      secondsTotal={preExerciseRestS}
-                      setSecondsTotal={setPreExerciseRestS}
-                    />
-                    <span className="ml-2 opacity-60">
-                      Pre-Exercise Rest
-                    </span>
-                  </div>
-                }
+                        {
+                          activeExercise.setsDescription &&
+                          <div className="mt-0 mr-2">
+                            <span className="opacity-50 text-base mr-1.5">Set</span>
+                            <span className="text-base font-semibold mr-1">{workoutSetNum}</span>
+                            <span className="opacity-50 text-base mr-1.5">out of</span>
+                            <span className="text-base font-semibold">{activeExercise.setsDescription}</span>
+                          </div>
+                        }
+                      </div>
+                    :
+                    <div className="m-1">
+                      <SeshCounter
+                        active={!activeIntervalCounterIsActive}
+                        seshStarted={true}
+                        className="inline-block font-semibold text-lg"
+                        secondsTotal={preExerciseRestS}
+                        setSecondsTotal={setPreExerciseRestS}
+                      />
+                      <span className="ml-2 opacity-60">
+                        Pre-Exercise Rest
+                      </span>
+                    </div>
+                  }
+                </div>
+                <div
+                  onClick={() => {
+                    setShowAddNote(!showAddNote);
+                  }}
+                  className={classNames(
+                    "px-1 py-1.5 inline-block align-top cursor-pointer",
+                    {
+                      "-mt-[2px]": isActiveSet && !activeIntervalCounterIsActive,
+                      "-mt-2": isActiveSet && activeIntervalCounterIsActive,
+                    }
+                  )}>
+                  + <ChatBubbleLeftIcon className="h-4 inline-block align-middle" />
+                </div>
               </div>
               {
-                activeExerciseActivePeriodsByMostRecent[0] &&
-                <div className="mr-4 ml-5 pt-1 pb-2.5 text-sm flex">
-                  <div className="flex-1 max-h-[80px] overflow-y-auto">
-                    <div className="flex">
-                      <div className="whitespace-nowrap opacity-60 mr-3">
-                        <ChatBubbleLeftIcon className="h-3 inline-block relative -top-0.25 mr-1.5" />
-                        {formatShortFromNow(moment(activeExerciseActivePeriodsByMostRecent[0].createdAt).fromNow())}
+                activeExerciseActiveNotedPeriodsByMostRecent[0] &&
+                <div className="mx-5 text-base flex mb-2">
+                  <div className="flex-1 max-h-[120px] overflow-y-auto">
+                    <div className="flex pt-2">
+                      <div>
+                        <ChatBubbleLeftIcon className="h-5 -mt-0.5 mr-3 ml-1 inline-block" />
                       </div>
-                      <div className={classNames(
-                        "flex-1",
+                      <div>
+                        <IntervalNote
+                          className="mr-2"
+                          interval={activeExerciseActiveNotedPeriodsByMostRecent[0]}
+                        />
                         {
-                          "whitespace-nowrap text-ellipsis w-full overflow-hidden": !showAdditionalActiveExerciseNotes,
+                          showAdditionalActiveExerciseNotes &&
+                          activeExerciseActiveNotedPeriodsByMostRecent.length ?
+                          activeExerciseActiveNotedPeriodsByMostRecent
+                          .slice(1)
+                          .map((activeExerciseActivePeriod: SeshInterval, i: number) => (
+                            <IntervalNote
+                              key={i}
+                              className="my-2"
+                              interval={activeExerciseActivePeriod}
+                            />
+                          ))
+                          :
+                          (
+                            showAdditionalActiveExerciseNotes &&
+                            <div className="ml-5 mt-1 italic">
+                              No more notes.
+                            </div>
+                          )
                         }
-                      )}>{activeExerciseActivePeriodsByMostRecent[0].note}</div>
+                      </div>
                     </div>
-                    {
-                      showAdditionalActiveExerciseNotes &&
-                      activeExerciseActivePeriodsByMostRecent.length ?
-                      activeExerciseActivePeriodsByMostRecent
-                      .slice(1)
-                      .map((activeExerciseActivePeriod: SeshInterval, i: number) => (
-                        <div key={i} className="flex">
-                          <div className="opacity-60 mr-3">
-                            <ChatBubbleLeftIcon className="h-3 inline-block relative -top-[1px] mr-1.5" />
-                            {formatShortFromNow(moment(activeExerciseActivePeriod.createdAt).fromNow())}
-                          </div>
-                          <div className="flex-1">{activeExerciseActivePeriod.note}</div>
-                        </div>
-                      ))
-                      :
-                      (
-                        showAdditionalActiveExerciseNotes &&
-                        <div className="ml-5 mt-1 italic">
-                          No more notes.
-                        </div>
-                      )
-                    }
                   </div>
                   <div
                     onClick={toggleShowActiveExerciseNotes}
                     className="ml-1 text-white cursor-pointer">
                     <ChevronDownIcon className={classNames(
-                      "h-5 inline-block relative -top-[1px]",
+                      "h-5 inline-block mt-2.5",
                       {
                         "rotate-180": showAdditionalActiveExerciseNotes
                       }
@@ -739,28 +760,29 @@ function WorkoutSesh({
                   </div>
                 </div>
               }
-              <div className="px-2 py-1 mx-3 flex">
-                <span className="inline-block">
-                  <span className="mt-1.5 text-lg align-bottom font-bold inline-block">Set #{workoutSetNum}</span>
-                </span>
-                <div className="ml-3 relative flex-1">
-                  <input
-                    type="text"
-                    value={activeExcNote}
-                    onChange={(e: any) => setActiveExcNote(e.target.value)}
-                    placeholder={`Note`}
-                    className="::placeholder:text-gray-400 focus:text-white focus:bg-white0 bg-white/10 group focus:outline-none rounded-full focus:w-full transition-all py-2 pl-[45px] pr-4 text-white"
-                  />
-                  <span className="inline-block text-gray-400 group:text-white font-semibold align-middle absolute left-[12px] top-[8px] z-2">
-                    <ChatBubbleLeftIcon className="h-4 -mt-1 ml-1.5 mr-2 inline-block" />
-                  </span>
+              {
+                showAddNote &&
+                <div className="px-1 py-1 mx-3 flex">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      ref={addNoteEl}
+                      value={activeExcNote}
+                      onChange={(e: any) => setActiveExcNote(e.target.value)}
+                      placeholder={`Note for Set #${workoutSetNum}`}
+                      className="text-base focus:text-white bg-white/20 group focus:outline-none rounded-full w-full transition-all py-2 pl-[45px] pr-4 text-white"
+                    />
+                    <span className="inline-block text-white/60 group:text-white font-semibold align-middle absolute left-[12px] top-[8.5px] z-2">
+                      <ChatBubbleLeftIcon className="h-4 -mt-2 ml-1 mr-2 inline-block" />
+                    </span>
+                  </div>
                 </div>
-              </div>
+              }
               <div
                 className={classnames(
-                  "mt-0 flex-1 font-bold tracking-widest uppercase text-xl",
+                  "mt-0 font-bold",
                   "transition-all",
-                  "flex flex-col justify-center pb-[102px]",
+                  "flex flex-col justify-center pb-[70px]",
                   {
                     "hidden": !seshStarted,
                     "bg-transparent text-white": seshStarted,
@@ -777,7 +799,7 @@ function WorkoutSesh({
                     <div
                       onClick={(!seshStarted || activeExerciseIdx === 0) ? undefined : startPrevExercise}
                       className={classNames(
-                        "flex items-center px-5",
+                        "flex items-center px-3",
                         {
                           // "bg-gray-100 text-gray-600 hover:text-gray-700": seshStarted && isActiveSet,
                           // "bg-[#858df0] text-white": seshStarted && !isActiveSet,
@@ -893,16 +915,9 @@ function WorkoutSesh({
                           : startNextExercise
                       }
                       className={classNames(
-                        "flex items-center px-5 cursor-pointer",
+                        "flex items-center px-3 cursor-pointer",
                         {
                           "hidden": !seshStarted
-                        },
-                        {
-                          // "bg-gray-100 text-gray-600 hover:text-gray-700": seshStarted && isActiveSet,
-                          // "bg-[#858df0] text-white": seshStarted && !isActiveSet,
-                          // "bg-gray-300 text-gray-600 hover:text-gray-700": seshStarted,
-                          // "bg-black": seshStarted && isActiveSet,
-
                         }
                       )}>
                         {
@@ -911,6 +926,36 @@ function WorkoutSesh({
                           :
                           <ForwardIcon className="text-white h-16 p-4 rounded-full bg-white/10" />
                         }
+                    </div>
+                  </div>
+                  <div className="text-sm text-white/40 rounded-full tracking-normal font-normal mx-5 normal-case">
+                    <div className="flex text-left">
+                      {
+                        exercises[activeExerciseIdx - 1] &&
+                        <div className="flex-1 flex">
+                          <div className="mr-2">
+                            <BackwardIcon className="inline-block h-4 -mt-0.5 mr-1" />
+                          </div>
+                          <div className="flex-1">
+                            <Clamped clamp={1}>
+                              {exercises[activeExerciseIdx - 1].name}
+                            </Clamped>
+                          </div>
+                        </div>
+                      }
+                      {
+                        !isLastExercise &&
+                        <div className="flex-1 flex text-right">
+                          <div className="flex-1">
+                            <Clamped clamp={1}>
+                              {exercises[activeExerciseIdx + 1].name}
+                            </Clamped>
+                          </div>
+                          <div className="ml-2">
+                            <ForwardIcon className="inline-block h-4 -mt-0.5 mr-1" />
+                          </div>
+                        </div>
+                      }
                     </div>
                   </div>
               </div>
@@ -1033,7 +1078,7 @@ function WorkoutSesh({
                           className={classNames(
                             "text-black",
                             {
-                              "px-3": !seshStarted
+                              "px-3 bg-white": !seshStarted
                             }
                           )}
                           style={{
