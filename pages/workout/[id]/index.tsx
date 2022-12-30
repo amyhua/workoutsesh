@@ -10,7 +10,7 @@ import Clamped from '../../../components/Clamped'
 import classNames from 'classnames'
 import { getSession, useSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
-import { ArrowLeftIcon, ArrowRightCircleIcon, ArrowRightIcon, ArrowUpIcon, Bars3Icon, BoltIcon, BoltSlashIcon, ChatBubbleLeftIcon, CheckCircleIcon, CheckIcon, ChevronDownIcon, ChevronUpIcon, ListBulletIcon, PencilIcon, PlayCircleIcon, PlayIcon, StopCircleIcon, StopIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftIcon, ArrowRightCircleIcon, ArrowRightIcon, ArrowUpIcon, Bars3Icon, BoltIcon, BoltSlashIcon, ChatBubbleLeftIcon, CheckCircleIcon, CheckIcon, ChevronDownIcon, ChevronUpIcon, ExclamationCircleIcon, ListBulletIcon, PencilIcon, PlayCircleIcon, PlayIcon, StopCircleIcon, StopIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import withSeshHistoryExercises from '../../../components/withSeshHistoryExercises'
 import ActiveSeshes from '../../../components/ActiveSeshes'
@@ -20,6 +20,7 @@ import { getNextIntervalProps } from '../../../lib/sesh-utils'
 import SeshHistoryContainer from '../../../components/SeshHistoryContainer'
 import moment from 'moment'
 import { formatShortFromNow } from '../../../lib/time-utils'
+import DurationText from '../../../components/DurationText'
 // see: https://github.com/atlassian/react-beautiful-dnd/issues/2350#issuecomment-1242917371
 
 resetServerContext()
@@ -50,6 +51,7 @@ function WorkoutSesh({
 }: any) {
   const session = useSession();
   workout = workout ? JSON.parse(workout) : undefined;
+  console.log('1workout', workout)
   error = error ? JSON.parse(error) : undefined;
   const { exercises: initialExercises = [] } = workout || {};
   const [unfinishedSeshes, setUnfinishedSeshes] = useState<SeshDto[]>(workout.seshes
@@ -311,6 +313,7 @@ function WorkoutSesh({
       </div>
     )
   }
+  console.log('activeExercise.betweenSetsRestTimeLimitS', activeExercise, activeExercise.betweenSetsRestTimeLimitS)
 
   return (
     <Layout title="Workout Sesh" background="#9ca3a5">
@@ -466,7 +469,7 @@ function WorkoutSesh({
                         </>
                       ) : 
                       <div className="flex">
-                        <div className="text-2xl font-bold">
+                        <div className="text-2xl font-bold align-top">
                           <BoltSlashIcon className={classNames(
                             "inline-block h-5 -mt-0.5 mr-1",
                             {
@@ -474,7 +477,36 @@ function WorkoutSesh({
                               "animate-pulse text-blue-300": activeIntervalCounterIsActive,
                             }
                           )} /> Rest
-                          <span className="font-light text-base ml-5 mr-2 inline-block"><span className="opacity-60 mr-1">Next:</span> Set #{workoutSetNum + 1}</span>
+                          <span className="font-light text-base ml-3 mr-2 inline-block align-middle">
+                            {
+                              activeExercise.betweenSetsRestTimeLimitS ?
+                                activeIntervalSecondsTotal > activeExercise.betweenSetsRestTimeLimitS ?
+                                <span className="text-white bg-red-500 py-1 px-2 rounded-full text-lg inline-block align-middle mr-3 font-semibold">
+                                  <DurationText short={true}
+                                      durationM={moment.duration(activeIntervalSecondsTotal - activeExercise.betweenSetsRestTimeLimitS, 'seconds')}
+                                    /> over!
+                                </span>
+                                :
+                                <span className="text-xl">
+                                  <strong className={classNames("font-bold", {
+                                    "text-green-300": activeExercise.betweenSetsRestTimeLimitS - activeIntervalSecondsTotal > 20,
+                                    "text-yellow-200": activeExercise.betweenSetsRestTimeLimitS - activeIntervalSecondsTotal <= 20 &&
+                                    activeExercise.betweenSetsRestTimeLimitS - activeIntervalSecondsTotal > 10,
+                                    "text-red-300": activeExercise.betweenSetsRestTimeLimitS - activeIntervalSecondsTotal <= 10 &&
+                                    activeExercise.betweenSetsRestTimeLimitS - activeIntervalSecondsTotal > 5,
+                                    "text-red-400": activeExercise.betweenSetsRestTimeLimitS - activeIntervalSecondsTotal <= 5,
+                                  })}>
+                                    <DurationText short={true}
+                                      durationM={moment.duration(activeExercise.betweenSetsRestTimeLimitS - activeIntervalSecondsTotal, 'seconds')}
+                                    />
+                                  </strong> left
+                                </span>
+                              :
+                              <>
+                                <span className="opacity-60 mr-1">Next:</span> Set #{workoutSetNum + 1}
+                              </>
+                            }
+                          </span>
                         </div>
                       </div>
                     }

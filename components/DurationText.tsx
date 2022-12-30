@@ -3,8 +3,10 @@ import { getHours, getMins, getSeconds } from "../lib/time-utils"
 
 const DurationText = ({
   durationM,
+  short,
 }: {
-  durationM: moment.Duration
+  durationM: moment.Duration;
+  short?: boolean;
 }) => {
   return (
     <>

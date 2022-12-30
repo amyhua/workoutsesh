@@ -236,7 +236,7 @@ function WorkoutForm({
                                 ...provided.draggableProps.style,
                               }}
                             >
-                              <div className="relative h-[100px] w-[100px] bg-slate-200 flex border-r border-black items-center rounded-tl-lg rounded-bl-lg overflow-hidden">
+                              <div className="relative min-h-[100px] w-[100px] bg-slate-200 flex border-r border-black items-center rounded-tl-lg rounded-bl-lg overflow-hidden">
                                 {
                                   exc.imageUrl &&
                                   <Image
