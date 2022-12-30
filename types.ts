@@ -1,3 +1,5 @@
+import { SeshInterval } from "@prisma/client";
+
 export type Error = {
   error: boolean;
   message: string;
@@ -32,4 +34,9 @@ export type SeshIntervalDto = {
   setNo: number;
   note?: string;
   active: boolean;
+}
+
+export type IntervalsMeta = {
+  intervalsBySetNo: Record<string, SeshInterval[]>;
+  noteBySetNo: Record<string, string>;
 }

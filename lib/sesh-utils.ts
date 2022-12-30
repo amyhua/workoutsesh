@@ -1,12 +1,21 @@
-import { SeshInterval } from "@prisma/client";
+import { Exercise, SeshInterval } from "@prisma/client";
 
-export const getNextIntervalProps = (intervals: SeshInterval[], restBetweenSets: boolean): {
+export const getNextIntervalProps = (intervals: (SeshInterval & { exercise: { restBetweenSets: boolean; } })[] = []): {
   setNo: number;
   active: boolean;
 } => {
-  const lastCreatedFinishedInterval = intervals[0];
+  const intervalsByLastCreated = intervals.sort((intA: SeshInterval, intB: SeshInterval) => (
+    new Date(intB.createdAt).getTime() - new Date(intA.createdAt).getTime()
+  ));
+  const lastCreatedFinishedInterval = intervalsByLastCreated[0];
+  if (!lastCreatedFinishedInterval) {
+    return {
+      setNo: 1,
+      active: true,
+    };
+  }
   if (
-    restBetweenSets &&
+    lastCreatedFinishedInterval.exercise.restBetweenSets &&
     lastCreatedFinishedInterval &&
     lastCreatedFinishedInterval.active
   ) {

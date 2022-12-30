@@ -6,10 +6,9 @@ import Logo from '../components/Logo'
 import Image from 'next/image'
 import classNames from 'classnames'
 import { useContext, useEffect, useState } from 'react'
-import { getSession } from 'next-auth/react'
 import AvatarMenu from './AvatarMenu'
 import MoreMenu from './MoreMenu'
-import { Exercise } from '@prisma/client'
+import { Exercise, Workout } from '@prisma/client'
 import { CheckCircleIcon, ExclamationCircleIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
 import AppContext from '../contexts/app-context'
 
@@ -44,34 +43,9 @@ const ImageTileRow = ({ className, imageUrls=[], size }: { className?: string; i
   </div>
 )
 
-// const LastSeshPreview = ({ sesh }: { sesh: any }) => (
-//   <section className="mb-8 px-4 pt-6 pb-8 bg-purple0 p-4 border-4 rounded-lg border-black">
-//     <header>
-//       <h2 className="font-bold mb-3 text-3xl">
-//         Last workout
-//       </h2>
-//     </header>
-//     <main className="my-1">
-//       <ImageTileRow
-//         size={75}
-//         imageUrls={prevWorkout.exercises.map((e: any) => e.imageUrl)}
-//         className="border-2 border-black rounded-sm"
-//       />
-//       <div className="mt-1">
-//         <h3 className="text-2xl font-bold my-2">{prevWorkout.name}</h3>
-//         <div className="font-semibold">
-//           SAMPLE 2 days ago. Completed in {prevWorkout.durationMin.toFixed(1)} minutes. <Link
-//           className="block underline" href="#">
-//             Summary
-//           </Link>
-//         </div>
-//       </div>
-//     </main>
-//   </section>
-// )
-
 export default function IndexDashboard({
-  user
+  user,
+  workouts,
 }: any) {
   const stats = [{
     value: user.seshesTotal || 0,
@@ -83,15 +57,7 @@ export default function IndexDashboard({
   const router = useRouter()
   const { indexError, indexSuccess } = useContext(AppContext)
   const [winReady, setWinReady] = useState(false)
-  const [workouts, setWorkouts] = useState([])
-  const loadWorkouts = async () => {
-    const resp = await fetch(`/api/workouts`);
-    const data = await resp.json();
-    setWorkouts(data);
-  };
-  const lastSesh = (user.seshes || [])[(user.seshes || []).length - 1];
   useEffect(() => {
-    loadWorkouts();
     setWinReady(true);
   }, []);
 
@@ -166,10 +132,6 @@ export default function IndexDashboard({
               }
             </div>
           </section>
-          {/* {
-            lastSesh &&
-            <LastSeshPreview sesh={lastSesh} />
-          } */}
         </div>
         <section className="max-w-3xl mx-auto">
           {
@@ -194,6 +156,9 @@ export default function IndexDashboard({
                     <article
                       className="group cursor-pointer px-6 pt-5 sm:pb-8 pb-3"
                       onClick={onStartWorkout && onStartWorkout(workout)}>
+                      <h3 className="font-bold text-2xl mt-4 pb-1">
+                        <PlayCircleIcon className="inline-block h-14 align-middle -ml-1 -mt-1 group-hover:text-green-500" /> {workout.name}
+                      </h3>
                       <div className="py-0">
                         <ImageTileRow
                           size={75}
@@ -207,17 +172,19 @@ export default function IndexDashboard({
                           className="border rounded-sm"
                         />
                       </div>
-                      <h3 className="font-bold text-2xl mt-4">
-                        <PlayCircleIcon className="inline-block h-14 align-middle -ml-1 -mt-1 group-hover:text-green-500" /> {workout.name}
-                      </h3>
                       <div className="flex sm:flex-row flex-col ml-1">
                         <div className="ml-0.25 flex-1 flex sm:flex-row-reverse">
                           <div className="flex-1">
-                            <p className="font-semibold text-lg mt-1">
+                            <p className="font-semibold text-base my-2">
                               {workout.description}
                             </p>
-                            <p className="text-sm mt-1 text-gray-500">
-                              {workout.exercises.map((exc: Exercise) => exc.name).join(' · ')}
+                            <p className="text-sm mt-3 text-gray-500">
+                              {/* <div className="font-semibold text-black mr-2 mb-3">{workout.exercises.length} exercise{workout.exercises.length !== 1 ? 's' : ''}</div> */}
+                              {workout.exercises.map((exc: Exercise, i: number) => (
+                                <span key={i} className="inline-block mr-2 mb-2 text-xs py-1 px-2 rounded-xl bg-gray-100 text-black border">
+                                  {exc.name}
+                                </span>
+                              ))}
                             </p>
                           </div>
                         </div>
@@ -242,30 +209,4 @@ export default function IndexDashboard({
       </main>
     </Layout>
   )
-}
-
-export async function getServerSideProps(context: any) {
-  const session = await getSession(context);
-  // const workouts = await prisma.workout.findMany({
-  //   where: {
-  //     userEmail: session && session.user &&
-  //       session.user.email,
-  //   }
-  // });
-  try {
-    return {
-      props : {
-        session,
-        // workouts,
-        params: context.params
-      }
-    }
-  } catch(error) {
-    console.log('error: ', error)
-    return {
-      props : {
-        error
-      }
-    }
-  }  
 }

@@ -3,6 +3,7 @@ import classNames from "classnames";
 import moment from "moment";
 import { useState } from "react";
 import { SeshDto } from "../types";
+import DurationText from "./DurationText";
 
 const ActiveSesh = ({
   sesh,
@@ -43,22 +44,23 @@ const ActiveSesh = ({
             }}
             className="group/play cursor-pointer flex-1 flex">
             <div>
-              <PlayCircleIcon className="-ml-1 h-14 mt-0.5 mr-2 group-hover/play:text-green-500" />
+              <PlayCircleIcon className="-ml-1 h-14 mt-0.5 mr-2 group-hover/play:text-green-500 text-black" />
             </div>
             <div className="flex-1 pt-2">
               <span className="mr-1 font-bold">
                 {moment(time).format('ddd MMM D h:mma')}
               </span>
               <div className="text-gray-400 text-xs mt-1">
-                <span className="inline-block w-[65px] mr-2">
-                  {durationM.minutes() > 0 ? durationM.minutes() + 'm ' : ''}
-                  {durationM.seconds()}s
+                <span className="inline-block mr-2">
+                  Duration: <DurationText durationM={durationM} />
                 </span>
-                {
-                  sesh.pausedAt ?
-                    moment(sesh.pausedAt).fromNow() :
-                    moment(sesh.updatedAt).fromNow()
-                }
+                <div>
+                  {
+                    sesh.pausedAt ?
+                      'Paused ' + moment(sesh.pausedAt).fromNow() :
+                      'Updated ' + moment(sesh.updatedAt).fromNow()
+                  }
+                </div>
               </div>
             </div>
           </div>
@@ -93,7 +95,7 @@ const ActiveSeshes = ({
         filter: 'drop-shadow(0 -5px 25px rgb(0 0 0 / 4%)) drop-shadow(0 0px 40px rgb(0 0 0 / 0.1))',
       }}>
       <h1 className="text-xl font-bold my-3">
-        Resume your active sesh{seshes.length > 1 ? 'es' : ''}
+        Resume your sesh{seshes.length > 1 ? 'es' : ''}
       </h1>
       {
         seshes.map((sesh: SeshDto, i) => (

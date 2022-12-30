@@ -10,7 +10,6 @@ const withSeshHistoryExercises = (Component: React.FC<any>) => {
       let restNote: string | undefined = '';
       if (!interval.active && interval.note) {
         // if note added during a rest period, then
-        console.log('saving on rest', lastSavedInterval);
         if (
           lastSavedInterval &&
           lastSavedInterval.exerciseId === interval.exerciseId &&
@@ -28,9 +27,6 @@ const withSeshHistoryExercises = (Component: React.FC<any>) => {
               }),
             })
           );
-        } else {
-          // given that the active set was 'skipped', add it to the rest interval
-          restNote = interval.note;
         }
       }
       promises.push(
@@ -38,7 +34,7 @@ const withSeshHistoryExercises = (Component: React.FC<any>) => {
           method: 'POST',
           body: JSON.stringify({
             ...interval,
-            note: interval.active ? interval.note : restNote,
+            note: interval.active ? interval.note : '',
           })
         })
       );
@@ -47,6 +43,10 @@ const withSeshHistoryExercises = (Component: React.FC<any>) => {
         .then((data: any[]) => {
           console.log('saved data...', data);
           setLastSavedInterval(data);
+          return {
+            ...data,
+            note: interval.note,
+          };
         })
         .catch((errs: any[]) => {
           console.error('Cannot save set', errs);

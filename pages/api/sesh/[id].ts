@@ -3,6 +3,11 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
 
+const getAverage = (nums: number[]) => {
+  const total = nums.reduce((sum: number, x: number) => sum + x);
+  return total / nums.length;
+}
+
 async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
   const session = await getSession({ req });
   if (!session || !session.user || !session.user.email) {
@@ -33,6 +38,7 @@ async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
               exercise: {
                 select: {
                   name: true,
+                  restBetweenSets: true,
                 }
               }
             },
@@ -102,6 +108,25 @@ async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
                 pausedAt: now,
               },
             });
+            const workout = await prisma.workout.findFirstOrThrow({
+              where: {
+                id: sesh.workoutId,
+              },
+              include: {
+                seshes: true,
+              }
+            });
+            await prisma.workout.update({
+              where: {
+                id: workout.id,
+              },
+              data: {
+                averageDurationS: getAverage([
+                  ...(workout.seshes || []).map((s: Sesh) => s.timeCompletedS),
+                  sesh.timeCompletedS,
+                ]),
+              }
+            })
             break;
           default:
             res.status(405).end(`Action ${req.query.action} Not Allowed`)
