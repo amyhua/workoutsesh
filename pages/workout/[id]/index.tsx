@@ -76,7 +76,7 @@ function WorkoutSesh({
   const [activeExerciseIdx, setActiveExerciseIdx] = useState(0);
   const activeExercise = exercises[activeExerciseIdx];
   const isLastExercise = activeExerciseIdx >= exercises.length - 1;
-  const getNextPeriodText = (): { setText: string; isSameExercise: boolean; } => {
+  const getNextPeriodText = (): { setText: string; isSameExercise: boolean; setNum?: number; } => {
     if (activeExercise.isRest) {
       // moves onto next exercise if any
       return (
@@ -94,6 +94,7 @@ function WorkoutSesh({
       // goes to next set in exercise
       return {
         setText: 'Set #' + (workoutSetNum + 1),
+        setNum: workoutSetNum + 1,
         isSameExercise: true,
       };
     }
@@ -647,17 +648,26 @@ function WorkoutSesh({
                   {
                     activeIntervalCounterIsActive ?
                       (activeExercise.isRest || !isActiveSet) ?
-                      <div className="mt-1.5">
+                      <div className="mt-2">
                         <Clamped clamp={1}>
-                          <span className="mr-2 text-white/60">
-                            <span className="mr-2">Next:</span>
-                            <span className="text-white">
-                              {getNextPeriodText().setText}
-                              </span>{
-                              getNextPeriodText().isSameExercise ? (
-                                <span className="ml-3">{activeExercise.name}</span>
-                              ) : ''
-                            }</span>
+                          <span className="mr-2 text-white/60 flex">
+                            <span className="text-white text-right flex-1">
+                              {
+                                getNextPeriodText().setNum ?
+                                <>
+                                  <span className="opacity-50 text-base mr-1.5 align-bottom">
+                                    <em className="italic mr-2">Next up...</em>
+                                    Set
+                                  </span>
+                                  <span className="text-base font-semibold mr-1">{getNextPeriodText().setNum}</span>
+                                  <span className="opacity-50 text-base mr-1.5">out of</span>
+                                  <span className="text-base font-semibold">{activeExercise.setsDescription}</span>
+                                </>
+                                :
+                                getNextPeriodText().setText
+                              }
+                              </span>
+                            </span>
                         </Clamped>
                       </div>
                       :
@@ -668,10 +678,10 @@ function WorkoutSesh({
                         <div className="flex-1">
                           {
                             new Array(workoutSetNum - 1).fill(0).map((_, i) => (
-                              <CheckIcon key={i} className="h-5 inline-block align-top mt-[2.5px]" />
+                              <CheckIcon key={i} className="h-5 inline-block align-top" />
                             ))
                           }
-                          <CheckIcon className="h-5 inline-block align-top mt-[2.5px] text-brightGreen" />
+                          <CheckIcon className="h-5 inline-block align-top text-brightGreen" />
                         </div>
                         {
                           activeExercise.setsDescription &&
@@ -769,7 +779,7 @@ function WorkoutSesh({
                       ref={addNoteEl}
                       value={activeExcNote}
                       onChange={(e: any) => setActiveExcNote(e.target.value)}
-                      placeholder={`Note for Set #${workoutSetNum}`}
+                      placeholder={`Note for ${!isActiveSet && activeExercise.restBetweenSets ? 'Previous ' : ''}Set #${workoutSetNum}`}
                       className="text-base focus:text-white bg-white/20 group focus:outline-none rounded-full w-full transition-all py-2 pl-[45px] pr-4 text-white"
                     />
                     <span className="inline-block text-white/60 group:text-white font-semibold align-middle absolute left-[12px] top-[8.5px] z-2">
@@ -870,15 +880,13 @@ function WorkoutSesh({
                                     :
                                     <div className="flex">
                                       {
-                                        isLastExercise ?
-                                        'Last'
-                                        :
                                         activeExercise.isRest ?
                                         <CheckIcon className="border-r-2 border-white/30 ml-2 px-3 py-5 h-[84px] inline-block text-brightGreen" />
                                         :
                                         <BoltIcon className="border-r-2 border-white/30 ml-2 px-3 py-5 h-[84px] inline-block text-brightGreen" />
                                       }
                                       <div className="pl-4 text-xl flex-1 align-middle flex flex-col justify-center">
+                                        
                                         <div className="text-base tracking-normal font-normal text-white/60">
                                           Start Next
                                         </div>
@@ -922,7 +930,7 @@ function WorkoutSesh({
                       )}>
                         {
                           activeExerciseIdx === exercises.length - 1 ?
-                          <StopCircleIcon className="text-white h-14 p-2" />
+                          <StopIcon className="text-white h-16 p-4 rounded-full bg-white/10" />
                           :
                           <ForwardIcon className="text-white h-16 p-4 rounded-full bg-white/10" />
                         }
@@ -974,7 +982,7 @@ function WorkoutSesh({
               "top-[55px] min-h-[100vh]": expanded,
             }
           )} style={{
-            top: (seshStarted && !expanded) ? 'calc(100vh - 102px)' : '',
+            top: (seshStarted && !expanded) ? 'calc(100vh - 70px)' : '',
           }}>
             {
               workout.seshes && workout.seshes.length && seshId === undefined ?
