@@ -22,6 +22,8 @@ model Exercise {
   repsDescription String?
   restBetweenSets Boolean @default(true)
   betweenSetsRestTimeLimitS Int?
+  isRest Boolean @default(false)
+  timeLimitS Int?
   intervals SeshInterval[]
 }
 
@@ -38,6 +40,53 @@ model Workout {
   averageDurationS Float? // average duration in seconds
   seshes Sesh[]
 }
+
+enum ExerciseEquipment {
+  kettlebell
+  lateralPulldownMachine
+  backExtensionMachine
+  crossoverMachine
+  smithMachine
+  exerciseBall
+  weightPlate
+  cables
+  trapBar
+  cableRowMachine
+  oneChair
+  twoChairs
+  fixedVerticalBar
+  dipStation
+  ezBar
+  preacherBench
+  none
+  weightedBench
+  declineBench
+  adjustableBench
+  dumbbells
+  chestPressMachine
+  legPressMachine
+  hackSquatMachine
+  legCurlMachine
+  flyMachine
+  exerciseBox
+  twoExerciseBoxes
+  stepPlatform
+  twoStepPlatforms
+  barbell
+  pullDownMachine
+  bottle
+  balanceBoard
+  bosuBall
+  treadmill
+  captainsChair
+  towel
+  doorway
+  rope
+  pullUpBar
+  resistanceBandWithGrips
+}
+
+// idea: specify once what machines your gym or home has
 
 model Sesh {
   id  Int @id @default(autoincrement())

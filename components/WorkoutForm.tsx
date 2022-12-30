@@ -11,6 +11,7 @@ import ExerciseForm from "./ExerciseForm";
 import { Exercise } from "@prisma/client";
 import DurationText from "./DurationText";
 import moment from "moment";
+import RestForm from "./RestForm";
 
 resetServerContext()
 
@@ -35,6 +36,7 @@ function WorkoutForm({
   workout?: any
 }) {
   const router = useRouter()
+  console.log('workout', workout)
   const { setIndexError, setIndexSuccess } = useContext(AppContext)
   const [submitting, setSubmitting] = useState(false)
   const [name, setName] = useState(workout.name || '')
@@ -44,10 +46,11 @@ function WorkoutForm({
     : [])
   const [editingExerciseIdx, setEditingExerciseIdx] = useState<number | undefined>()
   const [showExerciseForm, setShowExerciseForm] = useState(false)
+  const [showRestForm, setShowRestForm] = useState(false)
   const [winReady, setWinReady] = useState(false);
   const onEditExercise = (excIdx: number) => () => {
     setEditingExerciseIdx(excIdx)
-    setShowExerciseForm(true)
+    exercises[excIdx].isRest ? setShowRestForm(true) : setShowExerciseForm(true)
   }
   const goBack = () => {
     router.push(`/`)
@@ -67,6 +70,7 @@ function WorkoutForm({
         description,
         exercises: exercises.map((exc: any, i: number) => ({
           ...exc,
+          id: undefined,
           workoutOrder: i,
         }))
       })
@@ -107,60 +111,74 @@ function WorkoutForm({
       result.destination.index
     )
     setExercises(reorderedExercises)
-  }
+  };
+  const setExercise = (exc: Exercise) => {
+    if (editingExerciseIdx !== undefined) {
+      setExercises([
+        ...exercises.slice(0, editingExerciseIdx),
+        exc,
+        ...exercises.slice(editingExerciseIdx + 1)
+      ])
+    } else {
+      setExercises([
+        ...exercises,
+        exc,
+      ])
+    }
+  };
+  const onRemoveEditingExercise = () => {
+    if (editingExerciseIdx !== undefined) {
+      setExercises((excs: Exercise[]) => {
+        const temp = [...excs]
+        temp.splice(editingExerciseIdx, 1)
+        return temp
+      })
+      setShowExerciseForm(false)
+    }
+  };
   return (
     <>
-      <div
-        className={classNames(
-          "absolute z-10 top-0 bottom-o right-0 py-10 left-0 bg-black0",
-          {
-            "hidden": !showExerciseForm
+      <ExerciseForm
+        editing={editingExerciseIdx !== undefined}
+        open={showExerciseForm}
+        exercise={editingExerciseIdx !== undefined ?
+          exercises[editingExerciseIdx] as Exercise : {
+            name: '',
+            imageUrl: '',
+            setsDescription: '',
+            repsDescription: '',
+            restBetweenSets: true,
+          } as Partial<Exercise>
+        }
+        onClose={
+          () => {
+            console.log('close exc form')
+            setEditingExerciseIdx(undefined)
+            setShowExerciseForm(false)
           }
-        )}>
-        <ExerciseForm
-          key={showExerciseForm ? 1 : 0}
-          editing={editingExerciseIdx !== undefined}
-          open={showExerciseForm}
-          exercise={editingExerciseIdx !== undefined ?
-            exercises[editingExerciseIdx] as Exercise : {
-              name: '',
-              imageUrl: '',
-              setsDescription: '',
-              repsDescription: '',
-              restBetweenSets: true,
-            } as Partial<Exercise>
-          }
-          onClose={
-            () => {
-              setEditingExerciseIdx(undefined)
-              setShowExerciseForm(false)
-            }
-          }
-          onRemove={() => {
-            if (editingExerciseIdx !== undefined) {
-              setExercises((excs: Exercise[]) => {
-                const temp = [...excs]
-                temp.splice(editingExerciseIdx, 1)
-                return temp
-              })
-              setShowExerciseForm(false)
-            }
-          }}
-          setExercise={(exc: any) => {
-            if (editingExerciseIdx !== undefined) {
-              setExercises([
-                ...exercises.slice(0, editingExerciseIdx),
-                exc,
-                ...exercises.slice(editingExerciseIdx + 1)
-              ])
-            } else {
-              setExercises([
-                ...exercises,
-                exc,
-              ])
-            }
-          }} />
-      </div>
+        }
+        onRemove={onRemoveEditingExercise}
+        setExercise={setExercise}
+      />
+      <RestForm
+        open={showRestForm}
+        onClose={() => {
+          setShowRestForm(false)
+          setEditingExerciseIdx(undefined)
+        }}
+        editing={editingExerciseIdx !== undefined}
+        exercise={editingExerciseIdx !== undefined ?
+          exercises[editingExerciseIdx] as Exercise : {
+            name: '',
+            imageUrl: '',
+            setsDescription: '',
+            repsDescription: '',
+            restBetweenSets: true,
+          } as Partial<Exercise>
+        }
+        onRemove={onRemoveEditingExercise}
+        setExercise={setExercise}
+      />
       <main className="max-w-xl mx-auto mt-[70px] p-5">
         <div
           onClick={goBack}
@@ -201,7 +219,7 @@ function WorkoutForm({
           />
 
           <label htmlFor="exercises" className="mt-3 mb-2 block font-semibold">
-            🏋️ Exercises
+            🏋️ Activities
           </label>
           <div className="border-2 border-black px-3 py-4 rounded-lg bg-slate-50">
             <ul>
@@ -229,52 +247,75 @@ function WorkoutForm({
                           {(provided: any, snapshot: any) => (
                             <div
                               ref={provided.innerRef}
-                              className="flex-1 flex bg-white rounded-lg mb-3 shadow-md border border-black"
+                              className="flex-1 min-h-[100px] flex bg-white rounded-lg mb-3 shadow-md border border-black"
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                               style={{
                                 ...provided.draggableProps.style,
                               }}
                             >
-                              <div className="relative min-h-[100px] w-[100px] bg-slate-200 flex border-r border-black items-center rounded-tl-lg rounded-bl-lg overflow-hidden">
-                                {
-                                  exc.imageUrl &&
-                                  <Image
-                                    src={exc.imageUrl}
-                                    alt="Exercise Image"
-                                    priority
-                                    height={100}
-                                    width={100}
-                                    placeholder={require('./routine-placeholder.png')}
-                                    className="inline-block bg-slate-200"
-                                  />
-                                }
-                              </div>
-                              <div className="flex-1 py-3 pl-3 pr-8">
-                                <h3 className="font-semibold text-base">
-                                  {exc.name}
-                                </h3>
-                                <div className="text-sm text-slate-600">
-                                  <ExerciseDescription
-                                    setsDescription={exc.setsDescription}
-                                    repsDescription={exc.repsDescription}
-                                  />
-                                  <span className="text-sm">
-                                    <RestBetweenSetsDescription
-                                      value={exc.restBetweenSets}
-                                    />
-                                  </span>
-                                </div>
-                                {
-                                  exc.betweenSetsRestTimeLimitS &&
-                                  <div className="text-sm text-slate-600">
-                                    <ClockIcon className="h-3.5 text-gray-500 -mt-0.5 inline-block" /> Rest Period: <DurationText durationM={moment.duration(
-                                      exc.betweenSetsRestTimeLimitS,
-                                      'seconds'
-                                    )} /> / Set
+                              {
+                                exc.isRest ?
+                                <div className="flex-1 px-3 py-5">
+                                  <strong className="text-lg"><span className="text-3xl mr-1">🧘</span> Rest Period</strong>
+                                  <div className="mt-1 text-base">
+                                    <ClockIcon className="inline-block h-5 mr-1 -mt-1 text-gray-300" />
+                                    {
+                                      exc.timeLimitS ?
+                                      <DurationText durationM={moment.duration(exc.timeLimitS, 'seconds')} />
+                                      :
+                                      'No time limit'
+                                    }
                                   </div>
-                                }
-                              </div>
+                                </div>
+                                :
+                                <>
+                                  <div className="relative min-h-[100px] w-[100px] bg-slate-200 flex border-r border-black items-center rounded-tl-lg rounded-bl-lg overflow-hidden">
+                                    {
+                                      exc.imageUrl &&
+                                      <Image
+                                        src={exc.imageUrl}
+                                        alt="Exercise Image"
+                                        priority
+                                        height={100}
+                                        width={100}
+                                        placeholder={require('./routine-placeholder.png')}
+                                        className="inline-block bg-slate-200"
+                                      />
+                                    }
+                                  </div>
+                                  <div className="flex-1 py-3 pl-3 pr-8">
+                                    <h3 className="font-semibold text-base">
+                                      {exc.name}
+                                    </h3>
+                                    <div className="text-sm text-slate-600">
+                                      <ExerciseDescription
+                                        setsDescription={exc.setsDescription}
+                                        repsDescription={exc.repsDescription}
+                                      />
+                                      <span className="text-sm">
+                                        <RestBetweenSetsDescription
+                                          value={exc.restBetweenSets}
+                                        />
+                                      </span>
+                                    </div>
+                                    {
+                                      exc.restBetweenSets &&
+                                      <div className="text-sm text-slate-600">
+                                        🧘 Rest Time: {
+                                          exc.betweenSetsRestTimeLimitS ?
+                                          <>
+                                            <DurationText durationM={moment.duration(
+                                              exc.betweenSetsRestTimeLimitS,
+                                              'seconds'
+                                            )} /> / Set
+                                          </> : '--'
+                                        }
+                                      </div>
+                                    }
+                                  </div>
+                                </>
+                              }
                               <div className="pl-2 relative">
                                 <div
                                   className="whitespace-nowrap absolute top-0 right-0 px-2 py-1 text-lg">
@@ -302,8 +343,13 @@ function WorkoutForm({
               }
               <li
                 onClick={() => setShowExerciseForm(true)}
-                className="px-2 cursor-pointer font-bold h-[50px] w-full bg-white border-2 border-black text-black text-base flex items-center rounded-lg">
-                <PlusCircleIcon className="h-7 align-middle mr-2" /> Add Exercise
+                className="mb-3 mt-4 px-2 cursor-pointer font-bold h-[50px] w-full bg-white border-2 border-black text-black text-lg flex items-center rounded-lg">
+                <PlusCircleIcon className="h-7 align-middle mr-2" /> 🏋️ Add Exercise
+              </li>
+              <li
+                onClick={() => setShowRestForm(true)}
+                className="px-2 cursor-pointer font-bold h-[50px] w-full bg-white border-2 border-black text-black text-lg flex items-center rounded-lg">
+                <PlusCircleIcon className="h-7 align-middle mr-2" /> 🧘 Add Rest Period
               </li>
             </ul>
           </div>

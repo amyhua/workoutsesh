@@ -1,6 +1,8 @@
 import classnames from 'classnames'
+import moment from 'moment';
 import Image from 'next/image'
 import Clamped from './Clamped';
+import DurationText from './DurationText';
 
 const ReorderIconSvg = ({ color }: { color: string; }) => (
   <svg className="inline-block" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -63,7 +65,11 @@ const WorkoutRoutine = ({
           "text-gray-500"
         )}>
           <Clamped clamp={1}>
-            {exercise.description}
+            {
+              exercise.isRest && exercise.timeLimitS ?
+              <DurationText durationM={moment.duration(exercise.timeLimitS, 'seconds')} /> :
+              exercise.description
+            }
           </Clamped>
         </div>
       </div>

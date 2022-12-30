@@ -51,7 +51,6 @@ function WorkoutSesh({
 }: any) {
   const session = useSession();
   workout = workout ? JSON.parse(workout) : undefined;
-  console.log('1workout', workout)
   error = error ? JSON.parse(error) : undefined;
   const { exercises: initialExercises = [] } = workout || {};
   const [unfinishedSeshes, setUnfinishedSeshes] = useState<SeshDto[]>(workout.seshes
@@ -179,7 +178,6 @@ function WorkoutSesh({
       active: currWorkoutSetType === WorkoutSetType.Active,
     })
     .then((interval: SeshInterval) => {
-      console.log('saved interval', interval);
       setPastIntervals([
         // save by most recent order
         {
@@ -313,8 +311,7 @@ function WorkoutSesh({
       </div>
     )
   }
-  console.log('activeExercise.betweenSetsRestTimeLimitS', activeExercise, activeExercise.betweenSetsRestTimeLimitS)
-
+  
   return (
     <Layout title="Workout Sesh" background="#9ca3a5">
       <main className={classNames(
@@ -456,6 +453,7 @@ function WorkoutSesh({
                       {isActiveSet ? (
                         <>
                           <div className="text-2xl font-bold">
+
                             <Clamped clamp={2}>
                               <BoltIcon className={classNames(
                                 "inline-block h-5 -mt-0.5 mr-1",
