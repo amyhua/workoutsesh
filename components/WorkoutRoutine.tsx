@@ -39,7 +39,7 @@ const WorkoutRoutine = ({
     )}>
       <div className="m-0">
         <div className={classnames(
-          "relative rounded-sm w-[111px] min-h-[111px] text-center bg-white overflow-hidden",
+          "relative w-[111px] min-h-[111px] text-center bg-white overflow-hidden",
           "text-black z-100 border-r",
           isDragging ? "text-navy0": "text-black"
         )}>

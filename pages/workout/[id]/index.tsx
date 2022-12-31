@@ -479,7 +479,7 @@ function WorkoutSesh({
                   "opacity-25": !isActiveSet,
                 }
               )} style={{
-                minHeight: '390px'
+                minHeight: '350px'
               }}>
                 <div>
                   {
@@ -1015,7 +1015,7 @@ function WorkoutSesh({
             <div className="pb-10 bg-transparent">
               {
                 !seshStarted ?
-                <h2 className="text-center text-white font-semibold text-lg mb-0.5">
+                <h2 className="text-center text-white font-semibold text-lg mb-3 mt-7">
                   Upcoming Exercises
                 </h2>
                 :
@@ -1045,10 +1045,8 @@ function WorkoutSesh({
                 </h2>
               }
               <div className={classNames(
-                "shadow-xl drop-shadow-xl rounded-t-2xl overflow-hidden",
-              )} style={{
-                filter: 'drop-shadow(0 -5px 25px rgb(0 0 0 / 4%)) drop-shadow(0 0px 40px rgb(0 0 0 / 0.1))',
-              }}>
+                "shadow-xl rounded-t-2xl overflow-hidden",
+              )}>
                 {
                   winReady &&
                   activeBottomTab === BottomTab.Exercises &&

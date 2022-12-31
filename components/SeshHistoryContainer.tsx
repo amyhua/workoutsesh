@@ -104,13 +104,13 @@ function SeshHistoryContainer({
             {
               isSeshPage &&
               <>
-                <li className="mb-2">
-                  <span className="inline-block opacity-70 w-[110px]">
+                <li className="flex mb-2">
+                  <div className="inline-block opacity-70 w-[110px]">
                     Name
-                  </span>
-                  <span className="ml-1 font-semibold text-lg">
+                  </div>
+                  <div className="flex-1 ml-1 font-normal">
                     {workoutName}
-                  </span>
+                  </div>
                 </li>
                 {
                   sesh && sesh.timeCompletedS &&
@@ -118,7 +118,7 @@ function SeshHistoryContainer({
                     <span className="inline-block opacity-70 w-[110px]">
                       Total Time
                     </span>
-                    <span className="ml-1 font-semibold text-lg">
+                    <span className="ml-1">
                       <DurationText durationM={totalTimeM} />
                     </span>
                   </li>
@@ -129,7 +129,7 @@ function SeshHistoryContainer({
                   <span className="inline-block opacity-70 w-[110px]">
                     Average Set
                   </span>
-                  <span className="ml-1 font-semibold text-lg">
+                  <span className="ml-1">
                     <DurationText durationM={activePeriodDurationAvgM} />
                   </span>
                 </li>
@@ -139,7 +139,7 @@ function SeshHistoryContainer({
                   <span className="inline-block opacity-70 w-[110px]">
                     Average Rest
                   </span>
-                  <span className="ml-1 font-semibold text-lg">
+                  <span className="ml-1">
                     <DurationText durationM={restPeriodDurationAvgM} />
                   </span>
                 </li>

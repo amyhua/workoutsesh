@@ -131,8 +131,8 @@ export default function IndexDashboard({
                 <div className="text-3xl font-semibold text-white inline-block">
                   {totalSeshes.toLocaleString()}
                 </div>
-                <div className="text-xl font-semibold text-white/60 mt-2">
-                  Completed Workouts
+                <div className="text-lg text-white/60 mt-2">
+                  total completed workouts
                 </div>
               </article>
               <div className="flex">
@@ -140,16 +140,16 @@ export default function IndexDashboard({
                   <div className="text-3xl font-semibold text-white inline-block">
                     {totalSeshesThisWeek.toLocaleString()}
                   </div>
-                  <div className="text-xl font-semibold text-white/60 mt-2">
-                    This Week
+                  <div className="text-lg text-white/60 mt-2">
+                    this week
                   </div>
                 </article>
                 <article className="flex-1 sm:pr-5 last:pr-0">
                   <div className="text-3xl font-semibold text-white inline-block">
                     {totalSeshesThisMonth.toLocaleString()}
                   </div>
-                  <div className="text-xl font-semibold text-white/60 mt-2">
-                    This Month
+                  <div className="text-lg text-white/60 mt-2">
+                    this month
                   </div>
                 </article>
               </div>
@@ -173,16 +173,16 @@ export default function IndexDashboard({
                     key={i}
                     className="bg-white text-black shadow-xl rounded-lg my-5">
                     <article
-                      className="group cursor-pointer px-6 pt-5 sm:pb-8 pb-3"
+                      className="group cursor-pointer px-3 pt-5 sm:pb-8 pb-3"
                       onClick={onStartWorkout && onStartWorkout(workout)}>
-                      <h3 className="flex font-bold text-2xl mt-4">
-                        <PlayCircleIcon className="inline-block h-14 align-middle -ml-1 -mt-1 group-hover:text-green-500" />
+                      <PlayCircleIcon className="inline-block h-14 align-middle -ml-1 group-hover:text-green-500" />
+                      <h3 className="flex font-bold text-2xl">
                         <div className="mt-2 flex-1 ml-2 mb-2">
                           {workout.name}
                         </div>
                       </h3>
-                      <div className="ml-5 mt-2">
-                        <div className="font-semibold text-gray-800 mb-3">
+                      <div className="ml-2 mt-2">
+                        <div className="mb-3">
                           {
                             workout.seshes.length ?
                             <>
@@ -192,21 +192,17 @@ export default function IndexDashboard({
                           }
                           {
                             workout.seshes.length ?
-                            <div className="text-sm flex text-gray-500 mt-1">
-                              <span className="text-black font-semibold mr-2">Last sesh</span>
-                              <div className="flex-1 ml-2">
+                            <div className="text-sm text-black mt-1">
+                              <div className="font-normal">
                                 <div>
                                   {
                                     workout.seshes[workout.seshes.length - 1].finishedAt ?
-                                    'Finished at' : 'Started'
+                                    'Completed' : 'Started'
                                   } {(
                                     workout.seshes[workout.seshes.length - 1].finishedAt ?
                                     moment(workout.seshes[workout.seshes.length - 1].finishedAt) :
                                     moment(workout.seshes[workout.seshes.length - 1].createdAt)
-                                  ).fromNow()}
-                                </div>
-                                <div>
-                                  <DurationText durationM={moment.duration(workout.seshes[workout.seshes.length - 1].timeCompletedS, 'seconds')} />
+                                  ).fromNow()}. Duration: <DurationText durationM={moment.duration(workout.seshes[workout.seshes.length - 1].timeCompletedS, 'seconds')} />
                                 </div>
                               </div>
                             </div>
