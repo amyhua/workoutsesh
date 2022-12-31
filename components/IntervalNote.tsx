@@ -1,5 +1,4 @@
 import { SeshInterval } from "@prisma/client";
-import classNames from "classnames";
 import moment from "moment";
 import { formatShortFromNow } from "../lib/time-utils";
 import Clamped from "./Clamped";
