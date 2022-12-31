@@ -52,7 +52,7 @@ const AvatarMenu = ({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="bg-white text-black absolute -ml-1 left-0 right-0 z-10 mt-2 w-56 origin-top-right rounded-md shadow-lg border-2 border-black ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <Menu.Items className="bg-white text-black absolute -ml-1 right-0 z-10 mt-2 w-56 origin-top-right rounded-md shadow-lg border-2 border-black ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div className="py-1">
             <Menu.Item>
             {
