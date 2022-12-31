@@ -5,7 +5,6 @@ import Logo from '../../components/Logo'
 import Image from 'next/image'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
-import { Error, User } from '../../types'
 
 const workouts = [{
   name: 'Upper Body',
