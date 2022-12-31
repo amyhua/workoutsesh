@@ -15,7 +15,7 @@ async function intervalsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
     case 'GET':
       const {
         exerciseId,
-        notesOnly // if 'true' (case-insensitive), shows only those intervals with notes
+        // notesOnly // if 'true' (case-insensitive), shows only those intervals with notes
       } = req.query;
       // load past active periods of the user by exerciseId
       const intervals = await prisma.seshInterval.findMany({
@@ -27,9 +27,9 @@ async function intervalsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
           //   } : undefined
           // ),
           // TODO: make this on a param notesOnly
-          note: {
-            not: '',
-          },
+          // note: {
+          //   not: '',
+          // },
           active: true,
           sesh: {
             userEmail: session.user.email,
