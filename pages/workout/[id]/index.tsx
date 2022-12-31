@@ -410,7 +410,6 @@ function WorkoutSesh({
             {
               "text-white bg-gradient-to-b from-active1 to-active2": seshStarted && isActiveSet,
               "text-white bg-gradient-to-b from-rest1 to-rest2": seshStarted && !isActiveSet,
-              "text-black bg-white": !seshStarted,
               "h-[100vh] flex flex-col": seshStarted,
             }
           )}>
@@ -435,7 +434,7 @@ function WorkoutSesh({
               </div>
             }
             <div className={classNames(
-              "z-50 flex text-base font-normal px-4 pt-3"
+              "z-50 flex text-base text-white font-normal mx-5 pt-3"
             )}>
               <div className="flex-1">
                 <span className='overflow-hidden text-ellipsis w-full inline-block'>
@@ -458,7 +457,7 @@ function WorkoutSesh({
                   </span>
                 </>
                 :
-                <Link className="text-gray-400" href="/">Cancel</Link>
+                <Link className="text-white/60" href="/">Cancel</Link>
               }
             </div>
             <div
@@ -988,7 +987,7 @@ function WorkoutSesh({
             </div>
           </div>
           <section className={classNames(
-            "px-5 pt-5 z-50 transition-all",
+            "px-5 pt-2 z-50 transition-all",
             {
               "bg-active2": seshStarted && isActiveSet,
               "bg-[#353e94]": seshStarted && !isActiveSet,
