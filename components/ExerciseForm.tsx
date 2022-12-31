@@ -49,7 +49,7 @@ function ExerciseForm({
     editedMins ? editedMins : undefined);
   const onSubmit = () => {
     setExercise({
-      id: new Date().getTime(),
+      insertedTime: new Date().getTime(),
       name,
       imageUrl,
       setsDescription,

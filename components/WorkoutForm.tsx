@@ -69,7 +69,7 @@ function WorkoutForm({
         description,
         exercises: exercises.map((exc: any, i: number) => ({
           ...exc,
-          id: undefined,
+          insertedTime: undefined,
           workoutOrder: i,
         }))
       })
@@ -238,11 +238,11 @@ function WorkoutForm({
                         }}
                       >
                       {
-                        exercises.map((exc: Exercise, i) => (
+                        exercises.map((exc: Exercise & { insertedTime?: number; }, i) => (
                           <Draggable
                             index={i}
-                            key={String(exc.id)}
-                            draggableId={String(exc.id)}
+                            key={String(exc.id || exc.insertedTime)}
+                            draggableId={String(exc.id || exc.insertedTime)}
                           >
                           {(provided: any, snapshot: any) => (
                             <div

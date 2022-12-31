@@ -33,7 +33,7 @@ const RestForm = ({
   const onSubmit = (e: any) => {
     e.preventDefault();
     setExercise({
-      id: new Date().getTime(),
+      insertedTime: new Date().getTime(),
       name: 'Rest',
       isRest: true,
       timeLimitS: Number((restTimeLimitMin || 0) * 60) + Number(restTimeLimitS || 0) || null,
