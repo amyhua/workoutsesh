@@ -210,7 +210,7 @@ const Signin = () => {
                 className={classNames(
                 "font-semibold text-base p-3 w-full bg-[#4285F4] text-white rounded-lg",
               )}>
-                Sign in with Google
+                Continue with Google
               </button>
             )
           }
