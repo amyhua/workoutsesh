@@ -34,6 +34,7 @@ const RestForm = ({
     e.preventDefault();
     setExercise({
       insertedTime: new Date().getTime(),
+      id: exercise ? exercise.id : undefined,
       name: 'Rest',
       isRest: true,
       timeLimitS: Number((restTimeLimitMin || 0) * 60) + Number(restTimeLimitS || 0) || null,

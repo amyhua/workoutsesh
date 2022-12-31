@@ -13,6 +13,7 @@ import { CheckCircleIcon, ClockIcon, ExclamationCircleIcon, PlayCircleIcon } fro
 import AppContext from '../contexts/app-context'
 import moment from 'moment'
 import DurationText from './DurationText'
+import { getShownExercises } from '../lib/sesh-utils'
 
 type Stat = { value: number | string; label: string; }
 
@@ -218,7 +219,7 @@ export default function IndexDashboard({
                         <div className="py-0">
                           <ImageTileRow
                             size={75}
-                            imageUrls={workout.exercises
+                            imageUrls={getShownExercises(workout.exercises)
                               .sort(
                                 (a: any, b: any) => a.workoutOrder - b.workoutOrder
                               )
@@ -235,8 +236,7 @@ export default function IndexDashboard({
                                 {workout.description}
                               </p>
                               <p className="text-sm mt-3 text-gray-500">
-                                {/* <div className="font-semibold text-black mr-2 mb-3">{workout.exercises.length} exercise{workout.exercises.length !== 1 ? 's' : ''}</div> */}
-                                {workout.exercises.map((exc: Exercise, i: number) => (
+                                {getShownExercises(workout.exercises).map((exc: Exercise, i: number) => (
                                   <span key={i} className="inline-block mr-2 mb-2 text-xs py-1 px-2 rounded-xl bg-gray-100 text-black border">
                                     {exc.name}
                                   </span>

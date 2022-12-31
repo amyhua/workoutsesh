@@ -40,8 +40,11 @@ function WorkoutForm({
   const [submitting, setSubmitting] = useState(false)
   const [name, setName] = useState(workout.name || '')
   const [description, setDescription] = useState(workout.description || '')
+  console.log('workout.exercises', workout.exercises)
   const [exercises, setExercises] = useState<Exercise[]>(workout.exercises ?
-    workout.exercises.sort((a: any, b: any) => a.workoutOrder - b.workoutOrder)
+    workout.exercises
+      .filter((exc: Exercise) => exc.connectedToCurrentWorkout)
+      .sort((a: any, b: any) => a.workoutOrder - b.workoutOrder)
     : [])
   const [editingExerciseIdx, setEditingExerciseIdx] = useState<number | undefined>()
   const [showExerciseForm, setShowExerciseForm] = useState(false)
@@ -125,16 +128,23 @@ function WorkoutForm({
       ])
     }
   };
+  const removeExercise = (idx: number) => {
+    setExercises((excs: Exercise[]) => {
+      const temp = [...excs]
+      temp.splice(idx, 1)
+      return temp
+    });
+  }
   const onRemoveEditingExercise = () => {
     if (editingExerciseIdx !== undefined) {
-      setExercises((excs: Exercise[]) => {
-        const temp = [...excs]
-        temp.splice(editingExerciseIdx, 1)
-        return temp
-      })
+      removeExercise(editingExerciseIdx);
       setShowExerciseForm(false)
     }
   };
+  const onRemoveExercise = (i: number) => () => {
+    const sure = confirm('Are you sure?');
+    if (sure) removeExercise(i); 
+  }
   return (
     <>
       <ExerciseForm
@@ -247,7 +257,7 @@ function WorkoutForm({
                           {(provided: any, snapshot: any) => (
                             <div
                               ref={provided.innerRef}
-                              className="flex-1 min-h-[100px] flex bg-white rounded-lg mb-3 shadow-md border border-black"
+                              className="flex-1 min-h-[135px] flex bg-white rounded-lg mb-3 shadow-md border border-black"
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
                               style={{
@@ -321,12 +331,19 @@ function WorkoutForm({
                                   className="whitespace-nowrap absolute top-0 right-0 px-2 py-1 text-lg">
                                   <div
                                     onClick={onEditExercise(i)}
-                                    className="cursor-pointer text-sm align-top inline-block p-2 text-gray-400 hover:text-black">
+                                    className="cursor-pointer text-sm align-top inline-block py-1 px-2 text-blue-400 hover:text-black">
                                     <PencilSquareIcon className="mt-2 h-5" />
+                                  </div>
+                                  <div
+                                    onClick={onRemoveExercise(i)}
+                                    className="mt-3">
+                                    <XMarkIcon
+                                      className="cursor-pointer h-5 mx-2 text-red-400 hover:text-black"
+                                    />
                                   </div>
                                   <div className="mt-3">
                                     <Bars2Icon
-                                      className="cursor-pointer h-5 mx-2 text-gray-400 hover:text-black"
+                                      className="cursor-pointer h-5 px-2 text-gray-400 hover:text-black"
                                     />
                                   </div>
                                 </div>

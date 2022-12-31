@@ -16,7 +16,7 @@ import withSeshHistoryExercises from '../../../components/withSeshHistoryExercis
 import ActiveSeshes from '../../../components/ActiveSeshes'
 import { SeshDto } from '../../../types'
 import { Exercise, Sesh, SeshInterval } from '@prisma/client'
-import { getNextIntervalProps } from '../../../lib/sesh-utils'
+import { getNextIntervalProps, getShownExercises } from '../../../lib/sesh-utils'
 import SeshHistoryContainer from '../../../components/SeshHistoryContainer'
 import moment from 'moment'
 import { formatShortFromNow } from '../../../lib/time-utils'
@@ -52,9 +52,10 @@ function WorkoutSesh({
   saveCurrentInterval,
 }: any) {
   const session = useSession();
-  workout = workout ? JSON.parse(workout) : undefined;
+  workout = workout ? JSON.parse(workout) : {};
   error = error ? JSON.parse(error) : undefined;
-  const { exercises: initialExercises = [] } = workout || {};
+  const initialExercises = (getShownExercises(workout.exercises) || [])
+    .filter((exc: Exercise) => exc.connectedToCurrentWorkout);
   const [unfinishedSeshes, setUnfinishedSeshes] = useState<SeshDto[]>(workout.seshes
     .sort(
       (a: SeshDto, b: SeshDto) =>
@@ -1161,7 +1162,7 @@ function WorkoutSesh({
                 <div className={classNames(
                   "rounded-b-xl overflow-hidden",
                 )}>
-                  <button
+                  {/* <button
                     className={classNames(
                       "px-5 w-full font-bold",
                       "text-gray-600 text-xl bg-gray-100 py-7",
@@ -1171,7 +1172,7 @@ function WorkoutSesh({
                     )}
                   >
                     + Add Exercise
-                  </button>
+                  </button> */}
                   <button
                     onClick={seshStarted ? finishWorkout : startSesh}
                     className={classNames(

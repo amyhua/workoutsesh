@@ -50,6 +50,7 @@ function ExerciseForm({
   const onSubmit = () => {
     setExercise({
       insertedTime: new Date().getTime(),
+      id: exercise ? exercise.id : undefined,
       name,
       imageUrl,
       setsDescription,

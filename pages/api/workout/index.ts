@@ -45,6 +45,14 @@ async function workoutRoute(req: NextApiRequest, res: NextApiResponse<any>) {
       if (typeof session.user.email !== 'string') {
         throw new Error('Missing logged in user')
       }
+      const oldWorkout = await prisma.workout.findFirstOrThrow({
+        where: {
+          id: Number(req.body.id),
+        },
+        include: {
+          exercises: true
+        }
+      });
       const workoutExercises = req.body.exercises || [];
       workoutExercises.forEach(async (exc: Exercise) => {
         await prisma.exercise.upsert({
@@ -63,6 +71,21 @@ async function workoutRoute(req: NextApiRequest, res: NextApiResponse<any>) {
           }
         });
       });
+      const nowLinkedExcIds = workoutExercises.map((e: Exercise) => e.id);
+      const exerciseIdsToRemove = oldWorkout.exercises.map((exc: Exercise) => exc.id)
+        .filter((oldExcId: number) => nowLinkedExcIds.indexOf(oldExcId) === -1);
+      if (exerciseIdsToRemove && exerciseIdsToRemove.length) {
+        await prisma.exercise.updateMany({
+          where: {
+            id: {
+              in: exerciseIdsToRemove
+            }
+          },
+          data: {
+            connectedToCurrentWorkout: false
+          }
+        });
+      }
       const workout = await prisma.workout.update({
         where: {
           id: Number(req.body.id),

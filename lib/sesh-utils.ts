@@ -29,3 +29,6 @@ export const getNextIntervalProps = (intervals: (SeshInterval & { exercise: { re
   };
 };
 
+export const getShownExercises = (excs: Exercise[]) => excs
+  .sort((a: Exercise, b: Exercise) => a.workoutOrder - b.workoutOrder)
+  .filter((exc: Exercise) => exc.connectedToCurrentWorkout);

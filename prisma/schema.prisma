@@ -25,6 +25,7 @@ model Exercise {
   isRest Boolean @default(false)
   timeLimitS Int?
   intervals SeshInterval[]
+  connectedToCurrentWorkout Boolean @default(true)
 }
 
 model Workout {
