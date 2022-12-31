@@ -138,6 +138,7 @@ function WorkoutForm({
   return (
     <>
       <ExerciseForm
+        key={showExerciseForm ? 0 : 1}
         editing={editingExerciseIdx !== undefined}
         open={showExerciseForm}
         exercise={editingExerciseIdx !== undefined ?
@@ -159,6 +160,7 @@ function WorkoutForm({
         setExercise={setExercise}
       />
       <RestForm
+        key={showRestForm ? -1 : 2}
         open={showRestForm}
         onClose={() => {
           setShowRestForm(false)
@@ -340,12 +342,18 @@ function WorkoutForm({
                 </DragDropContext>
               }
               <li
-                onClick={() => setShowExerciseForm(true)}
+                onClick={() => {
+                  setEditingExerciseIdx(undefined);
+                  setShowExerciseForm(true);
+                }}
                 className="mb-3 mt-4 px-2 cursor-pointer font-bold h-[50px] w-full bg-white border-2 border-black text-black text-lg flex items-center rounded-lg">
                 <PlusCircleIcon className="h-7 align-middle mr-2" /> 🏋️ Add Exercise
               </li>
               <li
-                onClick={() => setShowRestForm(true)}
+                onClick={() => {
+                  setEditingExerciseIdx(undefined);
+                  setShowRestForm(true);
+                }}
                 className="px-2 cursor-pointer font-bold h-[50px] w-full bg-white border-2 border-black text-black text-lg flex items-center rounded-lg">
                 <PlusCircleIcon className="h-7 align-middle mr-2" /> 🧘 Add Rest Period
               </li>

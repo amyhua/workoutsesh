@@ -1,6 +1,7 @@
 import { Dialog } from "@headlessui/react";
 import { Exercise } from "@prisma/client";
 import classNames from "classnames";
+import moment from "moment";
 import { useState } from "react";
 import { OptionalText } from "./FormComponents";
 
@@ -19,8 +20,16 @@ const RestForm = ({
   onRemove: () => void;
   setExercise: any;
 }) => {
-  const [restTimeLimitS, setRestTimeLimitS] = useState<number>();
-  const [restTimeLimitMin, setRestTimeLimitMin] = useState<number>();
+  const editedMins = exercise ?
+    Math.floor(moment.duration(exercise.timeLimitS, 'seconds').asMinutes())
+    : undefined;
+  const [restTimeLimitS, setRestTimeLimitS] = useState<number | undefined>(
+    exercise && exercise.timeLimitS ?
+    (exercise.timeLimitS - (editedMins || 0) * 60)
+    : undefined
+  );
+  const [restTimeLimitMin, setRestTimeLimitMin] = useState<number | undefined>(
+    editedMins ? editedMins : undefined);
   const onSubmit = (e: any) => {
     e.preventDefault();
     setExercise({

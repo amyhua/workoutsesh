@@ -39,6 +39,7 @@ function ExerciseForm({
   const [restTimeLimitMin, setRestTimeLimitMin] = useState<number>();
   const onSubmit = () => {
     setExercise({
+      id: new Date().getTime(),
       name,
       imageUrl,
       setsDescription,
