@@ -438,7 +438,7 @@ function WorkoutSesh({
               "z-50 flex text-base font-normal px-4 pt-3"
             )}>
               <div className="flex-1">
-                <span className='overflow-hidden text-ellipsis w-full inline-block mt-1'>
+                <span className='overflow-hidden text-ellipsis w-full inline-block'>
                   {workout.name}
                 </span>
               </div>
@@ -458,7 +458,7 @@ function WorkoutSesh({
                   </span>
                 </>
                 :
-                <Link className="text-red-600" href="/">Cancel</Link>
+                <Link className="text-gray-400" href="/">Cancel</Link>
               }
             </div>
             <div
@@ -618,19 +618,27 @@ function WorkoutSesh({
                           setSecondsTotal={setActiveIntervalSecondsTotal}
                         />
                         :
-                        <PlayCircleIcon
-                          onClick={() => setActiveIntervalCounterIsActive(true)}
-                          className="cursor-pointer inline-block h-[75px] text-brightGreen" />
+                        <div className="flex cursor-pointer" onClick={() => setActiveIntervalCounterIsActive(true)}>
+                          <PlayCircleIcon
+                            className="cursor-pointer inline-block h-[75px] text-brightGreen" />
+                          {/* <h2 className="font-bold text-2xl py-6 ml-2 mr-5">Start</h2> */}
+                        </div>
                       }
                       {
                         !activeExercise.isRest &&
                         <div className="flex-1 pt-2.5 pl-2">
-                          <div>
-                            <span className="opacity-60 mr-2 w-[40px] inline-block">Sets</span>{activeExercise.setsDescription}
-                          </div>
-                          <div>
-                            <span className="opacity-60 mr-2 w-[40px] inline-block">Reps</span>{activeExercise.repsDescription}
-                          </div>
+                          {
+                            activeExercise.setsDescription &&
+                            <div>
+                              <span className="opacity-60 mr-2 w-[40px] inline-block">Sets</span>{activeExercise.setsDescription}
+                            </div>
+                          }
+                          {
+                            activeExercise.repsDescription &&
+                            <div>
+                              <span className="opacity-60 mr-2 w-[40px] inline-block">Reps</span>{activeExercise.repsDescription}
+                            </div>
+                          }
                         </div>
                       }
                     </div>
