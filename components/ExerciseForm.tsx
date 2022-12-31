@@ -65,7 +65,6 @@ function ExerciseForm({
               className="text-base relative rounded-md bg-white shadow-xl border border-slate-800 py-8 px-7 border-3 max-w-md mx-auto"
               onSubmit={onSubmit}>
               <div onClick={() => {
-                console.log('!close')
                 onClose();
               }} className="absolute z-100 top-0 right-0 p-3 text-gray-200 cursor-pointer hover:text-gray-600 text-2xl">
                 ✖

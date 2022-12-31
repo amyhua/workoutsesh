@@ -74,9 +74,8 @@ const options = {
             if (user.password) {
               // match on password
               return new Promise(async (resolve: any, reject:any) => {
-                console.log('compare', password, user.password)
                 bcrypt.compare(password, user.password as string, (err, result) => {
-                  console.log('err?', err, result)
+                  console.error('Error', err, result)
                   if (result) {
                     // password is valid
                     return resolve(user)

@@ -125,23 +125,21 @@ export default function IndexPage() {
   const { username } = router.query
   const [winReady, setWinReady] = useState(false)
 
-  async function loadUserData() {
-    try {
-      const resp = await fetch(`/api/user?username=${username}`);
-      const data = await resp.json() as any
-      if (resp.status !== 200) {
-        throw Error(data.message);
-      }
-      console.log('LOAD DATA', data);
-    } catch(err) {
-      router.push(`/signin?error=${err}`)
-    }
-  }
-
   useEffect(() => {
+    async function loadUserData() {
+      try {
+        const resp = await fetch(`/api/user?username=${username}`);
+        const data = await resp.json() as any
+        if (resp.status !== 200) {
+          throw Error(data.message);
+        }
+      } catch(err) {
+        router.push(`/signin?error=${err}`)
+      }
+    }
     setWinReady(true)
     loadUserData()
-  }, [])
+  }, [router, username])
 
   const onStartWorkout =
     (workout: any) =>

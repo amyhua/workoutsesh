@@ -32,7 +32,7 @@ export default class AuthService {
       })
       return response.json();
     } catch(err) {
-      console.log('Auth Service err', err);
+      console.error('Auth Service error', err);
       return Promise.reject(err)
     }
   }

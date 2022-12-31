@@ -22,7 +22,6 @@ function SeshHistoryContainer({
   isSeshPage?: boolean;
   sesh?: Sesh | SeshDatum;
 }) {
-  console.log('sesh', sesh)
   const totalTimeM = moment.duration(sesh ? sesh.timeCompletedS : 0, 'seconds');
   const activePeriods = intervals.filter((int: SeshInterval) => int.active);
   const restPeriods = intervals.filter((int: SeshInterval) => !int.active);

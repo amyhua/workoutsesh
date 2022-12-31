@@ -95,10 +95,6 @@ const Signin = () => {
   }
   const signInWithEmail = async () => {
     setFocusedMethod(AuthMethod.Email)
-    // const token = await signIn('email', {
-    //   email,
-    // });
-    // console.log('email signin', token);
   }
   const signInWithMagicLink = () => {
     setFocusedMethod(AuthMethod.MagicLink)
@@ -125,7 +121,7 @@ const Signin = () => {
         setSentVerifyEmail(true);
       })
       .catch(err => {
-        console.log('on err', err);
+        console.error('Email sign in error', err);
       })
       .finally(() => {
         setSubmitting(false);
@@ -145,10 +141,8 @@ const Signin = () => {
       })
       .then((res) => {
         if (res && !res.ok) {
-          console.log('set');
           setAuthError(res.error);
         }
-        console.log('resolved res', res);
         if (focusedMethod === AuthMethod.Create) {
           // after sign-up, automatically sign in
           signIn('credentials', {
@@ -159,7 +153,7 @@ const Signin = () => {
         }
       })
       .catch(err => {
-        console.log('on err', err);
+        console.error('Sign in error', err);
       })
       .finally(() => {
         setSubmitting(false);

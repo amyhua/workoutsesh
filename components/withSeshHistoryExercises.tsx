@@ -41,7 +41,6 @@ const withSeshHistoryExercises = (Component: React.FC<any>) => {
       return Promise.all(promises)
         .then((rs: any[]) => rs[rs.length - 1].json())
         .then((data: any[]) => {
-          console.log('!!saved data...', data, interval.note);
           setLastSavedInterval(data);
           return {
             ...data,

@@ -36,7 +36,6 @@ function WorkoutForm({
   workout?: any
 }) {
   const router = useRouter()
-  console.log('workout', workout)
   const { setIndexError, setIndexSuccess } = useContext(AppContext)
   const [submitting, setSubmitting] = useState(false)
   const [name, setName] = useState(workout.name || '')
@@ -152,7 +151,6 @@ function WorkoutForm({
         }
         onClose={
           () => {
-            console.log('close exc form')
             setEditingExerciseIdx(undefined)
             setShowExerciseForm(false)
           }
