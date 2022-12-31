@@ -72,8 +72,9 @@ async function workoutRoute(req: NextApiRequest, res: NextApiResponse<any>) {
         });
       });
       const nowLinkedExcIds = workoutExercises.map((e: Exercise) => e.id);
-      const exerciseIdsToRemove = oldWorkout.exercises.map((exc: Exercise) => exc.id)
-        .filter((oldExcId: number) => nowLinkedExcIds.indexOf(oldExcId) === -1);
+      const exerciseIdsToRemove = oldWorkout.exercises
+        .map((exc: Exercise) => exc.id)
+        .filter((oldExcId: number) => nowLinkedExcIds.indexOf(oldExcId) === -1) as number[];
       if (exerciseIdsToRemove && exerciseIdsToRemove.length) {
         await prisma.exercise.updateMany({
           where: {
