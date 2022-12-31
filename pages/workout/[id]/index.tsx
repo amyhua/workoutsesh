@@ -410,6 +410,7 @@ function WorkoutSesh({
           <div className={classnames(
             "transition-all",
             {
+              "bg-gray-700": !seshStarted,
               "text-white bg-gradient-to-b from-active1 to-active2": seshStarted && isActiveSet,
               "text-white bg-gradient-to-b from-rest1 to-rest2": seshStarted && !isActiveSet,
               "flex flex-col": seshStarted,
@@ -417,7 +418,7 @@ function WorkoutSesh({
           )}>
             {
               isConfirmingStop &&
-              <div className="px-4 flex text-white bg-black">
+              <div className="p-4 flex text-white bg-black">
                 <span className="font-semibold">
                   <StopIcon className="text-red-400 inline-block h-4 align-middle relative -top-0.5 mr-1" /> Finish this workout?
                 </span>
@@ -436,7 +437,7 @@ function WorkoutSesh({
               </div>
             }
             <div className={classNames(
-              "z-50 flex text-base text-white font-normal mx-5 pt-3"
+              "z-50 flex text-base text-white font-normal mx-3 pt-3"
             )}>
               <div className="flex-1">
                 <Clamped clamp={1}>
@@ -986,11 +987,11 @@ function WorkoutSesh({
             </div>
           </div>
           <section className={classNames(
-            "px-3 pt-2 z-50 transition-all overflow-auto",
+            "px-2 pt-2 z-50 transition-all overflow-auto",
             {
               "bg-active2": seshStarted && isActiveSet,
               "bg-[#353e94]": seshStarted && !isActiveSet,
-              "bg-transparent": !seshStarted,
+              "bg-gray-700": !seshStarted,
             },
             {
               // "top-[55px] min-h-[100vh]": expanded,
@@ -1000,22 +1001,26 @@ function WorkoutSesh({
           }}>
             {
               workout.seshes && workout.seshes.length && seshId === undefined ?
-              <ActiveSeshes
-                seshes={unfinishedSeshes}
-                resumeSesh={resumeSesh}
-                stopSesh={stopSesh}
-                unstopSesh={unstopSesh}
-              />
+              <>
+                <h2 className="text-center my-3 text-white font-semibold text-lg">Resume a sesh</h2>
+                <ActiveSeshes
+                  seshes={unfinishedSeshes}
+                  resumeSesh={resumeSesh}
+                  stopSesh={stopSesh}
+                  unstopSesh={unstopSesh}
+                />
+              </>
               : null
             }
             <div className="pb-10 bg-transparent">
+              <h2 className="mt-6 text-center my-3 text-white font-semibold text-lg">Scheduled Exercises</h2>
               <div className={classNames(
-                "shadow-xl drop-shadow-xl",
+                "shadow-xl drop-shadow-xl rounded-t-2xl overflow-hidden",
               )} style={{
                 filter: 'drop-shadow(0 -5px 25px rgb(0 0 0 / 4%)) drop-shadow(0 0px 40px rgb(0 0 0 / 0.1))',
               }}>
                 <div className={classnames(
-                  "pt-2 px-3 font-bold",
+                  "px-3 font-bold",
                   "text-base tracking-normal rounded-t-2xl transition-all bg-white/30",
                   {
                     "pb-0.5": activeBottomTab === BottomTab.Exercises,
@@ -1024,7 +1029,7 @@ function WorkoutSesh({
                 )}>
                   <div className={classNames(
                     {
-                    "rounded-full": !seshStarted,
+                    "hidden": !seshStarted,
                   })} style={{
                     lineHeight: seshStarted ? '32px' : '',
                   }}>
@@ -1035,14 +1040,7 @@ function WorkoutSesh({
                         "text-white font-semibold": activeBottomTab === BottomTab.Exercises,
                         "text-white/70 font-normal": activeBottomTab !== BottomTab.Exercises,
                       })}>
-                      {
-                        seshStarted ?
-                          'Scheduled'
-                          :
-                          <h3 className="mx-3 text-xl font-bold normal-case text-center">
-                            Exercises
-                          </h3>
-                      }
+                      Scheduled
                     </span>
                     {
                       seshStarted &&

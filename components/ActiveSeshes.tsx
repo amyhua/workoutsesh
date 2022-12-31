@@ -90,13 +90,10 @@ const ActiveSeshes = ({
 }) => {
   const [seshes, setSeshes] = useState<SeshDto[]>(initialSeshes);
   return (
-    <div className="py-5 px-5 bg-white shadow-xl drop-shadow-xl rounded-xl mb-5"
+    <div className="py-5 px-4 bg-white shadow-xl drop-shadow-xl rounded-xl mb-5"
       style={{
         filter: 'drop-shadow(0 -5px 25px rgb(0 0 0 / 4%)) drop-shadow(0 0px 40px rgb(0 0 0 / 0.1))',
       }}>
-      <h1 className="text-xl font-bold my-3">
-        Resume your sesh{seshes.length > 1 ? 'es' : ''}
-      </h1>
       {
         seshes.map((sesh: SeshDto, i) => (
           <ActiveSesh
