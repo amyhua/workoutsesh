@@ -107,7 +107,7 @@ function WorkoutSesh({
     activeExcLastSavedInterval?: SeshInterval,
   ) => {
     if (!exercise) throw new Error('Active exercise required');
-    return fetch(`/api/intervals?exerciseId=${exercise.id}&notesOnly=true`)
+    return fetch(`/api/intervals?exerciseId=${exercise.id}`)
       .then((r: any) => r.json())
       .then((intervals: SeshInterval[]) => {
         if (activeExcLastSavedInterval &&
@@ -664,10 +664,9 @@ function WorkoutSesh({
                                 getNextPeriodText().setNum ?
                                 <>
                                   <span className="opacity-50 text-base mr-1.5 align-bottom">
-                                    <em className="italic mr-2">Next up...</em>
                                     Set
                                   </span>
-                                  <span className="text-base font-semibold mr-1">{getNextPeriodText().setNum}</span>
+                                  <span className="text-base font-semibold mr-1">{workoutSetNum}</span>
                                   <span className="opacity-50 text-base mr-1.5">out of</span>
                                   <span className="text-base font-semibold">{activeExercise.setsDescription}</span>
                                 </>

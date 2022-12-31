@@ -1,3 +1,4 @@
+import { SeshInterval } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
@@ -25,9 +26,10 @@ async function intervalsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
           //     not: ''
           //   } : undefined
           // ),
-          note: notesOnly === 'true' ? {
+          // TODO: make this on a param notesOnly
+          note: {
             not: '',
-          } : undefined,
+          },
           active: true,
           sesh: {
             userEmail: session.user.email,
@@ -41,7 +43,8 @@ async function intervalsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
           note: true,
         }
       });
-      res.json(intervals);
+      // TODO: Fix later
+      res.json(intervals.filter((int: any) => int.note));
     case 'POST':
       const body = JSON.parse(req.body);
       const createdSeshInterval = await prisma.seshInterval.create({
