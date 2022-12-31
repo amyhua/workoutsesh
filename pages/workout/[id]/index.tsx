@@ -601,7 +601,7 @@ function WorkoutSesh({
                         activeIntervalCounterIsActive ?
                         <SeshCounter
                           className={classNames(
-                            "pl-2 pt-2 pb-2 font-semibold tracking-widest text-6xl relative",
+                            "pl-2 pt-2 pb-0 font-semibold tracking-widest text-6xl relative",
                             {
                               "hidden": !seshStarted,
                             }
@@ -638,13 +638,17 @@ function WorkoutSesh({
               </div>
               {/* set descriptor */}
               <div className={classNames(
-                "px-5 flex min-h-[36px]"
+                "px-5 flex min-h-[36px]",
               )}>
                 <div className="flex-1">
                   {
                     activeIntervalCounterIsActive ?
                       (activeExercise.isRest || !isActiveSet) ?
-                      <div className="mt-1.5">
+                      <div className={classNames(
+                        {
+                          "mt-1.5": !isActiveSet
+                        }
+                      )}>
                         <Clamped clamp={1}>
                           <span className="mr-2 text-white/60 flex">
                             <span className="text-white text-right flex-1">
@@ -660,7 +664,9 @@ function WorkoutSesh({
                                   <span className="text-base font-semibold">{activeExercise.setsDescription}</span>
                                 </>
                                 :
-                                getNextPeriodText().setText
+                                <>
+                                  <em className="italic mr-2">Next up...</em> {getNextPeriodText().setText}
+                                </>
                               }
                               </span>
                             </span>
@@ -709,11 +715,7 @@ function WorkoutSesh({
                     setShowAddNote(!showAddNote);
                   }}
                   className={classNames(
-                    "-mt-[2px] px-1 py-1.5 inline-block align-top cursor-pointer",
-                    // {
-                    //   "-mt-[2px]": isActiveSet && !activeIntervalCounterIsActive,
-                    //   "-mt-2": isActiveSet && activeIntervalCounterIsActive,
-                    // }
+                    "px-1 -mt-[2px] py-1.5 inline-block align-top cursor-pointer",
                   )}>
                   + <ChatBubbleLeftIcon className="h-4 inline-block align-middle" />
                 </div>
@@ -825,7 +827,13 @@ function WorkoutSesh({
                         <button
                           onClick={
                             activeIntervalCounterIsActive ?
-                            startNextSet :
+                            (
+                              activeExercise.isRest && isLastExercise ?
+                              () => setIsConfirmingStop(true) :
+                              activeExercise.isRest ?
+                                startNextExercise :
+                                startNextSet
+                            ) :
                             () => setActiveIntervalCounterIsActive(true)
                           }
                           className={classNames(
@@ -882,21 +890,27 @@ function WorkoutSesh({
                                         <BoltIcon className="border-r-2 border-white/30 ml-2 px-3 py-5 h-[84px] inline-block text-brightGreen" />
                                       }
                                       <div className="pl-4 text-xl flex-1 align-middle flex flex-col justify-center">
-                                        
-                                        <div className="text-base tracking-normal font-normal text-white/60">
-                                          Start Next
-                                        </div>
-                                        <div className={classNames(
-                                          "tracking-normal w-full pr-3 overflow-hidden font-semibold text-white",
-                                          {
-                                            "text-xl": !activeExercise.isRest,
-                                            "text-base": activeExercise.isRest,
-                                          }
-                                        )}>
-                                          <Clamped clamp={1}>
-                                            {getNextPeriodText().setText}
-                                          </Clamped>
-                                        </div>
+                                        {
+                                          activeExercise.isRest && isLastExercise ?
+                                          <span className="tracking-normal text-base leading-tight font-semibold">Finish workout!</span>
+                                          :
+                                          <>
+                                            <div className="text-base tracking-normal font-normal text-white/60">
+                                              Start Next
+                                            </div>
+                                            <div className={classNames(
+                                              "tracking-normal w-full pr-3 overflow-hidden font-semibold text-white",
+                                              {
+                                                "text-xl": !activeExercise.isRest,
+                                                "text-base": activeExercise.isRest,
+                                              }
+                                            )}>
+                                              <Clamped clamp={1}>
+                                                {getNextPeriodText().setText}
+                                              </Clamped>
+                                            </div>
+                                          </>
+                                        }
                                       </div>
                                     </div>
                                   }
