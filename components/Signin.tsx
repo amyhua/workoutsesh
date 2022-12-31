@@ -70,14 +70,12 @@ const Signin = () => {
   const session = useSession();
   const csrfToken = getCsrfToken();
   const { status } = session;
-  console.log('!session', session);
   const { redirect='/' } = router.query;
   if (status === 'authenticated') {
     router.push(typeof redirect === 'string' ? redirect : redirect[0])
   }
 
   const { error } = router.query;
-  console.log('query error', router, router.query, router.query.error, error, errorMsg[router.query.error]);
   const [loading, setLoading] = useState(false)
   const [focusedMethod, setFocusedMethod] = useState<AuthMethod>()
   const [email, setEmail] = useState('')
@@ -86,8 +84,8 @@ const Signin = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [authError, setAuthError] = useState(
     error === undefined ? undefined :
-    (errorMsg[String(error)] || error))
-  console.log('!authError', authError);
+    (errorMsg[JSON.stringify(error)] || error))
+
   const [sentVerifyEmail, setSentVerifyEmail] = useState(false);
   const [submitting, setSubmitting] = useState(false)
   const [providers, setProviders] = useState<any>([]);
@@ -167,34 +165,7 @@ const Signin = () => {
         setSubmitting(false);
       });
     }
-    // console.log('TODO: submit form', {
-    //   email,
-    //   password,
-    //   confirmPassword
-    // }) 
-    // setIsAuthError(false)
-    // auth.signin()
-    //   .then((token: string) => {
-    //     setAuthToken(token)
-    //     console.log('Navigating to user homepage...')
-    //     // @TODO: fetch username and navigate accordingly
-    //     console.log('@TODO: fetch username and navigate accordingly')
-    //     if (isFirstTimeUser) {
-    //       router.push('/intro')
-    //     } else {
-    //       router.push('/amyhua')
-    //     }
-    //   })
-    //   .catch(() => {
-    //     console.error('Invalid login')
-    //     setIsAuthError(true)
-    //   })
-    //   .finally(() => {
-    //     setSubmitting(false)
-    //   })
   }
-  console.log('!!authError', authError)
-
   useEffect(() => {
     loadProviders();
   }, []);
