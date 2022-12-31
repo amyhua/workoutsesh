@@ -12,6 +12,7 @@ export default function IndexPage({
   totalSeshesThisMonth
 }: any) {
   if (typeof workouts === 'string') workouts = JSON.parse(workouts) as Workout[];
+  console.log('workouts', workouts)
   return (
     <AuthenticatedPageWrapper>
       <IndexDashboard
@@ -35,7 +36,6 @@ export async function getServerSideProps(context: any) {
       workouts = await prisma.workout.findMany({
         where: {
           userEmail: session.user.email,
-
         },
         include: {
           exercises: true,
