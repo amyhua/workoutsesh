@@ -525,7 +525,7 @@ const Signin = () => {
                 "hidden": focusedMethod === AuthMethod.Create
               }
             )}>
-            Don't have an account? Sign up
+            Don&apos;t have an account? Sign up
           </button>
         </div>
       </main>

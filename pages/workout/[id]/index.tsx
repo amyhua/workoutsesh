@@ -386,7 +386,7 @@ function WorkoutSesh({
           404 Not Found
         </h1>
         <h1 className="text-xl font-semibold">
-          We couldn't find what you were looking for.
+          We couldn&apos;t find what you were looking for.
         </h1>
         <p className="mt-3 text-red-500">
           {JSON.stringify(error)}

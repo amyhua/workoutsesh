@@ -225,7 +225,7 @@ export default function IndexDashboard({
                   <h1 className="font-bold text-lg mb-2">
                     Create a workout!
                   </h1>
-                  Click on the "+ New Workout" button to get started.
+                  Click on the &quot;+ New Workout&quot; button to get started.
                 </div>
               }
             </ul>
