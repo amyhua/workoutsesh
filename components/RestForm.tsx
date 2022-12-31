@@ -20,7 +20,7 @@ const RestForm = ({
   onRemove: () => void;
   setExercise: any;
 }) => {
-  const editedMins = exercise ?
+  const editedMins = exercise && exercise.timeLimitS ?
     Math.floor(moment.duration(exercise.timeLimitS, 'seconds').asMinutes())
     : undefined;
   const [restTimeLimitS, setRestTimeLimitS] = useState<number | undefined>(

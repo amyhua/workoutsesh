@@ -8,6 +8,7 @@ import ExerciseDescription from "./ExerciseDescription";
 import RestBetweenSetsDescription from "./RestBetweenSetsDescription";
 import { OptionalText } from './FormComponents';
 import { Dialog } from "@headlessui/react";
+import moment from "moment";
 
 function ExerciseForm({
   open,
@@ -35,8 +36,17 @@ function ExerciseForm({
   const [repsDescription, setRepsDescription] = useState(exercise.repsDescription || '')
   const [setsDescription, setSetsDescription] = useState(exercise.setsDescription || '')
   const [restBetweenSets, setRestBetweenSets] = useState(true)
-  const [restTimeLimitS, setRestTimeLimitS] = useState<number>();
-  const [restTimeLimitMin, setRestTimeLimitMin] = useState<number>();
+
+  const editedMins = exercise && exercise.betweenSetsRestTimeLimitS ?
+    Math.floor(moment.duration(exercise.betweenSetsRestTimeLimitS, 'seconds').asMinutes())
+    : undefined;
+  const [restTimeLimitS, setRestTimeLimitS] = useState<number | undefined>(
+    exercise && exercise.betweenSetsRestTimeLimitS ?
+    (exercise.betweenSetsRestTimeLimitS - (editedMins || 0) * 60)
+    : undefined
+  );
+  const [restTimeLimitMin, setRestTimeLimitMin] = useState<number | undefined>(
+    editedMins ? editedMins : undefined);
   const onSubmit = () => {
     setExercise({
       id: new Date().getTime(),
