@@ -156,17 +156,13 @@ export default function IndexDashboard({
           </section>
         </div>
         <section className="max-w-3xl mx-auto">
-          {
-            workouts && workouts.length ?
-            <header className="mt-16 sm:mt-10 flex">
-              <div className="flex-1 -mt-3 text-right">
-                <Link href={`/workout/create`} className="bg-white inline-block text-center text-lg cursor-pointer font-bold ml-2 px-3 py-2 rounded-md text-black">
-                  + New Workout
-                </Link>
-              </div>
-            </header>
-            : null
-          }
+          <header className="mt-16 sm:mt-10 flex">
+            <div className="flex-1 -mt-3 text-right">
+              <Link href={`/workout/create`} className="bg-white inline-block text-center text-lg cursor-pointer font-bold ml-2 px-3 py-2 rounded-md text-black">
+                + New Workout
+              </Link>
+            </div>
+          </header>
           <main>
             <ul className="mx-auto pb-14">
               {
