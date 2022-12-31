@@ -174,8 +174,11 @@ export default function IndexDashboard({
                     <article
                       className="group cursor-pointer px-6 pt-5 sm:pb-8 pb-3"
                       onClick={onStartWorkout && onStartWorkout(workout)}>
-                      <h3 className="font-bold text-2xl mt-4">
-                        <PlayCircleIcon className="inline-block h-14 align-middle -ml-1 -mt-1 group-hover:text-green-500" /> {workout.name}
+                      <h3 className="flex font-bold text-2xl mt-4">
+                        <PlayCircleIcon className="inline-block h-14 align-middle -ml-1 -mt-1 group-hover:text-green-500" />
+                        <div className="mt-2 flex-1 ml-2 mb-2">
+                          {workout.name}
+                        </div>
                       </h3>
                       <div className="ml-5 mt-2">
                         <div className="font-semibold text-gray-800 mb-3">
@@ -188,10 +191,23 @@ export default function IndexDashboard({
                           }
                           {
                             workout.seshes.length ?
-                            <div className="text-sm text-gray-500 mt-0.5">
-                              <span className="text-black font-semibold mr-2">Last session:</span> <span className="mr-3">
-                                {moment(workout.seshes[workout.seshes.length - 1].updatedAt).fromNow()}
-                              </span>Duration: <DurationText durationM={moment.duration(workout.seshes[workout.seshes.length - 1].timeCompletedS, 'seconds')} />
+                            <div className="text-sm flex text-gray-500 mt-1">
+                              <span className="text-black font-semibold mr-2">Last sesh</span>
+                              <div className="flex-1 ml-2">
+                                <div>
+                                  {
+                                    workout.seshes[workout.seshes.length - 1].finishedAt ?
+                                    'Finished at' : 'Started'
+                                  } {(
+                                    workout.seshes[workout.seshes.length - 1].finishedAt ?
+                                    moment(workout.seshes[workout.seshes.length - 1].finishedAt) :
+                                    moment(workout.seshes[workout.seshes.length - 1].createdAt)
+                                  ).fromNow()}
+                                </div>
+                                <div>
+                                  <DurationText durationM={moment.duration(workout.seshes[workout.seshes.length - 1].timeCompletedS, 'seconds')} />
+                                </div>
+                              </div>
                             </div>
                             : null
                           }
