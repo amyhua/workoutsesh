@@ -87,6 +87,7 @@ export async function getServerSideProps(context: any) {
       }
     }
   } catch(error) {
+    console.error('Error loading Index page', error);
     return {
       props : {
         workouts: [],
