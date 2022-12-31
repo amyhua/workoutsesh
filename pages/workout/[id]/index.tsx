@@ -70,6 +70,7 @@ function WorkoutSesh({
   const [activeIntervalCounterIsActive, setActiveIntervalCounterIsActive] = useState(false);
   const [seshStarted, setSeshStarted] = useState(false);
   const [pastIntervals, setPastIntervals] = useState<(SeshInterval & { exercise: Exercise })[]>([]);
+  if (pastIntervals && pastIntervals[0] && !pastIntervals[0].exercise) console.log('pastIntervals', pastIntervals)
   // sorted by most recent first
   const [seshCounterIsActive, setSeshCounterIsActive] = useState(seshStarted);
   const [workoutSetNum, setWorkoutSetNum] = useState(1);
@@ -107,7 +108,7 @@ function WorkoutSesh({
     activeExcLastSavedInterval?: SeshInterval,
   ) => {
     if (!exercise) throw new Error('Active exercise required');
-    return fetch(`/api/intervals?exerciseId=${exercise.id}`)
+    return fetch(`/api/intervals?exerciseId=${exercise.id}&notesOnly=true`)
       .then((r: any) => r.json())
       .then((intervals: SeshInterval[]) => {
         if (activeExcLastSavedInterval &&
@@ -402,7 +403,7 @@ function WorkoutSesh({
         "bg-gray-400",
         {
           "min-h-[100vh]": !seshStarted,
-          "h-[100vh] overflow-hidden absolute top-0 bottom-0 left-0 right-0": seshStarted,
+          "h-[100vh]": seshStarted,
         }
       )}>
         <div className="max-w-md relative mx-auto">
@@ -411,13 +412,13 @@ function WorkoutSesh({
             {
               "text-white bg-gradient-to-b from-active1 to-active2": seshStarted && isActiveSet,
               "text-white bg-gradient-to-b from-rest1 to-rest2": seshStarted && !isActiveSet,
-              "h-[100vh] flex flex-col": seshStarted,
+              "flex flex-col": seshStarted,
             }
           )}>
             {
               isConfirmingStop &&
-              <div className="py-3 px-4 flex text-white bg-black">
-                <span className="py-1 font-semibold">
+              <div className="px-4 flex text-white bg-black">
+                <span className="font-semibold">
                   <StopIcon className="text-red-400 inline-block h-4 align-middle relative -top-0.5 mr-1" /> Finish this workout?
                 </span>
                 <div className="flex-1 text-right mt-0.5">
@@ -438,22 +439,24 @@ function WorkoutSesh({
               "z-50 flex text-base text-white font-normal mx-5 pt-3"
             )}>
               <div className="flex-1">
-                <span className='overflow-hidden text-ellipsis w-full inline-block'>
-                  {workout.name}
-                </span>
+                <Clamped clamp={1}>
+                  <span className='overflow-hidden text-ellipsis w-full inline-block'>
+                    {workout.name}
+                  </span>
+                </Clamped>
               </div>
               {
                 seshStarted ?
                 <>
                   <SeshCounter
-                    className="font-semibold text-right opacity-60 mt-1 mr-1"
+                    className="font-semibold text-right opacity-60"
                     active={seshStarted && seshCounterIsActive}
                     secondsTotal={workoutSecondsTotal}
                     setSecondsTotal={setWorkoutSecondsTotal}
                   />
                   <span
                     onClick={() => setIsConfirmingStop(true)}
-                    className="cursor-pointer inline-block mt-1.5 ml-2 text-red-300 text-sm rounded-full">
+                    className="cursor-pointer inline-block mt-[2.5px] ml-2 text-red-300 text-sm rounded-full">
                     <StopIcon className="inline-block h-4 align-middle relative -top-0.5" />
                   </span>
                 </>
@@ -463,21 +466,19 @@ function WorkoutSesh({
             </div>
             <div
               className={classNames(
-                "px-4 text-center flex items-center md:min-h-[calc(100% - 32px)] max-w-xl",
+                "text-center flex items-center md:min-h-[calc(100% - 32px)] max-w-xl",
                 {
                   "hidden": !seshStarted
                 }
               )}
-              style={{
-                height: 'calc(100vh - 475px)'
-              }}>
+            >
               <div className={classnames(
                 "mt-0 sm:mt-5 w-full flex flex-col justify-center",
                 {
                   "opacity-25": !isActiveSet,
                 }
               )} style={{
-                minHeight: 'calc(100% - 32px)'
+                minHeight: '390px'
               }}>
                 <div>
                   {
@@ -512,13 +513,11 @@ function WorkoutSesh({
               </div>
             </div>
             <div className={classNames(
-              "pt-[50px] left-0 right-0",
               {
                 "bg-gradient-to-b from-transparent via-active2 to-active2": seshStarted && isActiveSet,
                 "bg-gradient-to-b from-transparent via-[#353e94] to-[#353e94]": seshStarted && !isActiveSet,
-                "absolute bottom-0": seshStarted,
+                // "absolute bottom-0": seshStarted,
                 "hidden": !seshStarted,
-                // "absolute left-0 right-0": seshStarted,
               }
             )}>
               <div className="flex flex-col justify-center">
@@ -527,7 +526,7 @@ function WorkoutSesh({
                   "px-3 flex flex-col justify-center",
                   {
                     "pt-5 pb-2": !seshStarted,
-                    "pt-3": seshStarted
+                    "pt-5": seshStarted
                   })}>
                     <header className={classNames(
                       "mx-2 w-full items-center",
@@ -797,7 +796,7 @@ function WorkoutSesh({
                 className={classnames(
                   "mt-0 font-bold",
                   "transition-all",
-                  "flex flex-col justify-center pb-[70px]",
+                  "flex flex-col justify-center",
                   {
                     "hidden": !seshStarted,
                     "bg-transparent text-white": seshStarted,
@@ -953,7 +952,7 @@ function WorkoutSesh({
                         }
                     </div>
                   </div>
-                  <div className="text-sm text-white/40 rounded-full tracking-normal font-normal mx-5 normal-case">
+                  <div className="text-sm text-white/40 my-2 tracking-normal font-normal mx-5 normal-case">
                     <div className="flex text-left">
                       {
                         exercises[activeExerciseIdx - 1] &&
@@ -987,19 +986,17 @@ function WorkoutSesh({
             </div>
           </div>
           <section className={classNames(
-            "px-5 pt-2 z-50 transition-all",
+            "px-3 pt-2 z-50 transition-all overflow-auto",
             {
               "bg-active2": seshStarted && isActiveSet,
               "bg-[#353e94]": seshStarted && !isActiveSet,
               "bg-transparent": !seshStarted,
-              "absolute left-0 right-0 bottom-0": seshStarted,
-              "overflow-auto": seshStarted && expanded,
             },
             {
-              "top-[55px] min-h-[100vh]": expanded,
+              // "top-[55px] min-h-[100vh]": expanded,
             }
           )} style={{
-            top: (seshStarted && !expanded) ? 'calc(100vh - 70px)' : '',
+            // top: (seshStarted && !expanded) ? 'calc(100vh - 70px)' : '',
           }}>
             {
               workout.seshes && workout.seshes.length && seshId === undefined ?
@@ -1018,13 +1015,11 @@ function WorkoutSesh({
                 filter: 'drop-shadow(0 -5px 25px rgb(0 0 0 / 4%)) drop-shadow(0 0px 40px rgb(0 0 0 / 0.1))',
               }}>
                 <div className={classnames(
-                  "flex pt-2 px-3 uppercase tracking-wider font-bold",
-                  "text-sm rounded-t-2xl transition-all",
+                  "pt-2 px-3 font-bold",
+                  "text-base tracking-normal rounded-t-2xl transition-all bg-white/30",
                   {
                     "pb-0.5": activeBottomTab === BottomTab.Exercises,
                     "pb-2": activeBottomTab === BottomTab.History,
-                    "bg-white/90": !expanded,
-                    "bg-white": expanded,
                   }
                 )}>
                   <div className={classNames(
@@ -1037,9 +1032,8 @@ function WorkoutSesh({
                       onClick={() => setActiveBottomTab(BottomTab.Exercises)}
                       className={classNames(
                         "cursor-pointer ml-0.5 mr-2", {
-                        "text-black font-bold": activeBottomTab === BottomTab.Exercises,
-                        "text-slate-600 font-normal": activeBottomTab !== BottomTab.Exercises,
-                        "hidden": activeExerciseIdx === exercises.length - 1,
+                        "text-white font-semibold": activeBottomTab === BottomTab.Exercises,
+                        "text-white/70 font-normal": activeBottomTab !== BottomTab.Exercises,
                       })}>
                       {
                         seshStarted ?
@@ -1056,38 +1050,12 @@ function WorkoutSesh({
                         onClick={() => setActiveBottomTab(BottomTab.History)}
                         className={classNames(
                           "cursor-pointer", {
-                          "text-black font-bold": activeBottomTab === BottomTab.History,
-                          "text-slate-500 font-normal": activeBottomTab !== BottomTab.History,
+                          "text-white font-semibold": activeBottomTab === BottomTab.History,
+                          "text-white/70 font-normal": activeBottomTab !== BottomTab.History,
                         })}>
                         History
                       </span>
                     }
-                  </div>
-                  <div
-                    onClick={() => setExpanded(!expanded)}
-                    className={classNames(
-                      "flex-1 text-right",
-                      {
-                        "hidden": !seshStarted
-                      }
-                    )}>
-                    <span className={classNames(
-                      "inline-block cursor-pointer text-xs font-semibold px-4 py-2 rounded-full",
-                      {
-                        "bg-gray-200 text-gray-600": seshStarted && isActiveSet,
-                        "bg-[#858df0] text-white": seshStarted && !isActiveSet,
-                        "bg-gray-200": !seshStarted
-                      }
-                    )}>
-                      {
-                        expanded ? 'Less' : 'More'
-                      } <ArrowUpIcon className={classNames(
-                        "-mt-[3px] h-[12px] inline-block transition-all",
-                        {
-                          "rotate-180": expanded
-                        }
-                      )} />
-                    </span>
                   </div>
                 </div>
                 {

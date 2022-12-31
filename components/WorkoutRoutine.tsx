@@ -1,8 +1,10 @@
+import { Exercise } from '@prisma/client';
 import classnames from 'classnames'
 import moment from 'moment';
 import Image from 'next/image'
 import Clamped from './Clamped';
 import DurationText from './DurationText';
+import ExerciseDescription from './ExerciseDescription';
 
 const ReorderIconSvg = ({ color }: { color: string; }) => (
   <svg className="inline-block" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -18,7 +20,7 @@ const WorkoutRoutine = ({
   isDragging,
   expanded,
 }: {
-  exercise: any;
+  exercise: Exercise;
   isFirst?: boolean;
   isLast?: boolean;
   isDragging?: boolean;
@@ -30,12 +32,9 @@ const WorkoutRoutine = ({
       isDragging ?
         "border-t border-b" :
         isLast ? "border-none" : "border-b",
-      {
-        "bg-white/90": !expanded,
-        "bg-white": expanded
-      }
+        "bg-white",
     )}>
-      <div className="mr-1 mt-2">
+      <div className="m-0">
         <div className={classnames(
           "mx-3 relative rounded-sm w-[75px] h-[75px] text-center bg-gray-500 overflow-hidden",
           "text-black z-100",
@@ -57,32 +56,31 @@ const WorkoutRoutine = ({
           }
         </div>
       </div>
-      <div className="flex-1 flex justify-center flex-col">
+      <div className="ml-2 flex-1 flex justify-center flex-col">
         <h2 className={classnames(
-          "font-bold text-base mb-0.5",
+          "font-semibold text-base mb-0.5",
           isDragging ? "text-green-500" : "text-black"
         )}>
           <Clamped clamp={2}>
             {exercise.name}
           </Clamped>
         </h2>
-        <div className={classnames(
-          "text-base",
-          "text-gray-500"
-        )}>
-          <Clamped clamp={1}>
-            {
-              exercise.isRest && exercise.timeLimitS ?
-              <DurationText durationM={moment.duration(exercise.timeLimitS, 'seconds')} /> :
-              exercise.description
-            }
-          </Clamped>
+        <div className="text-black/70 text-sm">
+          {
+            exercise.isRest ?
+            <DurationText durationM={moment.duration(exercise.timeLimitS, 'seconds')} />
+            :
+            <ExerciseDescription 
+              setsDescription={exercise.setsDescription}
+              repsDescription={exercise.repsDescription}
+            />
+          }
         </div>
       </div>
       {
         (isFirst && isLast) ?
         null :
-        <div className="leading-[110px] px-4 cursor-pointer">
+        <div className="leading-[110px] px-2 cursor-pointer">
           <ReorderIconSvg
             color={isDragging ? '#000000' : '#C2C2C2'}
           />

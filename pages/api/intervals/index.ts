@@ -15,17 +15,18 @@ async function intervalsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
     case 'GET':
       const {
         exerciseId,
-        // notesOnly // if 'true' (case-insensitive), shows only those intervals with notes
+        notesOnly // if 'true' (case-insensitive), shows only those intervals with notes
       } = req.query;
       // load past active periods of the user by exerciseId
       const intervals = await prisma.seshInterval.findMany({
         where: {
           exerciseId: Number(exerciseId),
-          // note: (
-          //   String(notesOnly).toLowerCase() === 'true' ? {
-          //     not: ''
-          //   } : undefined
-          // ),
+          note: (
+            notesOnly &&
+            String(notesOnly).toLowerCase() === 'true' ? {
+              not: ''
+            } : undefined
+          ),
           // TODO: make this on a param notesOnly
           // note: {
           //   not: '',
@@ -43,8 +44,7 @@ async function intervalsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
           note: true,
         }
       });
-      // TODO: Fix later
-      res.json(intervals.filter((int: any) => int.note));
+      res.json(intervals);
     case 'POST':
       const body = JSON.parse(req.body);
       const createdSeshInterval = await prisma.seshInterval.create({

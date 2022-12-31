@@ -7,8 +7,8 @@ const ExerciseDescription = ({
   fancy = false,
   setNum,
 }: {
-  setsDescription: string;
-  repsDescription: string;
+  setsDescription?: string | null;
+  repsDescription?: string | null;
   setNum?: number;
   fancy?: boolean;
 }) => (
@@ -52,8 +52,9 @@ const ExerciseDescription = ({
         </span>
       </>
       :
+      !setsDescription && !repsDescription ? null :
       <>
-      {setsDescription || '<Sets>'} sets of {repsDescription || '<Reps>'}
+      {setsDescription || '---'} sets of {repsDescription || '---'}
       </>
     }
   </>
