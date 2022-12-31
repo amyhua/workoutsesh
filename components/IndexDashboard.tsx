@@ -48,14 +48,20 @@ const ImageTileRow = ({ className, imageUrls=[], size }: { className?: string; i
 export default function IndexDashboard({
   user,
   workouts,
+  totalSeshes,
+  totalSeshesThisWeek,
+  totalSeshesThisMonth,
 }: any) {
   const stats = [{
-    value: user.seshesTotal || 0,
-    label: 'total workouts'
+    value: totalSeshes || 0,
+    label: 'completed'
   }, {
-    value: user.seshesThisMonth || 0,
+    value: totalSeshesThisWeek || 0,
+    label: 'this week'
+  }, {
+    value: totalSeshesThisMonth || 0,
     label: 'this month'
-  }]
+  }];
   const router = useRouter()
   const { indexError, indexSuccess } = useContext(AppContext)
   const [winReady, setWinReady] = useState(false)
@@ -118,20 +124,34 @@ export default function IndexDashboard({
           }
         </div>
         <div className="mt-10 max-w-sm mx-auto">
-          <section className="pt-0 mb-2">
-            <div className="sm:flex">
-              {
-                stats.map((stat: Stat, i: number) => (
-                  <article key={i} className="flex-1 text-center sm:pr-5 last:pr-0">
-                    <div className="text-3xl font-bold text-white inline-block">
-                      {stat.value.toLocaleString()}
-                    </div>
-                    <div className="text-xl font-bold mt-2 mb-6">
-                      {stat.label}
-                    </div>
-                  </article>
-                ))
-              }
+          <section className="pt-0">
+            <div>
+              <article className="sm:pr-5 last:pr-0 mb-8">
+                <div className="text-3xl font-semibold text-white inline-block">
+                  {totalSeshes.toLocaleString()}
+                </div>
+                <div className="text-xl font-semibold text-white/60 mt-2">
+                  Completed Workouts
+                </div>
+              </article>
+              <div className="flex">
+                <article className="flex-1 sm:pr-5 last:pr-0">
+                  <div className="text-3xl font-semibold text-white inline-block">
+                    {totalSeshesThisWeek.toLocaleString()}
+                  </div>
+                  <div className="text-xl font-semibold text-white/60 mt-2">
+                    This Week
+                  </div>
+                </article>
+                <article className="flex-1 sm:pr-5 last:pr-0">
+                  <div className="text-3xl font-semibold text-white inline-block">
+                    {totalSeshesThisMonth.toLocaleString()}
+                  </div>
+                  <div className="text-xl font-semibold text-white/60 mt-2">
+                    This Month
+                  </div>
+                </article>
+              </div>
             </div>
           </section>
         </div>
@@ -221,7 +241,7 @@ export default function IndexDashboard({
                   </li>    
                 ))
                 :
-                <div className="p-4 rounded-lg my-3 border-2 border-black">
+                <div className="p-4 rounded-lg my-3 bg-white/10">
                   <h1 className="font-bold text-lg mb-2">
                     Create a workout!
                   </h1>

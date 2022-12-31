@@ -26,7 +26,16 @@ async function workoutsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
           exercises: true,
         }
       });
-      res.json(workouts);
+      const aggregTotal = await prisma.sesh.aggregate({
+        where: {
+          userEmail: session.user.email,
+        },
+        _count: true,
+      });
+      res.json({
+        workouts,
+        totalSeshes: aggregTotal._count,
+      });
       break;
     default:
       res.setHeader('Allow', ['GET'])
