@@ -1,4 +1,4 @@
-import { Sesh, SeshInterval } from "@prisma/client";
+import { Exercise, Sesh, SeshInterval } from "@prisma/client";
 
 export type Error = {
   error: boolean;
