@@ -1013,49 +1013,42 @@ function WorkoutSesh({
               : null
             }
             <div className="pb-10 bg-transparent">
-              <h2 className="mt-6 text-center my-3 text-white font-semibold text-lg">Scheduled Exercises</h2>
+              {
+                !seshStarted ?
+                <h2 className="text-center text-white font-semibold text-lg mb-0.5">
+                  Upcoming Exercises
+                </h2>
+                :
+                <h2 className={classNames(
+                  "text-white font-semibold text-lg mb-0.5",
+                )}>
+                  <span
+                    onClick={() => setActiveBottomTab(BottomTab.Exercises)}
+                    className={classNames(
+                      "cursor-pointer inline-block px-2 pb-3",
+                      {
+                        "opacity-60": activeBottomTab !== BottomTab.Exercises,
+                      }
+                    )}>
+                    Upcoming Exercises
+                  </span>
+                  <span
+                    onClick={() => setActiveBottomTab(BottomTab.History)}
+                    className={classNames(
+                      "cursor-pointer inline-block px-2 pb-3",
+                      {
+                        "opacity-60": activeBottomTab !== BottomTab.History,
+                      }
+                    )}>
+                    History
+                  </span>
+                </h2>
+              }
               <div className={classNames(
                 "shadow-xl drop-shadow-xl rounded-t-2xl overflow-hidden",
               )} style={{
                 filter: 'drop-shadow(0 -5px 25px rgb(0 0 0 / 4%)) drop-shadow(0 0px 40px rgb(0 0 0 / 0.1))',
               }}>
-                <div className={classnames(
-                  "px-3 font-bold",
-                  "text-base tracking-normal rounded-t-2xl transition-all bg-white",
-                  {
-                    "pb-0.5": activeBottomTab === BottomTab.Exercises,
-                    "pb-2": activeBottomTab === BottomTab.History,
-                  }
-                )}>
-                  <div className={classNames(
-                    {
-                    "hidden": !seshStarted,
-                  })} style={{
-                    lineHeight: seshStarted ? '40px' : '',
-                  }}>
-                    <span
-                      onClick={() => setActiveBottomTab(BottomTab.Exercises)}
-                      className={classNames(
-                        "cursor-pointer ml-0.5 mr-2", {
-                        "text-black font-semibold": activeBottomTab === BottomTab.Exercises,
-                        "text-black/70 font-normal": activeBottomTab !== BottomTab.Exercises,
-                      })}>
-                      Scheduled
-                    </span>
-                    {
-                      seshStarted &&
-                      <span
-                        onClick={() => setActiveBottomTab(BottomTab.History)}
-                        className={classNames(
-                          "cursor-pointer", {
-                          "text-black font-semibold": activeBottomTab === BottomTab.History,
-                          "text-black/70 font-normal": activeBottomTab !== BottomTab.History,
-                        })}>
-                        History
-                      </span>
-                    }
-                  </div>
-                </div>
                 {
                   winReady &&
                   activeBottomTab === BottomTab.Exercises &&
