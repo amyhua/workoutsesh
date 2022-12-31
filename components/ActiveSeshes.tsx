@@ -1,4 +1,4 @@
-import { CheckCircleIcon, CheckIcon, PlayCircleIcon, StopCircleIcon, StopIcon } from "@heroicons/react/20/solid";
+import { CheckIcon, PlayCircleIcon, StopIcon } from "@heroicons/react/20/solid";
 import classNames from "classnames";
 import moment from "moment";
 import { useState } from "react";
