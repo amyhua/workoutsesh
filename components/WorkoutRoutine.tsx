@@ -33,12 +33,14 @@ const WorkoutRoutine = ({
         "border-t border-b" :
         isLast ? "border-none" : "border-b",
         "bg-white",
+      {
+        "relative -left-[160px]": isDragging,
+      }
     )}>
       <div className="m-0">
         <div className={classnames(
-          "mx-3 relative rounded-sm w-[75px] h-[75px] text-center bg-gray-500 overflow-hidden",
-          "text-black z-100",
-          isFirst ? "mb-5 mt-2" : "my-5",
+          "relative rounded-sm w-[111px] min-h-[111px] text-center bg-white overflow-hidden",
+          "text-black z-100 border-r",
           isDragging ? "text-navy0": "text-black"
         )}>
           {

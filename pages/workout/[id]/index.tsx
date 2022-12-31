@@ -419,7 +419,7 @@ function WorkoutSesh({
             {
               isConfirmingStop &&
               <div className="p-4 flex text-white bg-black">
-                <span className="font-semibold">
+                <span className="font-semibold leading-8">
                   <StopIcon className="text-red-400 inline-block h-4 align-middle relative -top-0.5 mr-1" /> Finish this workout?
                 </span>
                 <div className="flex-1 text-right mt-0.5">
@@ -450,7 +450,7 @@ function WorkoutSesh({
                 seshStarted ?
                 <>
                   <SeshCounter
-                    className="font-semibold text-right opacity-60"
+                    className="font-semibold text-right"
                     active={seshStarted && seshCounterIsActive}
                     secondsTotal={workoutSecondsTotal}
                     setSecondsTotal={setWorkoutSecondsTotal}
@@ -733,7 +733,7 @@ function WorkoutSesh({
                   <div className="flex-1 max-h-[120px] overflow-y-auto">
                     <div className="flex pt-2">
                       <div>
-                        <ChatBubbleLeftIcon className="h-5 -mt-0.5 mr-3 ml-1 inline-block" />
+                        <ChatBubbleLeftIcon className="h-5 mr-3 ml-1 inline-block" />
                       </div>
                       <div>
                         <IntervalNote
@@ -788,7 +788,7 @@ function WorkoutSesh({
                       className="text-base focus:text-white bg-white/20 group focus:outline-none rounded-full w-full transition-all py-2 pl-[45px] pr-4 text-white"
                     />
                     <span className="inline-block text-white/60 group:text-white font-semibold align-middle absolute left-[12px] top-[8.5px] z-2">
-                      <ChatBubbleLeftIcon className="h-4 -mt-2 ml-1 mr-2 inline-block" />
+                      <ChatBubbleLeftIcon className="h-4 -mt-1 ml-1 mr-1 inline-block" />
                     </span>
                   </div>
                 </div>
@@ -953,12 +953,12 @@ function WorkoutSesh({
                         }
                     </div>
                   </div>
-                  <div className="text-sm text-white/40 my-2 tracking-normal font-normal mx-5 normal-case">
+                  <div className="text-sm text-white/40 my-3 tracking-normal font-normal mx-3 normal-case">
                     <div className="flex text-left">
                       {
                         exercises[activeExerciseIdx - 1] &&
                         <div className="flex-1 flex">
-                          <div className="mr-2">
+                          <div className="mr-1">
                             <BackwardIcon className="inline-block h-4 -mt-0.5 mr-1" />
                           </div>
                           <div className="flex-1">
@@ -976,7 +976,7 @@ function WorkoutSesh({
                               {exercises[activeExerciseIdx + 1].name}
                             </Clamped>
                           </div>
-                          <div className="ml-2">
+                          <div className="ml-1">
                             <ForwardIcon className="inline-block h-4 -mt-0.5 mr-1" />
                           </div>
                         </div>
@@ -1021,7 +1021,7 @@ function WorkoutSesh({
               }}>
                 <div className={classnames(
                   "px-3 font-bold",
-                  "text-base tracking-normal rounded-t-2xl transition-all bg-white/30",
+                  "text-base tracking-normal rounded-t-2xl transition-all bg-white",
                   {
                     "pb-0.5": activeBottomTab === BottomTab.Exercises,
                     "pb-2": activeBottomTab === BottomTab.History,
@@ -1031,14 +1031,14 @@ function WorkoutSesh({
                     {
                     "hidden": !seshStarted,
                   })} style={{
-                    lineHeight: seshStarted ? '32px' : '',
+                    lineHeight: seshStarted ? '40px' : '',
                   }}>
                     <span
                       onClick={() => setActiveBottomTab(BottomTab.Exercises)}
                       className={classNames(
                         "cursor-pointer ml-0.5 mr-2", {
-                        "text-white font-semibold": activeBottomTab === BottomTab.Exercises,
-                        "text-white/70 font-normal": activeBottomTab !== BottomTab.Exercises,
+                        "text-black font-semibold": activeBottomTab === BottomTab.Exercises,
+                        "text-black/70 font-normal": activeBottomTab !== BottomTab.Exercises,
                       })}>
                       Scheduled
                     </span>
@@ -1048,8 +1048,8 @@ function WorkoutSesh({
                         onClick={() => setActiveBottomTab(BottomTab.History)}
                         className={classNames(
                           "cursor-pointer", {
-                          "text-white font-semibold": activeBottomTab === BottomTab.History,
-                          "text-white/70 font-normal": activeBottomTab !== BottomTab.History,
+                          "text-black font-semibold": activeBottomTab === BottomTab.History,
+                          "text-black/70 font-normal": activeBottomTab !== BottomTab.History,
                         })}>
                         History
                       </span>
@@ -1069,11 +1069,11 @@ function WorkoutSesh({
                           className={classNames(
                             "text-black",
                             {
-                              "px-3 bg-white": !seshStarted
+                              "px-0 bg-white": !seshStarted
                             }
                           )}
                           style={{
-                            paddingBottom: snapshot.isDraggingOver ? 112 : 0,
+                            // paddingBottom: snapshot.isDraggingOver ? 112 : 0,
                           }}
                         >
                             {
@@ -1096,7 +1096,6 @@ function WorkoutSesh({
                                         style={{
                                           ...provided.draggableProps.style,
                                         }}
-                                        className=""
                                       >
                                         <WorkoutRoutine
                                           isFirst={i === 0}
