@@ -89,6 +89,7 @@ export async function getServerSideProps(context: any) {
   } catch(error) {
     return {
       props : {
+        workouts: [],
         error: error ? JSON.stringify(error) : null,
       }
     }
