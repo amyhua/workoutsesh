@@ -5,6 +5,9 @@ import { EllipsisHorizontalIcon, PencilIcon, TrashIcon } from "@heroicons/react/
 import Link from "next/link";
 
 const MoreMenu = ({ workoutId }: { workoutId: string }) => {
+  const onDeleteWorkout = () => {
+    alert('Coming soon');
+  }
   return (
     <Menu
       onClick={(e: any) => e.stopPropagation()}
@@ -41,7 +44,9 @@ const MoreMenu = ({ workoutId }: { workoutId: string }) => {
           <Menu.Item>
           {
               ({ active }: { active: boolean }) => (
-                <div className="py-2 px-3 whitespace-nowrap">
+                <div
+                  onClick={onDeleteWorkout}
+                  className="cursor-pointer py-2 px-3 whitespace-nowrap">
                     <TrashIcon className="inline-block h-4 align-top mt-0.5 mr-1" /> Delete
                 </div>
               )

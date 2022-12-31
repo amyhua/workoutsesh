@@ -45,6 +45,9 @@ export async function getServerSideProps(context: any) {
             }
           }
         },
+        orderBy: {
+          updatedAt: 'desc'
+        }
       });
       aggregTotalSeshes = await prisma.sesh.aggregate({
         where: {
