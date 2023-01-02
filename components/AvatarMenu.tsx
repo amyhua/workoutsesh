@@ -33,10 +33,10 @@ const AvatarMenu = ({
                 />
               }
               <div className="ml-3 text-left">
-                <p className="text-base font-semibold text-white group-hover:text-gray-900">
+                <div className="text-base font-semibold text-white group-hover:text-gray-900">
                   {user.name || user.email.replace(/\@.+$/, '')}
                   <ChevronDownIcon className="text-gray-300 inline-block -mr-1 ml-1 -mt-0.5 h-5 w-5" aria-hidden="true" />
-                </p>
+                </div>
               </div>
             </div>
           </div>

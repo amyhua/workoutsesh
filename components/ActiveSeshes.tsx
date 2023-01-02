@@ -48,9 +48,11 @@ const ActiveSesh = ({
             </div>
             <div className="flex-1 pt-2">
               <span className="mr-1 font-bold">
-                {moment(time).format('ddd MMM D h:mma')}
+                {moment(time).isSame(new Date(), 'day') ?
+                  moment(time).format('h:mma - [Today]')
+                  : moment(time).format('D h:mma - ddd MMM')}
               </span>
-              <div className="text-gray-400 text-xs">
+              <div className="text-gray-500 text-xs">
                 <span className="inline-block mr-2">
                   Duration: <DurationText durationM={durationM} />
                 </span>
@@ -66,8 +68,8 @@ const ActiveSesh = ({
           </div>
           <div
             onClick={() => stopSesh(sesh.id).then(() => setFinishedAt('DEFINED'))}
-            className="pl-1 pt-2 cursor-pointer group/stop">
-            <div className="p-2 rounded-lg bg-red-100 font-semibold text-red-400 group-hover/stop:text-red-600 text-xs pr-2">
+            className="pl-1 pt-3.5 cursor-pointer group/stop">
+            <div className="p-2 rounded-lg bg-red-100 font-semibold text-red-600 group-hover/stop:text-red-600 text-xs pr-2">
               <StopIcon className="inline-block h-4 -mt-[3px] mr-0.5" /> Stop
             </div>
           </div>

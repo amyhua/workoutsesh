@@ -3,10 +3,9 @@ import Image from "next/image"
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout"
-import AuthService from "../auth-service";
 import { getProviders, getCsrfToken, signIn, useSession, } from 'next-auth/react';
 import Logo from "../components/Logo";
-import { ArrowRightCircleIcon, ArrowRightIcon, StarIcon } from "@heroicons/react/20/solid";
+import { ArrowRightIcon, StarIcon } from "@heroicons/react/20/solid";
 
 const AppleIconSvg = () => (
   <svg className="inline-block align-top mr-1 mt-0.25" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -136,7 +135,7 @@ const Signin = () => {
         password,
         confirmPassword: focusedMethod === AuthMethod.Create ?
           confirmPassword : '',
-        callbackUrl: '/',
+        callbackUrl: '/?loading=true',
         csrfToken,
       })
       .then((res) => {
@@ -184,7 +183,25 @@ const Signin = () => {
             Track your workouts with ease.
           </div>
         </header>
-        <div className="mx-10 py-10">
+        <div className={classNames(
+          "mx-10 py-10 text-center text-xl opacity-50",
+          {
+            "hidden": status !== 'loading',
+          }
+        )}>
+          <LoadingBarbellSvg
+            size={25}
+            className="inline-block align-middle p-1 animate-spin mr-2"
+            color="#000000"
+          />
+          Loading...
+        </div>
+        <div className={classNames(
+          "mx-10 py-10",
+          {
+            "hidden": status === 'loading',
+          }
+        )}>
           {
             (authError !== undefined || error) ?
             <div className="mb-3 text-sm p-3 rounded-lg bg-red-100 text-red-700">
@@ -227,19 +244,6 @@ const Signin = () => {
             )}>
             Sign in with Email
           </button>
-          {/* <button
-            onClick={signInWithEmail}
-            disabled={submitting}
-            className={classNames(
-              "text-base font-semibold mt-3 p-3 w-full text-black rounded-lg",
-              {
-                "hidden": focusedMethod === AuthMethod.Email,
-                "bg-slate-500": submitting,
-                "bg-white border border-black": !submitting
-              }
-            )}>
-            Sign in with Username / Email
-          </button> */}
           <form className={classNames(
             {
               "pt-0 mt-3 border-t border-slate-200": ENABLE_APPLE_SIGNIN,

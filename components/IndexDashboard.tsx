@@ -119,9 +119,9 @@ export default function IndexDashboard({
           </h2>
           {
             indexError &&
-            <p className="ml-7">
+            <div className="ml-7">
               {indexError}
-            </p>
+            </div>
           }
         </div>
         <div className="mt-10 max-w-sm mx-auto">
@@ -228,16 +228,16 @@ export default function IndexDashboard({
                         <div className="flex sm:flex-row flex-col ml-1">
                           <div className="ml-0.25 flex-1 flex sm:flex-row-reverse">
                             <div className="flex-1">
-                              <p className="font-normal text-base mt-2 mb-5">
+                              <div className="font-normal text-base mt-2 mb-5">
                                 {workout.description}
-                              </p>
-                              <p className="text-sm mt-3 text-gray-500">
+                              </div>
+                              <div className="text-sm mt-3 text-gray-500">
                                 {getShownExercises(workout.exercises).map((exc: Exercise, i: number) => (
                                   <span key={i} className="inline-block mr-2 mb-2 text-xs py-1 px-2 rounded-xl bg-gray-100 text-black border">
                                     {exc.name}
                                   </span>
                                 ))}
-                              </p>
+                              </div>
                             </div>
                           </div>
                           <div onClick={e => e.stopPropagation()} className="text-left text-gray-500 hover:text-black cursor-pointer">

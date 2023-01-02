@@ -9,6 +9,27 @@ import RestBetweenSetsDescription from "./RestBetweenSetsDescription";
 import { OptionalText } from './FormComponents';
 import { Dialog } from "@headlessui/react";
 import moment from "moment";
+import DurationText from "./DurationText";
+
+const TimeQuickPick = ({ seconds, setTimeLimitMin, setTimeLimitS }: {
+  seconds: number;
+  setTimeLimitMin: (val: number) => any;
+  setTimeLimitS: (val: number) => any;
+}) => {
+  const durationM = moment.duration(seconds, 'seconds');
+  return (
+    <span
+      onClick={() => {
+        const mins = Math.floor(durationM.asMinutes());
+        const secs = Math.floor(durationM.asSeconds() % 60);
+        setTimeLimitMin(mins);
+        setTimeLimitS(secs);
+      }}
+      className="cursor-pointer inline-block p-2 mr-2 mt-2 mb-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300">
+      <DurationText durationM={durationM} />
+    </span>
+  );
+};
 
 function ExerciseForm({
   open,
@@ -45,6 +66,7 @@ function ExerciseForm({
     (exercise.betweenSetsRestTimeLimitS - (editedMins || 0) * 60)
     : undefined
   );
+  const [restTimeIsLimited, setRestTimeIsLimited] = useState(false);
   const [restTimeLimitMin, setRestTimeLimitMin] = useState<number | undefined>(
     editedMins ? editedMins : undefined);
   const onSubmit = () => {
@@ -152,7 +174,7 @@ function ExerciseForm({
                       "text-gray-500": restBetweenSets !== true,
                     }
                   )}>
-                  Include Rest
+                  Yes
                   <span className={classNames({
                     "hidden": restBetweenSets !== true
                   })}>
@@ -168,7 +190,7 @@ function ExerciseForm({
                       "text-gray-500": restBetweenSets !== false,
                     }
                   )}>
-                  Skip Rest
+                  No
                   <span className={classNames({
                     "hidden": restBetweenSets !== false,
                   })}>
@@ -180,31 +202,56 @@ function ExerciseForm({
                 restBetweenSets &&
                 <>
                   <label htmlFor="restTimeLimit" className="mt-3 mb-2 block font-semibold">
-                    Time Limit during Rest <OptionalText />
+                    Rest Time
                   </label>
-                  <div className="flex mb-3">
-                    <div className="relative">
-                      <input
-                        className="pl-[90px] flex-1 mr-2 rounded-lg text-base w-full p-3 mb-3 border-2 border-black focus:border-black focus:outline-none"
-                        type="number"
-                        name="restTimeLimit"
-                        value={restTimeLimitMin}
-                        onChange={(e: any) => setRestTimeLimitMin(e.target.value)}
-                        placeholder="0"
+                  <div className="font-semibold">
+                    <input type="radio" className="mr-2" checked={!restTimeIsLimited}
+                      onChange={(e: any) => setRestTimeIsLimited(!(e.target.value))}
+                    /> Unlimited
+                  </div>
+                  <div className="mb-3">
+                    <div className="flex">
+                      <input type="radio" className="mr-2" checked={restTimeIsLimited}
+                        onChange={(e: any) => setRestTimeIsLimited(e.target.value)}
                       />
-                      <label className="font-semibold absolute left-4 top-3.5">Minutes</label>
+                      <div className="relative mt-2.5">
+                        <input
+                          className="pl-[90px] flex-1 mr-2 rounded-lg text-base w-full p-3 border-2 border-black focus:border-black focus:outline-none"
+                          type="number"
+                          name="restTimeLimit"
+                          value={restTimeLimitMin}
+                          onChange={(e: any) => setRestTimeLimitMin(e.target.value)}
+                          placeholder="0"
+                          min="0"
+                        />
+                        <label className="font-semibold absolute left-4 top-3.5">Minutes</label>
+                      </div>
+                      <div className="relative pl-2 mt-2.5">
+                        <input
+                          className="pl-[95px] flex-1 rounded-lg text-base w-full p-3 border-2 border-black focus:border-black focus:outline-none"
+                          type="number"
+                          name="restTimeLimit"
+                          value={restTimeLimitS}
+                          onChange={(e: any) => setRestTimeLimitS(e.target.value)}
+                          placeholder="0"
+                          min="0"
+                        />
+                        <label className="font-semibold absolute left-6 top-3.5">Seconds</label>
+                      </div>
                     </div>
-                    <div className="relative pl-2">
-                      <input
-                        className="pl-[95px] flex-1 rounded-lg text-base w-full p-3 mb-3 border-2 border-black focus:border-black focus:outline-none"
-                        type="number"
-                        name="restTimeLimit"
-                        value={restTimeLimitS}
-                        onChange={(e: any) => setRestTimeLimitS(e.target.value)}
-                        placeholder="0"
-                      />
-                      <label className="font-semibold absolute left-6 top-3.5">Seconds</label>
+                    <div className="ml-5 pl-[1px]">
+                      <TimeQuickPick seconds={30} setTimeLimitMin={setRestTimeLimitMin} setTimeLimitS={setRestTimeLimitS} />
+                      <TimeQuickPick seconds={30 * 2} setTimeLimitMin={setRestTimeLimitMin} setTimeLimitS={setRestTimeLimitS} />
+                      <TimeQuickPick seconds={30 * 3} setTimeLimitMin={setRestTimeLimitMin} setTimeLimitS={setRestTimeLimitS} />
+                      <TimeQuickPick seconds={30 * 4} setTimeLimitMin={setRestTimeLimitMin} setTimeLimitS={setRestTimeLimitS} />
                     </div>
+                    {
+                      restTimeIsLimited &&
+                      ((restTimeLimitS || 0) + (restTimeLimitMin || 0) <= 0) &&
+                      <div className="text-sm text-red-500 ml-5 pl-[1px] my-2">
+                        Limited Rest time must be greater than 0.
+                      </div>
+                    }
                   </div>
                 </>
               }

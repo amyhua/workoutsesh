@@ -73,7 +73,7 @@ function SeshHistoryContainer({
         "h-[100vh] overflow-auto",
         {
           "p-7 pb-[200px] text-white": isSeshPage,
-          "px-2.5 my-5 bg-black text-white": !isSeshPage,
+          "px-2.5 my-5 bg-transparent pb-[50px] text-white": !isSeshPage,
         }
       )}>
         {

@@ -103,7 +103,7 @@ const options = {
     })
   ],
   pages: {
-    signIn: '/signin',
+    signIn: '/signin?loading=true',
     signOut: '/signin?signedout=true',
     error: '/signin',
     newUser: '/?intro=true',

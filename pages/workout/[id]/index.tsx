@@ -10,7 +10,7 @@ import Clamped from '../../../components/Clamped'
 import classNames from 'classnames'
 import { getSession, useSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
-import { BackwardIcon, BoltIcon, BoltSlashIcon, ChatBubbleLeftIcon, CheckIcon, ChevronDownIcon, ForwardIcon, PlayCircleIcon, PlayIcon, StopIcon } from '@heroicons/react/20/solid'
+import { ArrowUpIcon, BackwardIcon, BoltIcon, BoltSlashIcon, ChatBubbleLeftIcon, CheckIcon, ChevronDownIcon, ForwardIcon, PlayCircleIcon, PlayIcon, StopIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import withSeshHistoryExercises from '../../../components/withSeshHistoryExercises'
 import ActiveSeshes from '../../../components/ActiveSeshes'
@@ -144,6 +144,7 @@ function WorkoutSesh({
   const [preExerciseRestS, setPreExerciseRestS] = useState(0);
   const [seshId, setSeshId] = useState<number>();
   const [showAddNote, setShowAddNote] = useState(false);
+  const [notScrolledToTop, setNotScrolledToTop] = useState(false);
   const router = useRouter();
   const addNoteEl = useRef(null);
   const onStartSesh = useCallback((data: Sesh & { intervals: (SeshInterval & { exercise: Exercise })[] }) => {
@@ -177,6 +178,7 @@ function WorkoutSesh({
     // auto-start rests
     if (!newIsActiveSet) setActiveIntervalCounterIsActive(true);
     setCurrWorkoutSetType(newIsActiveSet ? WorkoutSetType.Active : WorkoutSetType.Rest);
+    window.scrollTo(0, 0);
   }, [
     exercises,
     loadActiveExercisePastActivePeriods
@@ -337,8 +339,15 @@ function WorkoutSesh({
       ...reorderedExercises
     ] : reorderedExercises)
   }
+  const handleScroll = () => {
+    setNotScrolledToTop(window.pageYOffset !== 0);
+  };
   useEffect(() => {
     setWinReady(true);
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    }
   }, [])
 
   useEffect(() => {
@@ -348,11 +357,6 @@ function WorkoutSesh({
       return fetch(`/api/sesh/${seshId}?action=pause&duration=${workoutSecondsTotal}` +
         `&orderedExerciseIds=${exercises.slice(activeExerciseIdx).map((exc: any) => exc.id).join(',')}`
       )
-    };
-    const unpauseActiveSesh = () => {
-      return fetch(`/api/sesh/${seshId}?action=unpause`)
-        .then((r: any) => r.json())
-        .then(onStartSesh)
     };
     const handleRouteChange = function() {
       if (seshId) pauseActiveSesh();
@@ -378,15 +382,26 @@ function WorkoutSesh({
         <h1 className="text-xl font-semibold">
           We couldn&apos;t find what you were looking for.
         </h1>
-        <p className="mt-3 text-red-500">
+        <div className="mt-3 text-red-500">
           {JSON.stringify(error)}
-        </p>
+        </div>
       </div>
     )
   }
   
   return (
     <Layout title="Workout Sesh" background="#9ca3a5">
+      {
+        notScrolledToTop &&
+        seshStarted &&
+        <div
+          onClick={() => window && window.scrollTo(0, 0)}
+          className="fixed left-0 bottom-0 right-0 m-5 z-50 text-center">
+          <div className="bg-black/50 text-white text-sm py-2 px-3 rounded-full inline-block">
+            Back to Top <ArrowUpIcon className="inline-block h-4 -mt-0.5" />
+          </div>
+        </div>
+      }
       <main className={classNames(
         {
           "min-h-[100vh] bg-gradient-to-b from-active1 to-active2": !seshStarted,
@@ -596,7 +611,6 @@ function WorkoutSesh({
                         <div className="flex cursor-pointer" onClick={() => setActiveIntervalCounterIsActive(true)}>
                           <PlayCircleIcon
                             className="cursor-pointer inline-block h-[75px] text-brightGreen" />
-                          {/* <h2 className="font-bold text-2xl py-6 ml-2 mr-5">Start</h2> */}
                         </div>
                       }
                       {
@@ -1024,7 +1038,7 @@ function WorkoutSesh({
                     workoutId={workout.id}
                   />
                 }
-                <div className="rounded-sm mx-2 mt-2 bg-white/10 text-white/60 p-4">
+                <div className="rounded-sm mx-2 mt-2 bg-white/10 text-white/60 p-4 mb-10">
                   <h3 className="mb-2">
                     {workout.name}
                   </h3>
@@ -1111,33 +1125,3 @@ export async function getServerSideProps(context: any) {
 }
 
 export default withSeshHistoryExercises(WorkoutSesh);
-
-{/* <div className={classNames(
-              "z-50 text-base text-white font-normal mx-3 pt-3"
-            )}>
-              <div className="inline-block">
-                <Clamped clamp={1}>
-                  <span className='overflow-hidden text-ellipsis w-full inline-block'>
-                    {workout.name}
-                  </span>
-                </Clamped>
-              </div>
-              {
-                seshStarted ?
-                <>
-                  <SeshCounter
-                    className="font-semibold text-right"
-                    active={seshStarted && seshCounterIsActive}
-                    secondsTotal={workoutSecondsTotal}
-                    setSecondsTotal={setWorkoutSecondsTotal}
-                  />
-                  <span
-                    onClick={() => setIsConfirmingStop(true)}
-                    className="cursor-pointer inline-block mt-[2.5px] ml-2 text-sm rounded-full">
-                    <StopIcon className="inline-block h-4 align-middle relative -top-0.5" />
-                  </span>
-                </>
-                :
-                <Link className="text-white/60" href="/">Cancel</Link>
-              }
-            </div> */}
