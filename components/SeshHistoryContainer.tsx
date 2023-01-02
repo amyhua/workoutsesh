@@ -70,10 +70,10 @@ function SeshHistoryContainer({
   return (
     <>
       <div className={classNames(
-        "p-7 h-[100vh] pb-[200px] overflow-auto",
+        "h-[100vh] overflow-auto",
         {
-          "text-white": isSeshPage,
-          "bg-gray-700 text-white": !isSeshPage,
+          "p-7 pb-[200px] text-white": isSeshPage,
+          "px-2.5 my-5 bg-black text-white": !isSeshPage,
         }
       )}>
         {

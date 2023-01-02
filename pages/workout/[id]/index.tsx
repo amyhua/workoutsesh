@@ -10,7 +10,7 @@ import Clamped from '../../../components/Clamped'
 import classNames from 'classnames'
 import { getSession, useSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
-import { ArrowLeftIcon, ArrowRightCircleIcon, ArrowRightIcon, ArrowUpIcon, BackwardIcon, Bars3Icon, BoltIcon, BoltSlashIcon, ChatBubbleLeftIcon, CheckCircleIcon, CheckIcon, ChevronDownIcon, ChevronUpIcon, ExclamationCircleIcon, ForwardIcon, ListBulletIcon, PencilIcon, PlayCircleIcon, PlayIcon, StopCircleIcon, StopIcon } from '@heroicons/react/20/solid'
+import { BackwardIcon, BoltIcon, BoltSlashIcon, ChatBubbleLeftIcon, CheckIcon, ChevronDownIcon, ForwardIcon, PlayCircleIcon, PlayIcon, StopIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import withSeshHistoryExercises from '../../../components/withSeshHistoryExercises'
 import ActiveSeshes from '../../../components/ActiveSeshes'
@@ -19,10 +19,10 @@ import { Exercise, Sesh, SeshInterval } from '@prisma/client'
 import { getNextIntervalProps, getShownExercises } from '../../../lib/sesh-utils'
 import SeshHistoryContainer from '../../../components/SeshHistoryContainer'
 import moment from 'moment'
-import { formatShortFromNow } from '../../../lib/time-utils'
 import DurationText from '../../../components/DurationText'
 import RestCounterBadge from '../../../components/RestCounterBadge'
 import IntervalNote from '../../../components/IntervalNote'
+import ConfirmStopWorkoutModal from '../../../components/ConfirmStopWorkoutModal'
 // see: https://github.com/atlassian/react-beautiful-dnd/issues/2350#issuecomment-1242917371
 
 resetServerContext()
@@ -354,27 +354,15 @@ function WorkoutSesh({
         .then((r: any) => r.json())
         .then(onStartSesh)
     };
-
-    const visibilityChangeHandler = function() {
-      if (document.visibilityState !== 'visible') {
-        if (seshStarted) pauseActiveSesh();
-      } else {
-        if (seshStarted) unpauseActiveSesh();
-      }
-    };
     const handleRouteChange = function() {
       if (seshId) pauseActiveSesh();
     };
 
-    document.addEventListener('visibilitychange', visibilityChangeHandler, {
-      passive: true
-    });
     window.addEventListener('beforeunload', handleRouteChange);
     router.events.on('routeChangeStart', handleRouteChange);
 
     return () => {
       // @ts-ignore
-      document.removeEventListener('visibilitychange', visibilityChangeHandler);
       window.removeEventListener('beforeunload', handleRouteChange);
       router.events.off('routeChangeStart', handleRouteChange);
     }
@@ -400,9 +388,8 @@ function WorkoutSesh({
   return (
     <Layout title="Workout Sesh" background="#9ca3a5">
       <main className={classNames(
-        "bg-gray-400",
         {
-          "min-h-[100vh]": !seshStarted,
+          "min-h-[100vh] bg-gradient-to-b from-active1 to-active2": !seshStarted,
           "h-[100vh]": seshStarted,
         }
       )}>
@@ -410,7 +397,7 @@ function WorkoutSesh({
           <div className={classnames(
             "transition-all",
             {
-              "bg-gray-700": !seshStarted,
+              "bg-transparent": !seshStarted,
               "text-white bg-gradient-to-b from-active1 to-active2": seshStarted && isActiveSet,
               "text-white bg-gradient-to-b from-rest1 to-rest2": seshStarted && !isActiveSet,
               "flex flex-col": seshStarted,
@@ -418,53 +405,30 @@ function WorkoutSesh({
           )}>
             {
               isConfirmingStop &&
-              <div className="p-4 flex text-white bg-black">
-                <span className="font-semibold leading-8">
-                  <StopIcon className="text-red-400 inline-block h-4 align-middle relative -top-0.5 mr-1" /> Finish this workout?
-                </span>
-                <div className="flex-1 text-right mt-0.5">
-                  <button
-                    onClick={() => setIsConfirmingStop(false)}
-                    className="mx-3 py-1 px-3 rounded-full bg-gray-700 text-sm">
-                    Cancel
-                  </button>
-                  <button
-                    onClick={finishWorkout}
-                    className="ml-1 py-1 px-3 rounded-full font-semibold bg-brightGreen text-black text-sm">
-                    Finish
-                  </button>
-                </div>
-              </div>
+              <ConfirmStopWorkoutModal
+                open={isConfirmingStop}
+                onClose={() => setIsConfirmingStop(false)}
+                onConfirm={finishWorkout}
+              />
             }
-            <div className={classNames(
-              "z-50 flex text-base text-white font-normal mx-3 pt-3"
-            )}>
-              <div className="flex-1">
-                <Clamped clamp={1}>
-                  <span className='overflow-hidden text-ellipsis w-full inline-block'>
-                    {workout.name}
-                  </span>
-                </Clamped>
-              </div>
-              {
-                seshStarted ?
-                <>
-                  <SeshCounter
-                    className="font-semibold text-right"
-                    active={seshStarted && seshCounterIsActive}
-                    secondsTotal={workoutSecondsTotal}
-                    setSecondsTotal={setWorkoutSecondsTotal}
+            {
+              !seshStarted &&
+              <header className="pt-8 text-left mx-3 text-white">
+                <h1 className="text-2xl mt-5 mb-5">
+                  {workout.name}
+                </h1>
+                {
+                  workout.seshes && workout.seshes.length && seshId === undefined ?
+                  <ActiveSeshes
+                    seshes={unfinishedSeshes}
+                    resumeSesh={resumeSesh}
+                    stopSesh={stopSesh}
+                    unstopSesh={unstopSesh}
                   />
-                  <span
-                    onClick={() => setIsConfirmingStop(true)}
-                    className="cursor-pointer inline-block mt-[2.5px] ml-2 text-red-300 text-sm rounded-full">
-                    <StopIcon className="inline-block h-4 align-middle relative -top-0.5" />
-                  </span>
-                </>
-                :
-                <Link className="text-white/60" href="/">Cancel</Link>
-              }
-            </div>
+                  : null
+                }
+              </header>
+            }
             <div
               className={classNames(
                 "text-center flex items-center md:min-h-[calc(100% - 32px)] max-w-xl",
@@ -529,22 +493,33 @@ function WorkoutSesh({
                     "pt-5 pb-2": !seshStarted,
                     "pt-5": seshStarted
                   })}>
-                    <header className={classNames(
-                      "mx-2 w-full items-center",
-                      "mb-0",
-                    )}>
+                    <header className="mx-2 w-full items-center mb-0.5">
                       {isActiveSet ? (
                         <>
-                          <div className="text-2xl font-bold">
-
+                          <div className="text-2xl font-bold relative">
                             <Clamped clamp={2}>
                               <BoltIcon className={classNames(
-                                "inline-block h-5 -mt-0.5 mr-1",
+                                "inline-block z-10 h-5 -mt-0.5 mr-2 px-0.5",
                                 {
                                   "text-gray-400": !activeIntervalCounterIsActive,
-                                  "animate-pulse text-brightGreen": activeIntervalCounterIsActive,
+                                  "text-brightGreen": activeIntervalCounterIsActive,
                                 }
-                              )} /> {activeExercise.name}
+                              )} />
+                              <BoltIcon className={classNames(
+                                "absolute left-0 top-2 inline-block z-10 h-5 -mt-0.5 mr-2 px-0.5",
+                                {
+                                  "text-brightGreen animate-ping": activeIntervalCounterIsActive,
+                                }
+                              )} />
+                              {
+                                isActiveSet &&
+                                activeIntervalCounterIsActive &&
+                                false &&
+                                <span
+                                  className="animate-ping rounded-full h-5 w-5 ml-0.5 bg-brightGreen inline-block align-middle absolute left-0 top-1"
+                                />
+                              }
+                              {activeExercise.name}
                             </Clamped>
                           </div>
                         </>
@@ -596,12 +571,12 @@ function WorkoutSesh({
                       </div>
                     }
                     </header>
-                    <div className="flex">
+                    <div className="flex min-h-[75px] items-center">
                       {
                         activeIntervalCounterIsActive ?
                         <SeshCounter
                           className={classNames(
-                            "pl-2 pt-2 pb-0 font-semibold tracking-widest text-6xl relative",
+                            "pl-2 min-w-[70px] pb-0 font-semibold tracking-widest text-6xl relative",
                             {
                               "hidden": !seshStarted,
                             }
@@ -626,7 +601,7 @@ function WorkoutSesh({
                       }
                       {
                         !activeExercise.isRest &&
-                        <div className="flex-1 pt-2.5 pl-2">
+                        <div className="flex-1 pl-2">
                           {
                             activeExercise.setsDescription &&
                             <div>
@@ -646,72 +621,32 @@ function WorkoutSesh({
               </div>
               {/* set descriptor */}
               <div className={classNames(
-                "px-5 flex min-h-[36px]",
+                "px-5 min-h-[36px] flex items-center",
               )}>
                 <div className="flex-1">
                   {
                     activeIntervalCounterIsActive ?
-                      (activeExercise.isRest || !isActiveSet) ?
-                      <div className={classNames(
-                        {
-                          "mt-1.5": !isActiveSet
-                        }
-                      )}>
-                        <Clamped clamp={1}>
-                          <span className="mr-2 text-white/60 flex">
-                            <span className="text-white text-right flex-1">
-                              {
-                                getNextPeriodText().setNum ?
-                                <>
-                                  <span className="opacity-50 text-base mr-1.5 align-bottom">
-                                    Set
-                                  </span>
-                                  <span className="text-base font-semibold mr-1">{workoutSetNum}</span>
-                                  <span className="opacity-50 text-base mr-1.5">out of</span>
-                                  <span className="text-base font-semibold">{activeExercise.setsDescription}</span>
-                                </>
-                                :
-                                <>
-                                  <em className="italic mr-2">Next up...</em> {getNextPeriodText().setText}
-                                </>
-                              }
-                              </span>
-                            </span>
-                        </Clamped>
-                      </div>
-                      :
-                      <div className="flex relative top-1.5">
-                        {/* <div className="inline-block -mt-1.5 mr-2">
-                          <span className="mt-1.5 text-lg align-bottom font-bold inline-block">Set #{workoutSetNum}</span>
-                        </div> */}
-                        <div className="flex-1">
-                          {
-                            new Array(workoutSetNum - 1).fill(0).map((_, i) => (
-                              <CheckIcon key={i} className="h-5 inline-block align-top" />
-                            ))
-                          }
-                          <CheckIcon className="h-5 inline-block align-top text-brightGreen" />
+                    <div className="text-lg">
+                      {
+                        activeExercise.setsDescription &&
+                        <div className="mt-0 mr-2">
+                          <span className="opacity-50 mr-1.5">Set</span>
+                          <span className="font-semibold mr-1">{workoutSetNum}</span>
+                          <span className="opacity-50 mr-1.5">out of</span>
+                          <span className="font-semibold">{activeExercise.setsDescription}</span>
                         </div>
-                        {
-                          activeExercise.setsDescription &&
-                          <div className="mt-0 mr-2">
-                            <span className="opacity-50 text-base mr-1.5">Set</span>
-                            <span className="text-base font-semibold mr-1">{workoutSetNum}</span>
-                            <span className="opacity-50 text-base mr-1.5">out of</span>
-                            <span className="text-base font-semibold">{activeExercise.setsDescription}</span>
-                          </div>
-                        }
-                      </div>
+                      }
+                    </div>
                     :
                     <div className="m-1">
                       <SeshCounter
                         active={!activeIntervalCounterIsActive}
                         seshStarted={true}
-                        className="inline-block font-semibold text-lg"
+                        className="inline-block font-semibold text-lg min-w-[40px] w-[40px]"
                         secondsTotal={preExerciseRestS}
                         setSecondsTotal={setPreExerciseRestS}
                       />
-                      <span className="ml-2 opacity-60">
+                      <span className="inline-block ml-4 opacity-60 align-top mt-[1px]">
                         Pre-Exercise Rest
                       </span>
                     </div>
@@ -722,7 +657,7 @@ function WorkoutSesh({
                     setShowAddNote(!showAddNote);
                   }}
                   className={classNames(
-                    "px-1 -mt-[2px] py-1.5 inline-block align-top cursor-pointer",
+                    "relative -top-0.5 px-1 inline-block align-top cursor-pointer",
                   )}>
                   + <ChatBubbleLeftIcon className="h-4 inline-block align-middle" />
                 </div>
@@ -816,9 +751,6 @@ function WorkoutSesh({
                       className={classNames(
                         "flex items-center px-3",
                         {
-                          // "bg-gray-100 text-gray-600 hover:text-gray-700": seshStarted && isActiveSet,
-                          // "bg-[#858df0] text-white": seshStarted && !isActiveSet,
-                          // "bg-gray-300 text-gray-600 hover:text-gray-700": seshStarted,
                           "cursor-pointer": seshStarted && activeExerciseIdx > 0,
                         }
                       )}>
@@ -845,11 +777,6 @@ function WorkoutSesh({
                           }
                           className={classNames(
                             "cursor-pointer flex-1 py-3 text-left",
-                            {
-                              // "bg-gray-100 text-gray-600 hover:text-gray-700": seshStarted,
-                              // "bg-white text-black": seshStarted && isActiveSet,
-                              // "bg-[#9fa7fe] text-white": seshStarted && !isActiveSet,
-                            }
                           )}>
                           <div>
                             <div className="mx-2">
@@ -858,8 +785,6 @@ function WorkoutSesh({
                                 "px-0",
                                 {
                                   "bg-white/20": seshStarted,
-                                  // "bg-[#3c4095] text-white": seshStarted && !isActiveSet,
-                                  // "bg-black text-white": !isActiveSet,
                                 }
                               )}>
                                 <div className="flex text-xl mb-0 mt-0 tracking-widest">
@@ -906,7 +831,7 @@ function WorkoutSesh({
                                               Start Next
                                             </div>
                                             <div className={classNames(
-                                              "tracking-normal w-full pr-3 overflow-hidden font-semibold text-white",
+                                              "tracking-normal w-full pr-3 overflow-hidden text-white",
                                               {
                                                 "text-xl": !activeExercise.isRest,
                                                 "text-base": activeExercise.isRest,
@@ -953,7 +878,7 @@ function WorkoutSesh({
                         }
                     </div>
                   </div>
-                  <div className="text-sm text-white/40 my-3 tracking-normal font-normal mx-3 normal-case">
+                  {/* <div className="text-sm text-white/40 mt-1 mb-2 tracking-normal font-normal mx-4 normal-case">
                     <div className="flex text-left">
                       {
                         exercises[activeExerciseIdx - 1] &&
@@ -982,16 +907,15 @@ function WorkoutSesh({
                         </div>
                       }
                     </div>
-                  </div>
+                  </div> */}
               </div>
             </div>
           </div>
           <section className={classNames(
-            "px-2 pt-2 z-50 transition-all overflow-auto",
+            "px-2 z-50 transition-all overflow-auto",
             {
               "bg-active2": seshStarted && isActiveSet,
               "bg-[#353e94]": seshStarted && !isActiveSet,
-              "bg-gray-700": !seshStarted,
             },
             {
               // "top-[55px] min-h-[100vh]": expanded,
@@ -999,24 +923,11 @@ function WorkoutSesh({
           )} style={{
             // top: (seshStarted && !expanded) ? 'calc(100vh - 70px)' : '',
           }}>
-            {
-              workout.seshes && workout.seshes.length && seshId === undefined ?
-              <>
-                <h2 className="text-center my-3 text-white font-semibold text-lg">Resume a sesh</h2>
-                <ActiveSeshes
-                  seshes={unfinishedSeshes}
-                  resumeSesh={resumeSesh}
-                  stopSesh={stopSesh}
-                  unstopSesh={unstopSesh}
-                />
-              </>
-              : null
-            }
-            <div className="pb-10 bg-transparent">
+            <div className="pb-8 bg-transparent">
               {
                 !seshStarted ?
-                <h2 className="text-center text-white font-semibold text-lg mb-3 mt-7">
-                  Upcoming Exercises
+                <h2 className="text-white font-semibold text-xl mb-3 mt-3">
+                  Upcoming <span className="text-white/60 font-normal">({exercises.length})</span>
                 </h2>
                 :
                 <h2 className={classNames(
@@ -1025,17 +936,17 @@ function WorkoutSesh({
                   <span
                     onClick={() => setActiveBottomTab(BottomTab.Exercises)}
                     className={classNames(
-                      "cursor-pointer inline-block px-2 pb-3",
+                      "cursor-pointer inline-block px-2 pb-0",
                       {
                         "opacity-60": activeBottomTab !== BottomTab.Exercises,
                       }
                     )}>
-                    Upcoming Exercises
+                    Upcoming <span className="text-white/60 font-normal">({exercises.length - activeExerciseIdx - 1})</span>
                   </span>
                   <span
                     onClick={() => setActiveBottomTab(BottomTab.History)}
                     className={classNames(
-                      "cursor-pointer inline-block px-2 pb-3",
+                      "cursor-pointer inline-block px-2 pb-0",
                       {
                         "opacity-60": activeBottomTab !== BottomTab.History,
                       }
@@ -1045,7 +956,7 @@ function WorkoutSesh({
                 </h2>
               }
               <div className={classNames(
-                "shadow-xl rounded-t-2xl overflow-hidden",
+                "overflow-hidden",
               )}>
                 {
                   winReady &&
@@ -1057,14 +968,8 @@ function WorkoutSesh({
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className={classNames(
-                            "text-black",
-                            {
-                              "px-0 bg-white": !seshStarted
-                            }
-                          )}
                           style={{
-                            // paddingBottom: snapshot.isDraggingOver ? 112 : 0,
+                            paddingBottom: snapshot.isDraggingOver ? 100 : 0,
                           }}
                         >
                             {
@@ -1089,11 +994,16 @@ function WorkoutSesh({
                                         }}
                                       >
                                         <WorkoutRoutine
+                                          counter={i + 1}
                                           isFirst={i === 0}
                                           isLast={i === exercises.length - activeExerciseIdx - (seshStarted ? 2 : 1)}
                                           exercise={exercise}
                                           isDragging={snapshot.isDragging}
-                                          expanded={expanded}
+                                          isDraggingClassName={
+                                            seshStarted && isActiveSet ? "bg-active2" :
+                                            seshStarted && !isActiveSet ? "bg-[#353e94]" :
+                                            "bg-gray-700"
+                                          }
                                         />
                                       </article>
                                     )}
@@ -1114,45 +1024,47 @@ function WorkoutSesh({
                     workoutId={workout.id}
                   />
                 }
-                <div className={classNames(
-                  "rounded-b-xl overflow-hidden",
-                )}>
-                  {/* <button
-                    className={classNames(
-                      "px-5 w-full font-bold",
-                      "text-gray-600 text-xl bg-gray-100 py-7",
-                      {
-                        "hidden": activeBottomTab !== BottomTab.Exercises
-                      }
-                    )}
-                  >
-                    + Add Exercise
-                  </button> */}
+                <div className="rounded-sm mx-2 mt-2 bg-white/10 text-white/60 p-4">
+                  <h3 className="mb-2">
+                    {workout.name}
+                  </h3>
+                  <SeshCounter
+                    className="font-semibold text-2xl"
+                    active={seshStarted && seshCounterIsActive}
+                    secondsTotal={workoutSecondsTotal}
+                    setSecondsTotal={setWorkoutSecondsTotal}
+                  />
+                  <span className="text-white/60 mr-2">Total Workout Time</span>
                   <button
                     onClick={seshStarted ? finishWorkout : startSesh}
                     className={classNames(
-                      "py-7 px-5 w-full font-bold",
-                      "text-black text-xl bg-brightGreen"
+                      "mt-3 py-3 px-3 w-full rounded-lg font-bold",
+                      "text-black text-xl bg-brightGreen text-left"
                     )}>
                     {
                       seshStarted ?
                       <>
-                        Finish Workout
-                      </> : <div className="relative top-1">
-                        <PlayCircleIcon className="h-14 inline-block align-top mr-2 -mt-2.5" />
-                        <span className="inline-block text-2xl mt-0.5">
-                          Start Sesh
+                        <CheckIcon className="h-6 inline-block align-top mt-0.5" /> Finish Workout
+                      </> : <div>
+                        <PlayIcon className="h-10 inline-block align-middle mr-2" />
+                        <span className="inline-block align-middle">
+                          Start
                         </span>
                       </div>
                     }
                   </button>
                 </div>
+                <div className="mx-2 mt-5 text-center">
+                </div>
               </div>
-              <Link
-                href="/"
-                className="block mt-5 text-lg p-3 text-center text-gray-600 cursor-pointer">
-                Cancel Workout
-              </Link>
+              {
+                !seshStarted &&
+                <Link
+                  href="/"
+                  className="block py-4 text-lg text-center text-white/60 cursor-pointer">
+                  Cancel
+                </Link>
+              }
             </div>
           </section>
         </div>
@@ -1199,3 +1111,33 @@ export async function getServerSideProps(context: any) {
 }
 
 export default withSeshHistoryExercises(WorkoutSesh);
+
+{/* <div className={classNames(
+              "z-50 text-base text-white font-normal mx-3 pt-3"
+            )}>
+              <div className="inline-block">
+                <Clamped clamp={1}>
+                  <span className='overflow-hidden text-ellipsis w-full inline-block'>
+                    {workout.name}
+                  </span>
+                </Clamped>
+              </div>
+              {
+                seshStarted ?
+                <>
+                  <SeshCounter
+                    className="font-semibold text-right"
+                    active={seshStarted && seshCounterIsActive}
+                    secondsTotal={workoutSecondsTotal}
+                    setSecondsTotal={setWorkoutSecondsTotal}
+                  />
+                  <span
+                    onClick={() => setIsConfirmingStop(true)}
+                    className="cursor-pointer inline-block mt-[2.5px] ml-2 text-sm rounded-full">
+                    <StopIcon className="inline-block h-4 align-middle relative -top-0.5" />
+                  </span>
+                </>
+                :
+                <Link className="text-white/60" href="/">Cancel</Link>
+              }
+            </div> */}

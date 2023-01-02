@@ -1,3 +1,4 @@
+import { Bars2Icon } from '@heroicons/react/20/solid';
 import { Exercise } from '@prisma/client';
 import classnames from 'classnames'
 import moment from 'moment';
@@ -5,6 +6,7 @@ import Image from 'next/image'
 import Clamped from './Clamped';
 import DurationText from './DurationText';
 import ExerciseDescription from './ExerciseDescription';
+import RestTile from './RestTile';
 
 const ReorderIconSvg = ({ color }: { color: string; }) => (
   <svg className="inline-block" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -18,76 +20,88 @@ const WorkoutRoutine = ({
   isFirst,
   isLast,
   isDragging,
-  expanded,
+  counter,
+  isDraggingClassName,
 }: {
   exercise: Exercise;
   isFirst?: boolean;
   isLast?: boolean;
   isDragging?: boolean;
-  expanded: boolean;
+  counter: number;
+  isDraggingClassName: string;
 }) => {
   return (
     <div className={classnames(
-      "flex border-b-gray-300",
+      "flex text-white border-white/20 py-4",
       isDragging ?
         "border-t border-b" :
         isLast ? "border-none" : "border-b",
-        "bg-white",
+        "bg-transparent",
       {
-        "relative -left-[160px]": isDragging,
+        "relative -left-[80px]": isDragging,
+        [isDraggingClassName]: isDragging,
       }
     )}>
-      <div className="m-0">
-        <div className={classnames(
-          "relative w-[111px] min-h-[111px] text-center bg-white overflow-hidden",
-          "text-black z-100 border-r",
-          isDragging ? "text-navy0": "text-black"
-        )}>
-          {
-            exercise.imageUrl ?
-            <Image
-              src={exercise.imageUrl}
-              alt="Exercise Image"
-              priority
-              fill
-              placeholder={require('./heart-pulse.png')}
-              className="inline-block h-[75px]"
-            />
-            :
-            <div className="inline-block w-[75px] h-[75px] bg-white" />
-          }
-        </div>
-      </div>
-      <div className="ml-2 flex-1 flex justify-center flex-col">
-        <h2 className={classnames(
-          "font-semibold text-base mb-0.5",
-          isDragging ? "text-green-500" : "text-black"
-        )}>
-          <Clamped clamp={2}>
-            {exercise.name}
-          </Clamped>
-        </h2>
-        <div className="text-black/70 text-sm">
-          {
-            exercise.isRest ?
-            <DurationText durationM={moment.duration(exercise.timeLimitS, 'seconds')} />
-            :
-            <ExerciseDescription 
-              setsDescription={exercise.setsDescription}
-              repsDescription={exercise.repsDescription}
-            />
-          }
-        </div>
-      </div>
       {
         (isFirst && isLast) ?
         null :
-        <div className="leading-[110px] px-2 cursor-pointer">
-          <ReorderIconSvg
-            color={isDragging ? '#000000' : '#C2C2C2'}
-          />
+        <div className="ml-1 px-1 cursor-pointer flex flex-col justify-center">
+          <Bars2Icon className="text-white/50 h-4 rounded-full" />
         </div>
       }
+      <div className="flex items-center ml-3 mr-4">
+        {counter}.
+      </div>
+      <div className={classnames(
+        "relative w-[50px] h-[50px] text-center bg-transparent overflow-hidden",
+        "text-black z-100",
+        isDragging ? "text-navy0": "text-black"
+      )}>
+        {
+          exercise.isRest ?
+          <RestTile className="h-[50px] w-[50px]" />
+          :
+          exercise.imageUrl ?
+          <Image
+            src={exercise.imageUrl}
+            alt="Exercise Image"
+            priority
+            fill
+            placeholder={require('./heart-pulse.png')}
+            className="inline-block h-[50px]"
+          />
+          :
+          <div className="inline-block w-[50px] h-[50px]" />
+        }
+      </div>
+      <div className="flex-1 flex justify-center flex-col h-[50px]">
+        <div className="ml-4">
+          <h2 className={classnames(
+            "font-normal text-base text-white",
+            { 
+              "font-bold": isDragging,
+            },
+          )}>
+            <Clamped clamp={2}>
+              {exercise.name}
+            </Clamped>
+          </h2>
+          <div className="text-white/70 text-sm">
+            {
+              exercise.isRest ?
+              exercise.timeLimitS ?
+                <DurationText durationM={moment.duration(exercise.timeLimitS, 'seconds')} />
+                :
+                'Until Ready'
+              :
+              <ExerciseDescription 
+                setsDescription={exercise.setsDescription}
+                repsDescription={exercise.repsDescription}
+              />
+            }
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

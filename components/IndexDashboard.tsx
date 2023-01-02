@@ -228,7 +228,7 @@ export default function IndexDashboard({
                         <div className="flex sm:flex-row flex-col ml-1">
                           <div className="ml-0.25 flex-1 flex sm:flex-row-reverse">
                             <div className="flex-1">
-                              <p className="font-semibold text-base my-2">
+                              <p className="font-normal text-base mt-2 mb-5">
                                 {workout.description}
                               </p>
                               <p className="text-sm mt-3 text-gray-500">

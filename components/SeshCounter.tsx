@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import classnames from "classnames"
 
 const toSeconds = (secondsTotal: number) => secondsTotal % 60;
-const toMinutes = (secondsTotal: number) => Math.floor(secondsTotal / 60);
+const toMinutes = (secondsTotal: number) => Math.floor(secondsTotal / 60) % 60;
+const toHours = (secondsTotal: number) => Math.floor((Math.floor(secondsTotal / 60)) / 60);
 
 export default function SeshCounter({
   active,
@@ -22,6 +23,8 @@ export default function SeshCounter({
 }) {
   const seconds = toSeconds(secondsTotal);
   const minutes = toMinutes(secondsTotal);
+  const hours = toHours(secondsTotal)
+  console.log('counter', seconds, minutes, hours)
   let timerInterval: any;
   useEffect(() => {
     if (active) {
@@ -41,7 +44,7 @@ export default function SeshCounter({
   return (
     <div className={classnames(
       className,
-      "text-white",
+      "text-white font-roboto",
       {
         "text-white": seshStarted !== undefined && seshStarted,
         "text-black": seshStarted !== undefined && !seshStarted,
@@ -50,7 +53,14 @@ export default function SeshCounter({
       <span className={classnames({
         "opacity-50": !active,
       })}>
-        {minutes.toFixed(0)}:{seconds <= 9 ? '0' + seconds : seconds}
+        {
+          hours ? (
+            (hours <= 9 ? '0' + hours : hours)
+            + ':'
+          )
+          : null
+        }
+        {minutes <= 9 ? '0' + minutes : minutes}:{seconds <= 9 ? '0' + seconds : seconds}
       </span>
       {children}
     </div>

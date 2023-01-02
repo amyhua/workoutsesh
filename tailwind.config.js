@@ -9,6 +9,7 @@ module.exports = {
     extend: {
       fontFamily: {
         'monospace': ['Inconsolata', 'Maison Neue Mono', 'Courier', 'Courier New', 'monospace'],
+        'roboto': ['Roboto', 'Arial', 'sans-serif'],
       },
       colors: {
         whitem1: '#ffffff85',
@@ -44,7 +45,8 @@ module.exports = {
         rest2: '#15398f',
         restBg: '#302c65',
         pink: '#ffcfff',
-        active1: '#5e5e5e',
+        // active1: '#5e5e5e',
+        active1: '#2b3830',
         active2: '#000000',
         purple0: '#f3efff',
       }

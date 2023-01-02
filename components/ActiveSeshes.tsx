@@ -28,7 +28,7 @@ const ActiveSesh = ({
     )}>
       {
         finishedAt ?
-        <div className="text-slate-400 text-base my-5">
+        <div className="text-gray-600 text-sm my-2">
           <CheckIcon className="ml-1 text-green-500 inline-block mr-1 h-5 -mt-0.5" /> Workout marked completed.
           <span
             onClick={() => unstopSesh(sesh.id).then(() => setFinishedAt(undefined))}
@@ -50,7 +50,7 @@ const ActiveSesh = ({
               <span className="mr-1 font-bold">
                 {moment(time).format('ddd MMM D h:mma')}
               </span>
-              <div className="text-gray-400 text-xs mt-1">
+              <div className="text-gray-400 text-xs">
                 <span className="inline-block mr-2">
                   Duration: <DurationText durationM={durationM} />
                 </span>
@@ -58,7 +58,7 @@ const ActiveSesh = ({
                   {
                     sesh.pausedAt ?
                       'Paused ' + moment(sesh.pausedAt).fromNow() :
-                      'Updated ' + moment(sesh.updatedAt).fromNow()
+                      'Started ' + moment(sesh.createdAt).fromNow()
                   }
                 </div>
               </div>
@@ -94,6 +94,9 @@ const ActiveSeshes = ({
       style={{
         filter: 'drop-shadow(0 -5px 25px rgb(0 0 0 / 4%)) drop-shadow(0 0px 40px rgb(0 0 0 / 0.1))',
       }}>
+      <h2 className="text-black text-left text-lg mb-3 font-bold">
+        Resume a Workout
+      </h2>
       {
         seshes.map((sesh: SeshDto, i) => (
           <ActiveSesh
