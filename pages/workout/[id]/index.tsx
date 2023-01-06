@@ -479,6 +479,7 @@ function WorkoutSesh({
                     <video
                       autoPlay={true}
                       loop
+                      controls={true}
                       muted
                       src={activeExercise.imageUrl}
                     />
