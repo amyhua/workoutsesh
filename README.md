@@ -32,6 +32,10 @@ ls
 rm var-15/postmaster.pid
 ```
 
+### Special gotchas
+
+* The db password cannot contain special characters. ($, #, etc.)
+
 -----
 
 #### Assets
