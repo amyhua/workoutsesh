@@ -21,12 +21,12 @@ async function intervalsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
       const intervals = await prisma.seshInterval.findMany({
         where: {
           exerciseId: Number(exerciseId),
-          note: (
-            notesOnly &&
-            String(notesOnly).toLowerCase() === 'true' ? {
-              not: ''
-            } : undefined
-          ),
+          // note: (
+          //   notesOnly &&
+          //   String(notesOnly).toLowerCase() === 'true' ? {
+          //     not: ''
+          //   } : undefined
+          // ),
           // TODO: make this on a param notesOnly
           // note: {
           //   not: '',

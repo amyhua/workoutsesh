@@ -108,9 +108,11 @@ function WorkoutSesh({
     activeExcLastSavedInterval?: SeshInterval,
   ) => {
     if (!exercise) throw new Error('Active exercise required');
-    return fetch(`/api/intervals?exerciseId=${exercise.id}&notesOnly=true`)
+    // return fetch(`/api/intervals?exerciseId=${exercise.id}&notesOnly=true`)
+    return fetch(`/api/intervals?exerciseId=${exercise.id}`)
       .then((r: any) => r.json())
       .then((intervals: SeshInterval[]) => {
+        console.log('intervals', intervals);
         if (activeExcLastSavedInterval &&
           activeExcLastSavedInterval.note &&
           intervals[0] &&
