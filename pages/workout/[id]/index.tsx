@@ -637,7 +637,7 @@ function WorkoutSesh({
               </div>
               {/* set descriptor */}
               <div className={classNames(
-                "px-5 min-h-[36px] flex items-center",
+                "px-5 min-h-[30px] flex items-center",
               )}>
                 <div className="flex-1">
                   {
@@ -645,7 +645,7 @@ function WorkoutSesh({
                     <div className="text-lg">
                       {
                         activeExercise.setsDescription &&
-                        <div className="mt-0 mr-2">
+                        <div className="mr-2">
                           <span className="opacity-50 mr-1.5">Set</span>
                           <span className="font-semibold mr-1">{workoutSetNum}</span>
                           <span className="opacity-50 mr-1.5">out of</span>
@@ -947,7 +947,7 @@ function WorkoutSesh({
                 </h2>
                 :
                 <h2 className={classNames(
-                  "text-white font-semibold text-lg mb-0.5",
+                  "text-white font-semibold text-lg mb-0.5 flex",
                 )}>
                   <span
                     onClick={() => setActiveBottomTab(BottomTab.Exercises)}
@@ -969,6 +969,15 @@ function WorkoutSesh({
                     )}>
                     History
                   </span>
+                  <div className="flex-1 text-right mr-3">
+                    <span className="font-normal text-white/60 mr-1">Total</span>
+                    <SeshCounter
+                      className="font-semibold text-white inline-block ml-1"
+                      active={seshStarted && seshCounterIsActive}
+                      secondsTotal={workoutSecondsTotal}
+                      setSecondsTotal={setWorkoutSecondsTotal}
+                    />
+                  </div>
                 </h2>
               }
               <div className={classNames(
