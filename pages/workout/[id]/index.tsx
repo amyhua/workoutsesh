@@ -480,7 +480,6 @@ function WorkoutSesh({
                       autoPlay={true}
                       playsInline={true}
                       loop
-                      controls={true}
                       muted
                       src={activeExercise.imageUrl}
                     />
