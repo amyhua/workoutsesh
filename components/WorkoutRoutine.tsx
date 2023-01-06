@@ -3,6 +3,7 @@ import { Exercise } from '@prisma/client';
 import classnames from 'classnames'
 import moment from 'moment';
 import Image from 'next/image'
+import { useState } from 'react';
 import Clamped from './Clamped';
 import DurationText from './DurationText';
 import ExerciseDescription from './ExerciseDescription';
@@ -30,6 +31,7 @@ const WorkoutRoutine = ({
   counter: number;
   isDraggingClassName: string;
 }) => {
+  const [isImageError, setIsImageError] = useState(false);
   return (
     <div className={classnames(
       "flex text-white border-white/20 py-4",
@@ -61,17 +63,25 @@ const WorkoutRoutine = ({
           exercise.isRest ?
           <RestTile className="h-[50px] w-[50px]" />
           :
-          exercise.imageUrl ?
+          (exercise.imageUrl && !isImageError) ?
           <Image
             src={exercise.imageUrl}
-            alt="Exercise Image"
+            alt="Exercise"
             priority
             fill
             placeholder={require('./heart-pulse.png')}
             className="inline-block h-[50px]"
+            onError={() => setIsImageError(true)}
           />
           :
-          <div className="inline-block w-[50px] h-[50px]" />
+          (exercise.imageUrl && String(exercise.imageUrl).match(/\.(mp4)$/)) ?
+          <video
+            autoPlay={false}
+            muted
+            src={exercise.imageUrl}
+          />
+          :
+          <div className="inline-block bg-white/30 w-[50px] h-[50px]" />
         }
       </div>
       <div className="flex-1 flex justify-center flex-col h-[50px]">
