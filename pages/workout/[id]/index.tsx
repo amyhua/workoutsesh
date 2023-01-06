@@ -1040,37 +1040,37 @@ function WorkoutSesh({
                     workoutId={workout.id}
                   />
                 }
-                <div className="rounded-sm mx-2 mt-2 bg-white/10 text-white/60 p-4 mb-10">
-                  <h3 className="mb-2">
+                <div className="mx-2 mt-2 bg-white/10 text-white/60 p-4 mb-4 rounded-lg">
+                  <h3 className="mb-0.5">
                     {workout.name}
                   </h3>
                   <SeshCounter
-                    className="font-semibold text-2xl"
+                    className="font-semibold text-2xl text-white"
                     active={seshStarted && seshCounterIsActive}
                     secondsTotal={workoutSecondsTotal}
                     setSecondsTotal={setWorkoutSecondsTotal}
                   />
                   <span className="text-white/60 mr-2">Total Workout Time</span>
-                  <button
-                    onClick={seshStarted ? finishWorkout : startSesh}
-                    className={classNames(
-                      "mt-3 py-3 px-3 w-full rounded-lg font-bold",
-                      "text-black text-xl bg-brightGreen text-left"
-                    )}>
-                    {
-                      seshStarted ?
-                      <>
-                        <CheckIcon className="h-6 inline-block align-top mt-0.5" /> Finish Workout
-                      </> : <div>
-                        <PlayIcon className="h-10 inline-block align-middle mr-2" />
-                        <span className="inline-block align-middle">
-                          Start
-                        </span>
-                      </div>
-                    }
-                  </button>
                 </div>
-                <div className="mx-2 mt-5 text-center">
+                <div className="mx-2">
+                  <button
+                      onClick={seshStarted ? finishWorkout : startSesh}
+                      className={classNames(
+                        "w-full py-3 px-3 rounded-lg font-bold",
+                        "text-black text-xl bg-brightGreen text-left"
+                      )}>
+                      {
+                        seshStarted ?
+                        <>
+                          <CheckIcon className="h-6 inline-block align-top mt-0.5" /> Finish Workout
+                        </> : <div>
+                          <PlayIcon className="h-10 inline-block align-middle mr-2" />
+                          <span className="inline-block align-middle">
+                            Start
+                          </span>
+                        </div>
+                      }
+                    </button>
                 </div>
               </div>
               {
