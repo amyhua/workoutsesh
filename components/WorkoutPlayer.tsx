@@ -993,7 +993,7 @@ function WorkoutSeshPlayer({
                         "opacity-60": activeBottomTab !== BottomTab.History,
                       }
                     )}>
-                    History
+                    Past
                   </span>
                   <div className="flex-1 text-right mr-2">
                     <span className="font-normal text-white/60 mr-1 align-middle">
