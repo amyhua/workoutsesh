@@ -441,7 +441,7 @@ function WorkoutSeshPlayer({
             }
             {
               !seshStarted &&
-              <header className="pt-8 pb-10 text-left mx-2 text-white">
+              <header className="pt-8 text-left mx-2 text-white">
                 <div className="text-3xl">
                   🤾‍♀️
                 </div>

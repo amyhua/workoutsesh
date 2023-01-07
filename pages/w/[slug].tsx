@@ -25,16 +25,14 @@ export async function getServerSideProps(context: any) {
       },
       include: {
         exercises: true,
-        seshes: {
-          where: {
-            finishedAt: null,
-          }
-        }
       },
     });
     return {
       props : {
-        workout: workout ? JSON.stringify(workout) : null,
+        workout: workout ? JSON.stringify({
+          ...workout,
+          seshes: [],
+        }) : null,
         params: context.params
       }
     }
