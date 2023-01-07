@@ -24,7 +24,6 @@ export default function SeshCounter({
   const seconds = toSeconds(secondsTotal);
   const minutes = toMinutes(secondsTotal);
   const hours = toHours(secondsTotal)
-  console.log('counter', seconds, minutes, hours)
   let timerInterval: any;
   useEffect(() => {
     if (active) {

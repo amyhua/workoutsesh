@@ -59,7 +59,8 @@ function WorkoutSeshPlayer({
     timeCompletedS: 0,
     workoutId: workout.id,
     workout: workout,
-  }
+    orderedExerciseIds: [],
+  };
   const initialExercises = (getShownExercises(workout.exercises) || [])
     .filter((exc: Exercise) => exc.connectedToCurrentWorkout);
   const [unfinishedSeshes, setUnfinishedSeshes] = useState<SeshDto[]>(workout.seshes
@@ -156,13 +157,14 @@ function WorkoutSeshPlayer({
   const router = useRouter();
   const addNoteEl = useRef(null);
   const onStartSesh = useCallback((data: Sesh & { intervals: (SeshInterval & { exercise: Exercise })[] }) => {
+    console.log('onStartSesh data', data);
     setSeshStarted(true);
     setActiveIntervalCounterIsActive(data ? false : true);
     setSeshCounterIsActive(true);
     setExpanded(false);
-    setSeshId(data.id);
+    setSeshId(data ? data.id : undefined);
     setWorkoutSecondsTotal(data.timeCompletedS)
-    setPastIntervals(data.intervals);
+    setPastIntervals(data.intervals || []);
     if (data.orderedExerciseIds.length) {
       const orderedExercises = exercises.sort(
         (a: Exercise, b: Exercise) => {
