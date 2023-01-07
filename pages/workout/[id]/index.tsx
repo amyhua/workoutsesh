@@ -8,7 +8,6 @@ import WorkoutRoutine from '../../../components/WorkoutRoutine'
 import { resetServerContext, DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import Clamped from '../../../components/Clamped'
 import classNames from 'classnames'
-import { getSession, useSession } from 'next-auth/react'
 import { prisma } from '../../../lib/prismadb'
 import { ArrowUpIcon, BackwardIcon, BoltIcon, BoltSlashIcon, ChatBubbleLeftIcon, CheckIcon, ChevronDownIcon, ForwardIcon, PlayCircleIcon, PlayIcon, StopIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
@@ -51,7 +50,7 @@ function WorkoutSesh({
   error,
   saveCurrentInterval,
 }: any) {
-  const session = useSession();
+  // const session = useSession();
   workout = workout ? JSON.parse(workout) : {};
   error = error ? JSON.parse(error) : undefined;
   const initialExercises = (getShownExercises(workout.exercises) || [])
@@ -206,9 +205,9 @@ function WorkoutSesh({
     });
   };
   const isActiveSet = currWorkoutSetType === WorkoutSetType.Active;
-  if (!session) {
-    if (winReady) router.push(`/signin?error=${'Not logged in'}`);
-  }
+  // if (!session) {
+  //   if (winReady) router.push(`/signin?error=${'Not logged in'}`);
+  // }
   const resumeSesh = (seshId: number) => {
     return startSesh(seshId);
   };
@@ -430,8 +429,11 @@ function WorkoutSesh({
             }
             {
               !seshStarted &&
-              <header className="pt-8 text-left mx-3 text-white">
-                <h1 className="text-2xl mt-5 mb-5">
+              <header className="pt-8 pb-10 text-left mx-2 text-white">
+                <div className="text-3xl">
+                  🤾‍♀️
+                </div>
+                <h1 className="text-3xl mb-5 font-bold">
                   {workout.name}
                 </h1>
                 {
@@ -943,8 +945,8 @@ function WorkoutSesh({
             <div className="pb-8 bg-transparent">
               {
                 !seshStarted ?
-                <h2 className="text-white font-semibold text-xl mb-3 mt-3">
-                  Upcoming <span className="text-white/60 font-normal">({exercises.length})</span>
+                <h2 className="text-white font-semibold text-2xl mb-3 mt-3">
+                  Exercises <span className="text-white/60 font-normal">({exercises.length})</span>
                 </h2>
                 :
                 <h2 className={classNames(
@@ -1101,27 +1103,21 @@ function WorkoutSesh({
 
 export async function getServerSideProps(context: any) {
   try {
-    const session = await getSession(context);
-    let workout;
-    if (session && session.user) {
-      const { email } = session.user || {};
-      workout = await prisma.workout.findFirstOrThrow({
-        where: {
-          id: Number(context.query.id),
-        },
-        include: {
-          exercises: true,
-          seshes: {
-            where: {
-              finishedAt: null,
-            }
+    const workout = await prisma.workout.findFirstOrThrow({
+      where: {
+        id: Number(context.query.id),
+      },
+      include: {
+        exercises: true,
+        seshes: {
+          where: {
+            finishedAt: null,
           }
-        },
-      });
-    }
+        }
+      },
+    });
     return {
       props : {
-        session: JSON.stringify(session),
         workout: workout ? JSON.stringify(workout) : null,
         params: context.params
       }

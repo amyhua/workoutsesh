@@ -21,14 +21,14 @@ const ActiveSesh = ({
   const durationM = moment.duration(sesh.timeCompletedS, 'seconds');
   return (
     <article className={classNames(
-      "mb-3 text-slate-700",
+      "mb-3 text-white",
       {
         "flex": !finishedAt
       }
     )}>
       {
         finishedAt ?
-        <div className="text-gray-600 text-sm my-2">
+        <div className="text-white/70 text-sm my-2">
           <CheckIcon className="ml-1 text-green-500 inline-block mr-1 h-5 -mt-0.5" /> Workout marked completed.
           <span
             onClick={() => unstopSesh(sesh.id).then(() => setFinishedAt(undefined))}
@@ -44,13 +44,13 @@ const ActiveSesh = ({
             }}
             className="group/play cursor-pointer flex-1 flex">
             <div>
-              <PlayCircleIcon className="-ml-1 h-14 mt-0.5 mr-2 group-hover/play:text-green-500 text-black" />
+              <PlayCircleIcon className="-ml-1 h-14 mt-0.5 mr-2 group-hover/play:text-green-500 text-white" />
             </div>
             <div className="flex-1 pt-2">
               <span className="mr-1 font-bold">
                 {moment(time).isSame(new Date(), 'day') ?
                   moment(time).format('h:mma - [Today]')
-                  : moment(time).format('D h:mma - ddd MMM')}
+                  : moment(time).format('h:mma - ddd MMM D')}
               </span>
               <div className="text-gray-500 text-xs">
                 <span className="inline-block mr-2">
@@ -68,8 +68,8 @@ const ActiveSesh = ({
           </div>
           <div
             onClick={() => stopSesh(sesh.id).then(() => setFinishedAt('DEFINED'))}
-            className="pl-1 pt-3.5 cursor-pointer group/stop">
-            <div className="p-2 rounded-lg bg-red-100 font-semibold text-red-600 group-hover/stop:text-red-600 text-xs pr-2">
+            className="pl-1 pt-3 cursor-pointer group/stop">
+            <div className="p-2 rounded-lg bg-white font-semibold text-black group-hover/stop:text-red-600 text-xs pr-2">
               <StopIcon className="inline-block h-4 -mt-[3px] mr-0.5" /> Stop
             </div>
           </div>
@@ -92,25 +92,25 @@ const ActiveSeshes = ({
 }) => {
   const [seshes, setSeshes] = useState<SeshDto[]>(initialSeshes);
   return (
-    <div className="py-5 px-4 bg-white shadow-xl drop-shadow-xl rounded-xl mb-5"
-      style={{
-        filter: 'drop-shadow(0 -5px 25px rgb(0 0 0 / 4%)) drop-shadow(0 0px 40px rgb(0 0 0 / 0.1))',
-      }}>
-      <h2 className="text-black text-left text-lg mb-3 font-bold">
-        Resume a Workout
-      </h2>
-      {
-        seshes.map((sesh: SeshDto, i) => (
-          <ActiveSesh
-            key={i}
-            sesh={sesh}
-            resumeSesh={resumeSesh}
-            stopSesh={stopSesh}
-            unstopSesh={unstopSesh}
-          />
-        ))
-      }
-    </div>
+    <>
+      <h2 className="text-left text-2xl mb-3 font-bold">
+          Resume a Workout
+        </h2>
+      <div className="py-5 px-4 bg-black/20 text-white rounded-xl mb-0"
+      >
+        {
+          seshes.map((sesh: SeshDto, i) => (
+            <ActiveSesh
+              key={i}
+              sesh={sesh}
+              resumeSesh={resumeSesh}
+              stopSesh={stopSesh}
+              unstopSesh={unstopSesh}
+            />
+          ))
+        }
+      </div>
+    </>
   );
 };
 
