@@ -157,7 +157,6 @@ function WorkoutSeshPlayer({
   const router = useRouter();
   const addNoteEl = useRef(null);
   const onStartSesh = useCallback((data: Sesh & { intervals: (SeshInterval & { exercise: Exercise })[] }) => {
-    console.log('onStartSesh data', data);
     setSeshStarted(true);
     setActiveIntervalCounterIsActive(data ? false : true);
     setSeshCounterIsActive(true);
@@ -209,7 +208,7 @@ function WorkoutSeshPlayer({
         })
       })
     )
-    .then((resp: any) => resp.json())
+    .then((resp: any) => resp && resp.json ? resp.json() : resp)
     .then(onStartSesh)
     .catch((err: any) => {
       console.error('onStartSesh failed', err);
