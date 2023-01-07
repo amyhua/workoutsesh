@@ -28,9 +28,9 @@ async function intervalsRoute(req: NextApiRequest, res: NextApiResponse<any>) {
           //   } : undefined
           // ),
           // TODO: make this on a param notesOnly
-          // note: {
-          //   not: '',
-          // },
+          note: {
+            not: '',
+          },
           active: true,
           sesh: {
             userEmail: session.user.email,
