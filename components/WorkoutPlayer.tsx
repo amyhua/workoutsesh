@@ -8,7 +8,7 @@ import WorkoutRoutine from './WorkoutRoutine'
 import { resetServerContext, DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import Clamped from './Clamped'
 import classNames from 'classnames'
-import { ArrowUpIcon, BackwardIcon, BoltIcon, BoltSlashIcon, ChatBubbleLeftIcon, CheckIcon, ChevronDownIcon, ForwardIcon, PlayCircleIcon, PlayIcon, ShareIcon, StopIcon } from '@heroicons/react/20/solid'
+import { ArrowUpIcon, BackwardIcon, BoltIcon, BoltSlashIcon, ChatBubbleLeftIcon, CheckIcon, ChevronDownIcon, ClockIcon, ForwardIcon, PlayCircleIcon, PlayIcon, ShareIcon, StopIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import withSeshHistoryExercises from './withSeshHistoryExercises'
 import ActiveSeshes from './ActiveSeshes'
@@ -61,9 +61,10 @@ function WorkoutSeshPlayer({
     workout: workout,
     orderedExerciseIds: [],
   };
-  const initialExercises = (getShownExercises(workout.exercises) || [])
+  const initialExercises = getShownExercises(workout.exercises || [])
     .filter((exc: Exercise) => exc.connectedToCurrentWorkout);
-  const [unfinishedSeshes, setUnfinishedSeshes] = useState<SeshDto[]>(workout.seshes
+  const [unfinishedSeshes, setUnfinishedSeshes] = useState<SeshDto[]>(
+    (workout.seshes || [])
     .sort(
       (a: SeshDto, b: SeshDto) =>
         new Date (b.updatedAt).getTime() - new Date (a.updatedAt).getTime()
@@ -160,7 +161,8 @@ function WorkoutSeshPlayer({
     setActiveIntervalCounterIsActive(data ? false : true);
     setSeshCounterIsActive(true);
     setSeshId(data ? data.id : undefined);
-    setWorkoutSecondsTotal(data.timeCompletedS)
+    setWorkoutSecondsTotal(data.timeCompletedS);
+    setPreExerciseRestS(0);
     setPastIntervals(data.intervals || []);
     if (data.orderedExerciseIds.length) {
       const orderedExercises = exercises.sort(
@@ -529,12 +531,12 @@ function WorkoutSeshPlayer({
               <div className="flex flex-col justify-center">
                 <div
                   className={classnames(
-                  "px-3 flex flex-col justify-center",
+                  "pt-4 px-2 flex flex-col justify-center",
                   {
-                    "pt-5 pb-2": !seshStarted,
-                    "pt-5": seshStarted
+                    "pb-2": !seshStarted,
+                    "": seshStarted
                   })}>
-                    <header className="mx-2 w-full items-center mb-0.5">
+                    <header className="mx-1 w-full items-center mb-0.5">
                       {isActiveSet ? (
                         <>
                           <div className="text-2xl font-bold relative">
@@ -661,7 +663,7 @@ function WorkoutSeshPlayer({
               </div>
               {/* set descriptor */}
               <div className={classNames(
-                "px-5 min-h-[30px] flex items-center",
+                "mx-4 min-h-[30px] flex items-center",
               )}>
                 <div className="flex-1">
                   {
@@ -678,7 +680,7 @@ function WorkoutSeshPlayer({
                       }
                     </div>
                     :
-                    <div className="m-1">
+                    <div className="my-1">
                       <SeshCounter
                         active={!activeIntervalCounterIsActive}
                         seshStarted={true}
@@ -993,10 +995,12 @@ function WorkoutSeshPlayer({
                     )}>
                     History
                   </span>
-                  <div className="flex-1 text-right mr-3">
-                    <span className="font-normal text-white/60 mr-1">Total</span>
+                  <div className="flex-1 text-right mr-2">
+                    <span className="font-normal text-white/60 mr-1 align-middle">
+                      Total <ClockIcon className="h-5 inline-block -mt-1" />
+                    </span>
                     <SeshCounter
-                      className="font-semibold text-white inline-block ml-1"
+                      className="font-semibold text-white inline-block align-middle ml-1"
                       active={seshStarted && seshCounterIsActive}
                       secondsTotal={workoutSecondsTotal}
                       setSecondsTotal={setWorkoutSecondsTotal}
@@ -1073,23 +1077,23 @@ function WorkoutSeshPlayer({
                     workoutId={workout.id}
                   />
                 }
-                <div className="mx-2 mt-2 bg-white/10 text-white/60 p-4 mb-4 rounded-lg">
-                  <h3 className="mb-0.5">
-                    {workout.name}
-                  </h3>
-                  <SeshCounter
-                    className="font-semibold text-2xl text-white"
-                    active={seshStarted && seshCounterIsActive}
-                    secondsTotal={workoutSecondsTotal}
-                    setSecondsTotal={setWorkoutSecondsTotal}
-                  />
-                  <span className="text-white/60 mr-2">Total Workout Time</span>
-                </div>
-                <div className="mx-2">
+                {
+                  seshStarted &&
+                  <div className="mx-2 mt-4 bg-white/10 text-white/60 p-4 mb-4 rounded-2xl">
+                    <SeshCounter
+                      className="font-semibold text-2xl text-white"
+                      active={seshStarted && seshCounterIsActive}
+                      secondsTotal={workoutSecondsTotal}
+                      setSecondsTotal={setWorkoutSecondsTotal}
+                    />
+                    <span className="text-white/60 mr-2">Total Workout Time</span>
+                  </div>
+                }
+                <div className="mx-2 mt-6">
                   <button
                       onClick={seshStarted ? finishWorkout : startSesh}
                       className={classNames(
-                        "w-full py-3 px-3 rounded-lg font-bold",
+                        "w-full py-3 px-3 rounded-2xl text-center font-bold",
                         "text-black text-xl bg-brightGreen text-left"
                       )}>
                       {
