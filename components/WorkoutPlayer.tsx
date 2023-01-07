@@ -143,7 +143,6 @@ function WorkoutSeshPlayer({
       loadActiveExercisePastActivePeriods();
     }
   };
-  const [expanded, setExpanded] = useState(false);
   const [activeBottomTab, setActiveBottomTab] = useState(BottomTab.Exercises);
   const [winReady, setWinReady] = useState(false);
   const [isConfirmingStop, setIsConfirmingStop] = useState(false);
@@ -160,7 +159,6 @@ function WorkoutSeshPlayer({
     setSeshStarted(true);
     setActiveIntervalCounterIsActive(data ? false : true);
     setSeshCounterIsActive(true);
-    setExpanded(false);
     setSeshId(data ? data.id : undefined);
     setWorkoutSecondsTotal(data.timeCompletedS)
     setPastIntervals(data.intervals || []);
@@ -480,7 +478,7 @@ function WorkoutSeshPlayer({
               )}
             >
               <div className={classnames(
-                "mt-0 sm:mt-5 w-full flex flex-col justify-center",
+                "mt-0 w-full flex flex-col justify-center",
                 {
                   "opacity-25": !isActiveSet,
                 }
