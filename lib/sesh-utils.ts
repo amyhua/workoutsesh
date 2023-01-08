@@ -1,31 +1,40 @@
 import { Exercise, SeshInterval } from "@prisma/client";
 
-export const getNextIntervalProps = (intervals: (SeshInterval & { exercise: { restBetweenSets: boolean; } })[] = []): {
+export const getNextIntervalProps = (
+  intervals: (
+    SeshInterval & { exercise: { restBetweenSets: boolean; } }
+  )[] = [],
+  activeExercise: Exercise
+): {
   setNo: number;
   active: boolean;
 } => {
   // assume intervals are ordered by most recently created
   const lastCreatedFinishedInterval = intervals[0];
   if (!lastCreatedFinishedInterval) {
+    // next set is a new set for the exercise
     return {
       setNo: 1,
-      active: true,
+      active: activeExercise.isRest ? false : true,
     };
   }
   if (
+    lastCreatedFinishedInterval &&
     lastCreatedFinishedInterval.exercise &&
     lastCreatedFinishedInterval.exercise.restBetweenSets &&
-    lastCreatedFinishedInterval &&
     lastCreatedFinishedInterval.active
   ) {
+    // next set is a rest period for the exercise
     return {
       setNo: lastCreatedFinishedInterval.setNo,
       active: false
     };
   }
+  // last set was a rest for a rest-between exercise, or,
+  // was a set for a no-rest exercise
   return {
-    setNo: (lastCreatedFinishedInterval ? lastCreatedFinishedInterval.setNo : 0) + 1,
-    active: true
+    setNo: lastCreatedFinishedInterval.setNo + 1,
+    active: !activeExercise.isRest
   };
 };
 

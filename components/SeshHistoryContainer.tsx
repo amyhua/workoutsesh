@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, BoltIcon, ChatBubbleLeftIcon, CheckIcon, PlayIcon } from "@heroicons/react/20/solid";
+import { ArrowLeftIcon, BoltIcon, BoltSlashIcon, ChatBubbleLeftIcon, CheckIcon, FunnelIcon, PlayIcon } from "@heroicons/react/20/solid";
 import { Exercise, Sesh, SeshInterval } from "@prisma/client";
 import classNames from "classnames";
 import moment from "moment";
@@ -32,6 +32,7 @@ function SeshHistoryContainer({
   const restPeriodDurationAvg = restPeriodsTotalDur / restPeriods.length;
   const restPeriodDurationAvgM = moment.duration(restPeriodDurationAvg, 'seconds');
   const [lastShownRowIdx, setLastShownRowIdx] = useState(4);
+  const [filterExerciseName, setFilterExerciseName] = useState<string>();
   const exerciseHeaderCount: any = {};
   const intervalsByExerciseName: any = {};
   intervals.forEach((interval: any, i: number) => {
@@ -49,10 +50,11 @@ function SeshHistoryContainer({
         exerciseHeaderCount[interval.exercise.name] || 0
       ) + 1;
     }
-    let groupName = interval.exercise.name + (
-      exerciseHeaderCount[interval.exercise.name] > 1 ?
-        ' #' + exerciseHeaderCount[interval.exercise.name] : ''
-    );
+    // let groupName = interval.exercise.name + (
+    //   exerciseHeaderCount[interval.exercise.name] > 1 ?
+    //     ' #' + exerciseHeaderCount[interval.exercise.name] : ''
+    // );
+    const groupName = interval.exercise.name;
     intervalsByExerciseName[groupName] = intervalsByExerciseName[groupName]|| [];
     intervalsByExerciseName[groupName].push(interval);
   });
@@ -60,6 +62,8 @@ function SeshHistoryContainer({
     intervalsByExerciseName[name] = intervalsByExerciseName[name].reduce((meta: IntervalsMeta, interval: any) => {
       meta.intervalsBySetNo[interval.setNo] = meta.intervalsBySetNo[interval.setNo] || [];
       meta.intervalsBySetNo[interval.setNo].push(interval);
+      meta.intervals = meta.intervals || [];
+      meta.intervals.push(interval);
       if (interval.note) meta.noteBySetNo[interval.setNo] = interval.note;
       return meta;
     }, {
@@ -70,10 +74,10 @@ function SeshHistoryContainer({
   return (
     <>
       <div className={classNames(
-        "h-[100vh] overflow-auto",
+        "overflow-auto",
         {
-          "p-7 pb-[200px] text-white": isSeshPage,
-          "px-2.5 my-5 bg-transparent pb-[50px] text-white": !isSeshPage,
+          "h-[100vh] p-7 pb-[200px] text-white": isSeshPage,
+          "px-2.5 mb-5 bg-transparent pb-[50px] text-white": !isSeshPage,
         }
       )}>
         {
@@ -147,65 +151,76 @@ function SeshHistoryContainer({
             }
           </ul>
         </div>
-        {
-          Object.keys(intervalsByExerciseName).length ?
-          <div className="opacity-70 font-mono text-sm mb-2">
-            <span className="mr-4">S = Set</span>
-            R = Rest
-          </div>
-          :
-          <div className="mt-1 text-lg">
-            Nothing yet.
-          </div>
-        }
-        {
-          !isSeshPage && activePeriods.length ?
-          <>
-            <h2 className="font-semibold mb-2 mt-5">Most recent</h2>
-            {
-              activePeriods
-              .slice(0, lastShownRowIdx + 1)
-              .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-              .map((int: any, i: number) => (
-                <article className={classNames(
-                  "flex text-base mb-2 py-1.5 border-b",
-                  {
-                    "border-white0": i < Math.min(lastShownRowIdx, activePeriods.length - 1),
-                    "border-none": i >= Math.min(lastShownRowIdx, activePeriods.length - 1),
-                  }
-                )} key={i}>
-                  <div>
-                    <span className="opacity-60 mr-3">{getShortDurationFormat(moment.duration(int.durationS, 'seconds'))}</span>
-                    <span className="whitespace-nowrap">{int.exercise.name}</span>
-                    {
-                      int.note &&
-                      <div className="ml-[28px] text-yellow-100 italic">
-                        <ChatBubbleLeftIcon className="inline-block h-3 text-yellow-200 -mt-0.5 mr-3" /> {int.note}
-                      </div>
-                    }
-                  </div>
-                </article>
-              ))
-            }
-            {
-              lastShownRowIdx < activePeriods.length - 1 &&
-              <div
-                onClick={() => setLastShownRowIdx((idx:number) => idx + 5)}
-                className="inline-block my-2 cursor-pointer text-sm italic">
-                Show more
-              </div>
-            }
-          </>
-          : null
-        }
+        <div className="">
         {
           Object.keys(intervalsByExerciseName).map((exerciseName: string, i: number) => (
             <SeshExerciseSummary
               key={i}
               exerciseName={exerciseName}
               intervalsMeta={intervalsByExerciseName[exerciseName]}
+              onSelect={() => setFilterExerciseName(exerciseName)}
             />
           ))
+        }
+        </div>
+        {
+          !isSeshPage && activePeriods.length ?
+          <>
+            <h2 className="font-bold text-xl mb-3 mt-0 flex items-center">
+              Completed Intervals {
+                filterExerciseName &&
+                <span
+                  onClick={() => setFilterExerciseName('')}
+                  className="cursor-pointer group font-normal text-base mt-1 inline-block">
+                  <FunnelIcon
+                    className="cursor-pointer h-4 inline-block ml-4 mr-2 -mt-1 text-pink"
+                  />
+                  {filterExerciseName} <span className="ml-1 text-white/40 group-hover:text-white underline">clear</span>
+                </span>
+              }
+            </h2>
+            <div className="max-h-[400px] overflow-auto">
+              {
+                intervals
+                .filter((int: any) =>
+                  filterExerciseName ?
+                  int.exercise.name === filterExerciseName : true
+                )
+                .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                .map((int: any, i: number) => (
+                  <article className={classNames(
+                    "flex text-base bg-white/10 py-3 px-3 rounded-sm mb-2",
+                  )} key={i}>
+                    <div className="flex items-center">
+                      <span className="inline-block min-w-[100px] text-white/40 pr-2">
+                        {moment(int.createdAt).format('M/D h:mm:ss')}
+                      </span>
+                      <span className="w-[200px] overflow-hidden text-ellipsis inline-block whitespace-nowrap">{int.exercise.name}</span>
+                      <span className="mr-4">
+                        Set {int.setNo}
+                      </span>
+                      <span className="mr-4">
+                        {
+                          int.active ?
+                          <BoltIcon className="-mt-1 h-4 inline-block text-brightGreen" />
+                          :
+                          <BoltSlashIcon className="-mt-1 h-4 inline-block text-white/40" />
+                        }
+                      </span>
+                      <span className="mr-4">{getShortDurationFormat(moment.duration(int.durationS, 'seconds'))}</span>
+                      {
+                        int.note &&
+                        <div className="ml-[28px] text-yellow-100 italic">
+                          <ChatBubbleLeftIcon className="inline-block h-3 text-yellow-200 -mt-0.5 mr-3" /> {int.note}
+                        </div>
+                      }
+                    </div>
+                  </article>
+                ))
+              }
+            </div>
+          </>
+          : null
         }
       </div>
       {

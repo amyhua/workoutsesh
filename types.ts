@@ -39,6 +39,7 @@ export type SeshIntervalDto = {
 export type IntervalsMeta = {
   intervalsBySetNo: Record<string, SeshInterval[]>;
   noteBySetNo: Record<string, string>;
+  intervals: SeshInterval[];
 }
 
 export type SeshDatum = Sesh & { intervals: (SeshInterval & { exercise: Exercise })[] } & { workout: { name: string; id: number; } };

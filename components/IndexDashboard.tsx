@@ -124,7 +124,7 @@ export default function IndexDashboard({
             </div>
           }
         </div>
-        <div className="mt-10 max-w-sm mx-auto">
+        <div className="mt-10 max-w-sm">
           <section className="pt-0">
             <div>
               <article className="sm:pr-5 last:pr-0 mb-8">

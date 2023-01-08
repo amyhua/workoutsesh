@@ -44,6 +44,8 @@ const reorder = (list: any[], startIndex: number, endIndex: number) => {
   return result;
 }
 
+const IMAGE_SIZE = 750;
+
 function WorkoutSeshPlayer({
   workout,
   error,
@@ -78,7 +80,6 @@ function WorkoutSeshPlayer({
   const [activeIntervalCounterIsActive, setActiveIntervalCounterIsActive] = useState(false);
   const [seshStarted, setSeshStarted] = useState(false);
   const [pastIntervals, setPastIntervals] = useState<(SeshInterval & { exercise: Exercise })[]>([]);
-  if (pastIntervals && pastIntervals[0] && !pastIntervals[0].exercise) console.log('pastIntervals', pastIntervals)
   // sorted by most recent first
   const [seshCounterIsActive, setSeshCounterIsActive] = useState(seshStarted);
   const [workoutSetNum, setWorkoutSetNum] = useState(1);
@@ -120,7 +121,6 @@ function WorkoutSeshPlayer({
     return fetch(`/api/intervals?exerciseId=${exercise.id}`)
       .then((r: any) => r.json())
       .then((intervals: SeshInterval[]) => {
-        console.log('intervals', intervals);
         if (activeExcLastSavedInterval &&
           activeExcLastSavedInterval.note &&
           intervals[0] &&
@@ -157,13 +157,14 @@ function WorkoutSeshPlayer({
   const router = useRouter();
   const addNoteEl = useRef(null);
   const onStartSesh = useCallback((data: Sesh & { intervals: (SeshInterval & { exercise: Exercise })[] }) => {
+    console.log('onStartSesh', data, exercises);
     setSeshStarted(true);
-    setActiveIntervalCounterIsActive(data ? false : true);
     setSeshCounterIsActive(true);
     setSeshId(data ? data.id : undefined);
     setWorkoutSecondsTotal(data.timeCompletedS);
     setPreExerciseRestS(0);
     setPastIntervals(data.intervals || []);
+    let activeExc = activeExercise;
     if (data.orderedExerciseIds.length) {
       const orderedExercises = exercises.sort(
         (a: Exercise, b: Exercise) => {
@@ -179,14 +180,18 @@ function WorkoutSeshPlayer({
         orderedExercises.findIndex((exc: Exercise) => exc.id === data.orderedExerciseIds[0])
         : 0;
       setActiveExerciseIdx(newActiveExerciseIdx);
-      loadActiveExercisePastActivePeriods(exercises[newActiveExerciseIdx]);
+      activeExc = exercises[newActiveExerciseIdx];
+      setCurrWorkoutSetType(activeExc.isRest ? WorkoutSetType.Rest : WorkoutSetType.Active);
+      loadActiveExercisePastActivePeriods(activeExc);
     }
     // set set# + workout set type, based on last saved intervals, if any
-    const { setNo: newSetNo, active: newIsActiveSet } = getNextIntervalProps(data.intervals);
+    const { setNo: newSetNo, active: newIsActiveSet } = getNextIntervalProps(data.intervals, activeExc);
     setWorkoutSetNum(newSetNo);
     // auto-start rests
     if (!newIsActiveSet) setActiveIntervalCounterIsActive(true);
     setCurrWorkoutSetType(newIsActiveSet ? WorkoutSetType.Active : WorkoutSetType.Rest);
+    console.log('newIsActiveSet', newIsActiveSet)
+    setActiveIntervalCounterIsActive(!newIsActiveSet);
     window.scrollTo(0, 0);
   }, [
     exercises,
@@ -215,7 +220,6 @@ function WorkoutSeshPlayer({
       alert(`Something went wrong. Workout session cannot be saved. ${err.message}`);
     });
   };
-  const isActiveSet = currWorkoutSetType === WorkoutSetType.Active;
   // if (!session) {
   //   if (winReady) router.push(`/signin?error=${'Not logged in'}`);
   // }
@@ -233,6 +237,7 @@ function WorkoutSeshPlayer({
     savedIntervalExc: Exercise = activeExercise,
     activeExc: Exercise = activeExercise
   ) => {
+    if (isUnsavedSesh) return;
     setPastIntervals([
       // save by most recent order
       {
@@ -302,6 +307,7 @@ function WorkoutSeshPlayer({
       if (!loadedNotes) loadActiveExercisePastActivePeriods(newActiveExc);
     };
     if (activeIntervalCounterIsActive) {
+      // TODO: increment rest exercises
       saveCurrentInterval({
         seshId: seshId,
         exerciseId: activeExercise.id,
@@ -402,9 +408,11 @@ function WorkoutSeshPlayer({
   }
 
   const shareLink = !winReady ? '' : `${window.location.host}/w/${workout.slug}`;
-  
+
+  const isActiveSet = !activeExercise.isRest && currWorkoutSetType === WorkoutSetType.Active;
+
   return (
-    <Layout title="Workout Sesh" background="#9ca3a5">
+    <Layout title="Workout Sesh" background="#000000">
       {
         notScrolledToTop &&
         seshStarted &&
@@ -422,12 +430,12 @@ function WorkoutSeshPlayer({
           "h-[100vh]": seshStarted,
         }
       )}>
-        <div className="max-w-md relative mx-auto">
+        <div className="max-w-7xl relative mx-auto lg:flex lg:min-h-full">
           <div className={classnames(
-            "transition-all",
+            "transition-all flex-2",
             {
               "bg-transparent": !seshStarted,
-              "text-white bg-gradient-to-b from-active1 to-active2": seshStarted && isActiveSet,
+              "text-white bg-gradient-to-b from-active1 to-active2 lg:bg-black lg:bg-none": seshStarted && isActiveSet,
               "text-white bg-gradient-to-b from-rest1 to-rest2": seshStarted && !isActiveSet,
               "flex flex-col": seshStarted,
             }
@@ -473,19 +481,19 @@ function WorkoutSeshPlayer({
             }
             <div
               className={classNames(
-                "text-center flex items-center md:min-h-[calc(100% - 32px)] max-w-xl",
+                "text-center flex items-center lg:min-h-[calc(100% - 32px)] m-0 p-0",
                 {
                   "hidden": !seshStarted
                 }
               )}
             >
               <div className={classnames(
-                "mt-0 w-full flex flex-col justify-center",
+                "w-full",
                 {
                   "opacity-25": !isActiveSet,
                 }
               )} style={{
-                minHeight: '350px'
+                minHeight: '350px',
               }}>
                 <div>
                   {
@@ -494,10 +502,10 @@ function WorkoutSeshPlayer({
                       src={activeExercise.imageUrl}
                       alt="Active Exercise"
                       priority
-                      height={500}
-                      width={500}
+                      height={IMAGE_SIZE}
+                      width={IMAGE_SIZE}
                       placeholder={require('./routine-placeholder.png')}
-                      className="w-full text-center inline-block"
+                      className="w-full inline-block"
                     />
                     :
                     activeExercise.imageUrl ?
@@ -509,7 +517,7 @@ function WorkoutSeshPlayer({
                       src={activeExercise.imageUrl}
                     />
                     :
-                    <h1 className="text-white text-3xl">
+                    <h1 className={`text-white text-3xl min-w-[${IMAGE_SIZE}px] h-[350px] flex items-center justify-center`}>
                       {activeExercise.name}
                     </h1>
                   }
@@ -562,47 +570,49 @@ function WorkoutSeshPlayer({
                                   className="animate-ping rounded-full h-5 w-5 ml-0.5 bg-brightGreen inline-block align-middle absolute left-0 top-1"
                                 />
                               }
-                              {activeExercise.name}
+                              {activeExercise.name} {
+                                activeExercise.isRest ?
+                                <span className="font-light">
+                                  {
+                                    activeExercise.timeLimitS ?
+                                    <DurationText durationM={moment.duration(activeExercise.timeLimitS, 'seconds')} />
+                                    : 'Until Ready'
+                                  }
+                                </span>
+                                : null
+                              }
                             </Clamped>
                           </div>
                         </>
                       ) : 
                       <div className="flex">
-                        <div className="text-2xl font-bold align-top">
+                        <div className="text-2xl font-bold flex items-center">
                           <BoltSlashIcon className={classNames(
-                            "inline-block h-5 -mt-0.5 mr-1",
+                            "inline-block h-5 -mt-0.5 mr-1 text-xl",
                             {
                               "text-gray-400": !activeIntervalCounterIsActive,
                               "animate-pulse text-blue-300": activeIntervalCounterIsActive,
                             }
                           )} /> Rest
-                          <span className="font-light text-base ml-2 mr-2 inline-block align-middle">
+                          <span className="font-light text-2xl ml-2 mr-2">
                             {
                               !activeExercise.isRest &&
                               activeExercise.betweenSetsRestTimeLimitS ?
                               <>
-                                <span className="text-xl mr-1">
-                                  <span className="opacity-60">for</span> <DurationText
+                                <span className="mr-1">
+                                  <DurationText
                                     durationM={moment.duration(activeExercise.betweenSetsRestTimeLimitS, 'seconds')}
                                   />
                                 </span>
-                                <RestCounterBadge
-                                  timerS={activeIntervalSecondsTotal}
-                                  timeLimitS={activeExercise.betweenSetsRestTimeLimitS}
-                                />
                               </>
                               :
                               (activeExercise.isRest && activeExercise.timeLimitS) ?
                               <>
-                                <span className="text-xl mr-1">
-                                  <span className="opacity-60">for</span> <DurationText
+                                <span className="mr-1">
+                                  <DurationText
                                     durationM={moment.duration(activeExercise.timeLimitS, 'seconds')}
                                   />
                                 </span>
-                                <RestCounterBadge
-                                  timerS={activeIntervalSecondsTotal}
-                                  timeLimitS={activeExercise.timeLimitS}
-                                />
                               </>
                               :
                               <>
@@ -670,25 +680,42 @@ function WorkoutSeshPlayer({
                     activeIntervalCounterIsActive ?
                     <div className="text-lg">
                       {
-                        activeExercise.setsDescription &&
+                        isActiveSet ?
                         <div className="mr-2">
                           <span className="opacity-50 mr-1.5">Set</span>
                           <span className="font-semibold mr-1">{workoutSetNum}</span>
-                          <span className="opacity-50 mr-1.5">out of</span>
-                          <span className="font-semibold">{activeExercise.setsDescription}</span>
+                          {
+                            activeExercise.setsDescription &&
+                            <>
+                              <span className="opacity-50 mr-1.5">out of</span>
+                              <span className="font-semibold">{activeExercise.setsDescription}</span>
+                            </>
+                          }
+                        </div>
+                        :
+                        <div>
+                          {
+                            activeExercise.betweenSetsRestTimeLimitS || activeExercise.timeLimitS ?
+                            <RestCounterBadge
+                              timerS={activeIntervalSecondsTotal}
+                              timeLimitS={activeExercise.betweenSetsRestTimeLimitS || activeExercise.timeLimitS || 0}
+                            />
+                            :
+                            'Until Ready for Next'
+                          }
                         </div>
                       }
                     </div>
                     :
-                    <div className="my-1">
+                    <div className="my-1 text-lg sm:text-xl flex items-center">
                       <SeshCounter
                         active={!activeIntervalCounterIsActive}
                         seshStarted={true}
-                        className="inline-block font-semibold text-lg min-w-[40px] w-[40px]"
+                        className="block font-semibold min-w-[40px] mr-1"
                         secondsTotal={preExerciseRestS}
                         setSecondsTotal={setPreExerciseRestS}
                       />
-                      <span className="inline-block ml-4 opacity-60 align-top mt-[1px]">
+                      <span className="block ml-4 opacity-60 -mt-[3px]">
                         Pre-Exercise Rest
                       </span>
                     </div>
@@ -706,13 +733,13 @@ function WorkoutSeshPlayer({
               </div>
               {
                 activeExerciseActiveNotedPeriodsByMostRecent[0] &&
-                <div className="mx-5 text-base flex mb-2">
+                <div className="mx-4 text-base flex mb-2">
                   <div className="flex-1 max-h-[120px] overflow-y-auto">
                     <div className="flex pt-2">
-                      <div>
+                      <div className="text-right">
                         <ChatBubbleLeftIcon className="h-5 mr-3 ml-1 inline-block" />
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <IntervalNote
                           className="mr-2"
                           interval={activeExerciseActiveNotedPeriodsByMostRecent[0]}
@@ -865,7 +892,7 @@ function WorkoutSeshPlayer({
                                       }
                                       <div className="pl-4 text-xl flex-1 align-middle flex flex-col justify-center">
                                         {
-                                          activeExercise.isRest && isLastExercise ?
+                                          isLastExercise ?
                                           <span className="tracking-normal text-base leading-tight font-semibold">Finish workout!</span>
                                           :
                                           <>
@@ -876,7 +903,7 @@ function WorkoutSeshPlayer({
                                               "tracking-normal w-full pr-3 overflow-hidden text-white",
                                               {
                                                 "text-xl": !activeExercise.isRest,
-                                                "text-base": activeExercise.isRest,
+                                                "text-lg": activeExercise.isRest,
                                               }
                                             )}>
                                               <Clamped clamp={1}>
@@ -954,7 +981,7 @@ function WorkoutSeshPlayer({
             </div>
           </div>
           <section className={classNames(
-            "px-2 z-50 transition-all overflow-auto",
+            "flex-1 lg:py-4 px-2 z-50 transition-all overflow-auto",
             {
               "bg-active2": seshStarted && isActiveSet,
               "bg-[#353e94]": seshStarted && !isActiveSet,
@@ -1089,7 +1116,7 @@ function WorkoutSeshPlayer({
                     <span className="text-white/60 mr-2">Total Workout Time</span>
                   </div>
                 }
-                <div className="mx-2 mt-6">
+                <div className="mx-2 mt-6 mb-10">
                   <button
                       onClick={seshStarted ? finishWorkout : startSesh}
                       className={classNames(

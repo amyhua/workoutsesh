@@ -7,7 +7,6 @@ const withSeshHistoryExercises = (Component: React.FC<any>) => {
     const [lastSavedInterval, setLastSavedInterval] = useState<any>();
     const saveCurrentInterval = (interval: SeshInterval) => {
       const promises = [];
-      let restNote: string | undefined = '';
       if (!interval.active && interval.note) {
         // if note added during a rest period, then
         if (

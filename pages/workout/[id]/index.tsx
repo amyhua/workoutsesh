@@ -4,13 +4,11 @@ import WorkoutPlayer from '../../../components/WorkoutPlayer'
 function WorkoutIdPage({
   workout,
   error,
-  saveCurrentInterval,
 }: any) {
   return (
     <WorkoutPlayer
       workout={workout}
       error={error}
-      saveCurrentInterval={saveCurrentInterval}
     />
   );
 }

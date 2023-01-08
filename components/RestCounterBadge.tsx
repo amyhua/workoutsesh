@@ -18,13 +18,13 @@ const RestCounterBadge = ({
     :
     timerS > timeLimitS ?
     <span className={classNames(
-      "text-red-300 font-bold text-xl ml-1",
+      "text-white font-bold text-xl ml-1",
       className
     )}>
-      <ExclamationTriangleIcon className="inline-block h-6 text-yellow-300" />
+      <ExclamationTriangleIcon className="inline-block h-6 text-yellow-400 mr-1 -mt-[1px]" />
       <DurationText short={true}
           durationM={moment.duration(timerS - timeLimitS, 'seconds')}
-        /> over!
+        /> <span className="text-red-300">over!</span>
     </span>
     :
     <span className={classNames(

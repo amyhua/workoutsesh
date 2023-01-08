@@ -44,7 +44,7 @@ const ActiveSesh = ({
             }}
             className="group/play cursor-pointer flex-1 flex">
             <div>
-              <PlayCircleIcon className="-ml-1 h-14 mt-0.5 mr-2 group-hover/play:text-green-500 text-white" />
+              <PlayCircleIcon className="-ml-1 h-14 mt-0.5 mr-2 group-hover/play:text-brightGreen text-white" />
             </div>
             <div className="flex-1 pt-2">
               <span className="mr-1 font-bold">
@@ -52,17 +52,20 @@ const ActiveSesh = ({
                   moment(time).format('h:mma - [Today]')
                   : moment(time).format('h:mma - ddd MMM D')}
               </span>
-              <div className="text-gray-500 text-xs">
-                <span className="inline-block mr-2">
+              <div className="text-white/50 text-xs">
+                <span className="inline-block mr-3">
                   Duration: <DurationText durationM={durationM} />
                 </span>
-                <div>
+                <span>
                   {
                     sesh.pausedAt ?
                       'Paused ' + moment(sesh.pausedAt).fromNow() :
                       'Started ' + moment(sesh.createdAt).fromNow()
                   }
-                </div>
+                </span>
+              </div>
+              <div className="text-white/50 text-xs">
+                {sesh.orderedExerciseIds.length} exercise{sesh.orderedExerciseIds.length === 1 ? '' : 's'} left
               </div>
             </div>
           </div>
@@ -96,7 +99,7 @@ const ActiveSeshes = ({
       <h2 className="text-left text-2xl mb-3 font-bold">
           Resume a Workout
         </h2>
-      <div className="py-5 px-4 bg-black/20 text-white rounded-xl mb-0"
+      <div className="py-5 px-4 bg-white/5 text-white rounded-xl mb-0"
       >
         {
           seshes.map((sesh: SeshDto, i) => (
