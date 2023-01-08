@@ -29,7 +29,7 @@ function SeshExerciseSummary({
         <div
           onClick={onSelect}
           className="flex group cursor-pointer">
-          <h3 className="flex-1 font-bold text-xl mb-1 mr-2">
+          <h3 className="flex-1 font-bold text-xl mb-1 mr-4">
             {exerciseName}
           </h3>
           <div>

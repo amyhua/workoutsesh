@@ -432,7 +432,7 @@ function WorkoutSeshPlayer({
       )}>
         <div className="max-w-7xl relative mx-auto lg:flex lg:min-h-full">
           <div className={classnames(
-            "transition-all flex-2 relative",
+            "transition-all flex-2 relative lg:h-[100vh]",
             {
               "bg-transparent": !seshStarted,
               "text-white bg-gradient-to-b from-active1 to-active2 lg:bg-black lg:bg-none": seshStarted && isActiveSet,
@@ -450,7 +450,7 @@ function WorkoutSeshPlayer({
             }
             {
               !seshStarted &&
-              <header className="pt-8 text-left mx-2 text-white">
+              <header className="pt-4 sm:mx-5 text-left mx-2 text-white">
                 <Link href="/" className="block my-3 text-white/40 hover:text-white cursor-pointer">
                   <ArrowLeftIcon className="h-4 inline-block" /> Workouts
                 </Link>
@@ -481,53 +481,48 @@ function WorkoutSeshPlayer({
             }
             <div
               className={classNames(
-                "text-center flex items-center min-h-[350px] lg:min-h-[calc(100vh - 42px)] m-0 p-0",
+                "text-center flex items-center min-h-[350px] m-0 p-0",
                 {
                   "hidden": !seshStarted
                 }
               )}
             >
               <div className={classnames(
-                "w-full min-h-[350px] lg:min-h-[600px] lg:min-w-[600px] lg:flex lg:items-center justify-center transition-opacity duration-300",
+                "w-full bg-white min-h-[350px] h-full overflow-hidden lg:min-w-[600px] lg:flex lg:items-center justify-center transition-opacity duration-300",
                 {
                   "opacity-25": !isActiveSet,
                 }
               )}>
-                <div>
-                  {
-                    activeExercise.imageUrl && String(activeExercise.imageUrl).match(/\.(jpeg|jpg|gif|png)$|data/) ?
-                    <Image
-                      src={activeExercise.imageUrl}
-                      alt="Active Exercise"
-                      priority
-                      height={IMAGE_SIZE}
-                      width={IMAGE_SIZE}
-                      placeholder={require('./routine-placeholder.png')}
-                      className="w-full inline-block"
-                    />
-                    :
-                    activeExercise.imageUrl ?
-                    <video
-                      autoPlay={true}
-                      playsInline={true}
-                      loop
-                      muted
-                      src={activeExercise.imageUrl}
-                    />
-                    :
-                    <h1 className={`text-white text-3xl min-w-[${IMAGE_SIZE}px] h-[350px] flex items-center justify-center`}>
-                      {activeExercise.name}
-                    </h1>
-                  }
-                  <div className={classNames(
-                    "relative flex ease-linear items-center bg-white overflow-hidden w-full",
-                  )}>
-                  </div>
-                </div>
+                {
+                  activeExercise.imageUrl && String(activeExercise.imageUrl).match(/\.(jpeg|jpg|gif|png)$|data/) ?
+                  <Image
+                    src={activeExercise.imageUrl}
+                    alt="Active Exercise"
+                    priority
+                    height={IMAGE_SIZE}
+                    width={IMAGE_SIZE}
+                    placeholder={require('./routine-placeholder.png')}
+                    className="w-full inline-block"
+                  />
+                  :
+                  activeExercise.imageUrl ?
+                  <video
+                    className="w-auto h-full"
+                    autoPlay={true}
+                    playsInline={true}
+                    loop
+                    muted
+                    src={activeExercise.imageUrl}
+                  />
+                  :
+                  <h1 className={`text-white text-3xl min-w-[${IMAGE_SIZE}px] h-[350px] flex items-center justify-center`}>
+                    {activeExercise.name}
+                  </h1>
+                }
               </div>
             </div>
             <div className={classNames(
-              "transition-all lg:absolute lg:left-0 lg:bottom-0 lg:right-0",
+              "transition-all",
               {
                 "bg-restBg": seshStarted && !isActiveSet,
                 "bg-black": seshStarted && isActiveSet,
@@ -980,7 +975,7 @@ function WorkoutSeshPlayer({
             </div>
           </div>
           <section className={classNames(
-            "flex-1 lg:p-4 lg:max-h-[100vh] lg:overflow-auto px-2 z-50 transition-all overflow-auto",
+            "flex-1 lg:min-w-[500px] lg:p-4 lg:max-h-[100vh] lg:overflow-auto px-2 z-50 transition-all overflow-auto",
             {
               "bg-active2": seshStarted && isActiveSet,
               "bg-restBg": seshStarted && !isActiveSet,

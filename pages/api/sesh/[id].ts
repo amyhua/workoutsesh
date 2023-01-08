@@ -107,6 +107,7 @@ async function seshRoute(req: NextApiRequest, res: NextApiResponse<any>) {
                 finishedAt: now,
                 timeCompletedS: Number(req.query.duration),
                 pausedAt: now,
+                orderedExerciseIds: [],
               },
             });
             const workout = await prisma.workout.findFirstOrThrow({

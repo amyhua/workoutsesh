@@ -28,10 +28,9 @@ function SeshHistoryContainer({
   const activePeriodsTotalDur = activePeriods.reduce((sum: number, int: SeshInterval) => sum + int.durationS, 0);
   const restPeriodsTotalDur = restPeriods.reduce((sum: number, int: SeshInterval) => sum + int.durationS, 0);
   const activePeriodDurationAvg = activePeriodsTotalDur / activePeriods.length;
-  const activePeriodDurationAvgM = moment.duration(activePeriodDurationAvg, 'seconds');
+  const activePeriodDurationAvgM = moment.duration(Number(activePeriodDurationAvg.toFixed(1)), 'seconds');
   const restPeriodDurationAvg = restPeriodsTotalDur / restPeriods.length;
-  const restPeriodDurationAvgM = moment.duration(restPeriodDurationAvg, 'seconds');
-  const [lastShownRowIdx, setLastShownRowIdx] = useState(4);
+  const restPeriodDurationAvgM = moment.duration(Number(restPeriodDurationAvg.toFixed(1)), 'seconds');
   const [filterExerciseName, setFilterExerciseName] = useState<string>();
   const exerciseHeaderCount: any = {};
   const intervalsByExerciseName: any = {};
@@ -83,19 +82,21 @@ function SeshHistoryContainer({
         {
           isSeshPage &&
           <h1 className="text-4xl font-bold">
-            Great Job!
+            👍👍👍 Great Job!!
           </h1>
         }
         {
           isSeshPage &&
-          <h2 className={classNames(
-            "tracking-wide",
-            {
-              "mt-5": isSeshPage,
-            }
-          )}>
-            <div className="font-bold text-2xl">Summary</div>
-          </h2>
+          <>
+            <h2 className={classNames(
+              "tracking-wide",
+              {
+                "mt-5": isSeshPage,
+              }
+            )}>
+              <div className="font-bold text-2xl">You did it!</div>
+            </h2>
+          </>
         }
         {/* overall stats */}
         <div>
@@ -164,7 +165,7 @@ function SeshHistoryContainer({
         }
         </div>
         {
-          !isSeshPage && activePeriods.length ?
+          activePeriods.length ?
           <>
             <h2 className="font-bold text-xl mb-3 mt-0 flex items-center">
               Completed Sets {
@@ -179,7 +180,12 @@ function SeshHistoryContainer({
                 </span>
               }
             </h2>
-            <div className="max-h-[400px] overflow-auto">
+            <div className={classNames(
+              "overflow-auto",
+              {
+                "max-h-[400px]": !isSeshPage,
+              }
+            )}>
               {
                 intervals
                 .filter((int: any) =>

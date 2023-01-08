@@ -124,42 +124,38 @@ export default function IndexDashboard({
             </div>
           }
         </div>
-        <div className="mt-10 max-w-sm">
-          <section className="pt-0">
-            <div>
-              <article className="sm:pr-5 last:pr-0 mb-8">
-                <div className="text-3xl font-semibold text-white inline-block">
-                  {totalSeshes.toLocaleString()}
-                </div>
-                <div className="text-lg text-white/60 mt-2">
-                  total completed workouts
-                </div>
-              </article>
-              <div className="flex">
-                <article className="flex-1 sm:pr-5 last:pr-0">
-                  <div className="text-3xl font-semibold text-white inline-block">
-                    {totalSeshesThisWeek.toLocaleString()}
-                  </div>
-                  <div className="text-lg text-white/60 mt-2">
-                    this week
-                  </div>
-                </article>
-                <article className="flex-1 sm:pr-5 last:pr-0">
-                  <div className="text-3xl font-semibold text-white inline-block">
-                    {totalSeshesThisMonth.toLocaleString()}
-                  </div>
-                  <div className="text-lg text-white/60 mt-2">
-                    this month
-                  </div>
-                </article>
-              </div>
+        <div className="mt-10 max-w-3xl mx-auto">
+          <article className="sm:pr-5 last:pr-0 mb-8">
+            <div className="text-3xl font-semibold text-white inline-block">
+              {totalSeshes.toLocaleString()}
             </div>
-          </section>
+            <div className="text-lg text-white/60 mt-2">
+              total completed workouts
+            </div>
+          </article>
+          <div className="flex">
+            <article className="flex-1 sm:pr-5 last:pr-0">
+              <div className="text-3xl font-semibold text-white inline-block">
+                {totalSeshesThisWeek.toLocaleString()}
+              </div>
+              <div className="text-lg text-white/60 mt-2">
+                this week
+              </div>
+            </article>
+            <article className="flex-1 sm:pr-5 last:pr-0">
+              <div className="text-3xl font-semibold text-white inline-block">
+                {totalSeshesThisMonth.toLocaleString()}
+              </div>
+              <div className="text-lg text-white/60 mt-2">
+                this month
+              </div>
+            </article>
+          </div>
         </div>
         <section className="max-w-3xl mx-auto">
           <header className="mt-16 sm:mt-10 flex">
             <div className="flex-1 -mt-3 text-right">
-              <Link href={`/workout/create`} className="bg-white inline-block text-center text-lg cursor-pointer font-bold ml-2 px-3 py-2 rounded-md text-black">
+              <Link href={`/workout/create`} className="bg-transparent text-white inline-block text-center text-base cursor-pointer ml-2 px-4 py-2 rounded-md border border-white/30">
                 + New Workout
               </Link>
             </div>
@@ -171,7 +167,7 @@ export default function IndexDashboard({
                 workouts.map((workout: any, i: number) => (
                   <li
                     key={i}
-                    className="bg-white text-black shadow-xl rounded-lg my-5">
+                    className="bg-white/10 text-white shadow-xl rounded-lg my-5">
                     <article
                       className="group cursor-pointer px-3 pt-5 sm:pb-8 pb-3"
                       onClick={onStartWorkout && onStartWorkout(workout)}>
@@ -185,7 +181,7 @@ export default function IndexDashboard({
                         <div className="font-normal text-base my-2">
                           {workout.description}
                         </div>
-                        <div className="mt-1 text-sm text-black/60">
+                        <div className="mt-1 text-sm text-white">
                           {
                             workout.seshes.length ?
                             <>
@@ -213,8 +209,8 @@ export default function IndexDashboard({
                           }
                         </div>
                         <div className="flex sm:flex-row flex-col">
-                          <div className="text-sm mt-4 text-gray-500">
-                            {getShownExercises(workout.exercises).map((exc: Exercise, i: number) => (
+                          <div className="text-sm mt-4 text-white/70">
+                            <strong>Exercises:</strong> {getShownExercises(workout.exercises).map((exc: Exercise, i: number) => (
                               // <span key={i} className="inline-block mr-2 mb-2 text-xs py-1 px-2 rounded-xl bg-gray-100 text-black border">
                               //   {exc.name}
                               // </span>
@@ -224,7 +220,7 @@ export default function IndexDashboard({
                               }</span>
                             ))}
                           </div>
-                          <div onClick={e => e.stopPropagation()} className="pl-0.5 text-left text-gray-500 hover:text-black cursor-pointer">
+                          <div onClick={e => e.stopPropagation()} className="sm:flex-1 sm:text-right sm:mr-2 pl-0.5 sm:my-2 text-left text-white cursor-pointer">
                             <MoreMenu workoutId={workout.id} />
                           </div>
                         </div>
