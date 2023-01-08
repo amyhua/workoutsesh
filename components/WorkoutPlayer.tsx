@@ -481,14 +481,14 @@ function WorkoutSeshPlayer({
             }
             <div
               className={classNames(
-                "text-center flex items-center min-h-[350px] m-0 p-0",
+                "text-center flex items-center min-h-[320px] m-0 p-0",
                 {
                   "hidden": !seshStarted
                 }
               )}
             >
               <div className={classnames(
-                "w-full bg-white min-h-[350px] h-full overflow-hidden lg:min-w-[600px] lg:flex lg:items-center justify-center transition-opacity duration-300",
+                "w-full bg-white min-h-[320px] h-full overflow-hidden lg:min-w-[600px] lg:flex lg:items-center justify-center transition-opacity duration-300",
                 {
                   "opacity-25": !isActiveSet,
                 }
@@ -1004,7 +1004,7 @@ function WorkoutSeshPlayer({
                         "opacity-60": activeBottomTab !== BottomTab.Exercises,
                       }
                     )}>
-                    Next <span className="text-white/60 font-normal">({exercises.length - activeExerciseIdx - 1})</span>
+                    Upcoming <span className="text-white/60 font-normal">({exercises.length - activeExerciseIdx - 1})</span>
                   </span>
                   <span
                     onClick={() => setActiveBottomTab(BottomTab.History)}
@@ -1014,7 +1014,7 @@ function WorkoutSeshPlayer({
                         "opacity-60": activeBottomTab !== BottomTab.History,
                       }
                     )}>
-                    Past
+                    Summary
                   </span>
                   <div className="flex-1 text-right mr-2">
                     <span className="font-normal text-white/60 mr-1 align-middle">
