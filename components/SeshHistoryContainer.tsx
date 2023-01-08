@@ -167,7 +167,7 @@ function SeshHistoryContainer({
           !isSeshPage && activePeriods.length ?
           <>
             <h2 className="font-bold text-xl mb-3 mt-0 flex items-center">
-              Completed Intervals {
+              Completed Sets {
                 filterExerciseName &&
                 <span
                   onClick={() => setFilterExerciseName('')}
@@ -189,25 +189,30 @@ function SeshHistoryContainer({
                 .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                 .map((int: any, i: number) => (
                   <article className={classNames(
-                    "flex text-base bg-white/10 py-3 px-3 rounded-sm mb-2",
+                    "text-base bg-white/10 py-3 px-3 rounded-sm mb-2 min-w-[400px]",
                   )} key={i}>
                     <div className="flex items-center">
-                      <span className="inline-block min-w-[100px] text-white/40 pr-2">
-                        {moment(int.createdAt).format('M/D h:mm:ss')}
-                      </span>
-                      <span className="w-[200px] overflow-hidden text-ellipsis inline-block whitespace-nowrap">{int.exercise.name}</span>
-                      <span className="mr-4">
+                      <div className="hidden md:inline-block min-w-[100px] text-white/40 pr-2">
+                        {moment(int.createdAt).format('M/D/YYYY H:mm:ss')}
+                      </div>
+                      <div className="inline-block md:hidden text-white/40 pr-2">
+                        {moment(int.createdAt).format('H:mm:ss')}
+                      </div>
+                      <div className="ml-3 flex-1 overflow-hidden text-ellipsis inline-block whitespace-nowrap">
+                        {int.exercise.name}
+                      </div>
+                      <div className="mr-4">
                         Set {int.setNo}
-                      </span>
-                      <span className="mr-4">
+                      </div>
+                      <div className="mr-4">
                         {
                           int.active ?
                           <BoltIcon className="-mt-1 h-4 inline-block text-brightGreen" />
                           :
                           <BoltSlashIcon className="-mt-1 h-4 inline-block text-white/40" />
                         }
-                      </span>
-                      <span className="mr-4">{getShortDurationFormat(moment.duration(int.durationS, 'seconds'))}</span>
+                      </div>
+                      <div className="mr-4">{getShortDurationFormat(moment.duration(int.durationS, 'seconds'))}</div>
                       {
                         int.note &&
                         <div className="ml-[28px] text-yellow-100 italic">

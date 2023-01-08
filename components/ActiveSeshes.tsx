@@ -99,7 +99,7 @@ const ActiveSeshes = ({
       <h2 className="text-left text-2xl mb-3 font-bold">
           Resume a Workout
         </h2>
-      <div className="py-5 px-4 bg-white/5 text-white rounded-xl mb-0"
+      <div className="py-5 px-4 bg-white/5 text-white rounded-xl mb-3"
       >
         {
           seshes.map((sesh: SeshDto, i) => (

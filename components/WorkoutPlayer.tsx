@@ -8,7 +8,7 @@ import WorkoutRoutine from './WorkoutRoutine'
 import { resetServerContext, DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import Clamped from './Clamped'
 import classNames from 'classnames'
-import { ArrowUpIcon, BackwardIcon, BoltIcon, BoltSlashIcon, ChatBubbleLeftIcon, CheckIcon, ChevronDownIcon, ClockIcon, ForwardIcon, PlayCircleIcon, PlayIcon, ShareIcon, StopIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftIcon, ArrowUpIcon, BackwardIcon, BoltIcon, BoltSlashIcon, ChatBubbleLeftIcon, CheckIcon, ChevronDownIcon, ClockIcon, ForwardIcon, PlayCircleIcon, PlayIcon, ShareIcon, StopIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import withSeshHistoryExercises from './withSeshHistoryExercises'
 import ActiveSeshes from './ActiveSeshes'
@@ -358,7 +358,7 @@ function WorkoutSeshPlayer({
     ] : reorderedExercises)
   }
   const handleScroll = () => {
-    setNotScrolledToTop(window.pageYOffset !== 0);
+    setNotScrolledToTop(window.pageYOffset > window.innerHeight * 0.3);
   };
   useEffect(() => {
     setWinReady(true);
@@ -432,11 +432,11 @@ function WorkoutSeshPlayer({
       )}>
         <div className="max-w-7xl relative mx-auto lg:flex lg:min-h-full">
           <div className={classnames(
-            "transition-all flex-2",
+            "transition-all flex-2 relative",
             {
               "bg-transparent": !seshStarted,
               "text-white bg-gradient-to-b from-active1 to-active2 lg:bg-black lg:bg-none": seshStarted && isActiveSet,
-              "text-white bg-gradient-to-b from-rest1 to-rest2": seshStarted && !isActiveSet,
+              "text-white bg-restBg": seshStarted && !isActiveSet,
               "flex flex-col": seshStarted,
             }
           )}>
@@ -451,11 +451,11 @@ function WorkoutSeshPlayer({
             {
               !seshStarted &&
               <header className="pt-8 text-left mx-2 text-white">
-                <div className="text-3xl">
-                  🤾‍♀️
-                </div>
+                <Link href="/" className="block my-3 text-white/40 hover:text-white cursor-pointer">
+                  <ArrowLeftIcon className="h-4 inline-block" /> Workouts
+                </Link>
                 <h1 className="text-3xl mb-5 font-bold">
-                  {workout.name}
+                  💪 {workout.name}
                 </h1>
                 {
                   winReady &&
@@ -481,20 +481,18 @@ function WorkoutSeshPlayer({
             }
             <div
               className={classNames(
-                "text-center flex items-center lg:min-h-[calc(100% - 32px)] m-0 p-0",
+                "text-center flex items-center min-h-[350px] lg:min-h-[calc(100vh - 42px)] m-0 p-0",
                 {
                   "hidden": !seshStarted
                 }
               )}
             >
               <div className={classnames(
-                "w-full",
+                "w-full min-h-[350px] lg:min-h-[600px] lg:min-w-[600px] lg:flex lg:items-center justify-center transition-opacity duration-300",
                 {
                   "opacity-25": !isActiveSet,
                 }
-              )} style={{
-                minHeight: '350px',
-              }}>
+              )}>
                 <div>
                   {
                     activeExercise.imageUrl && String(activeExercise.imageUrl).match(/\.(jpeg|jpg|gif|png)$|data/) ?
@@ -529,9 +527,10 @@ function WorkoutSeshPlayer({
               </div>
             </div>
             <div className={classNames(
+              "transition-all lg:absolute lg:left-0 lg:bottom-0 lg:right-0",
               {
-                "bg-gradient-to-b from-transparent via-active2 to-active2": seshStarted && isActiveSet,
-                "bg-gradient-to-b from-transparent via-[#353e94] to-[#353e94]": seshStarted && !isActiveSet,
+                "bg-restBg": seshStarted && !isActiveSet,
+                "bg-black": seshStarted && isActiveSet,
                 // "absolute bottom-0": seshStarted,
                 "hidden": !seshStarted,
               }
@@ -596,24 +595,24 @@ function WorkoutSeshPlayer({
                           )} /> Rest
                           <span className="font-light text-2xl ml-2 mr-2">
                             {
-                              !activeExercise.isRest &&
-                              activeExercise.betweenSetsRestTimeLimitS ?
-                              <>
+                              !activeExercise.isRest ?
+                                activeExercise.betweenSetsRestTimeLimitS ?
                                 <span className="mr-1">
                                   <DurationText
                                     durationM={moment.duration(activeExercise.betweenSetsRestTimeLimitS, 'seconds')}
                                   />
                                 </span>
-                              </>
+                                :
+                                <span className="text-white/60">
+                                  from Set {workoutSetNum} — {activeExercise.name}
+                                </span>
                               :
                               (activeExercise.isRest && activeExercise.timeLimitS) ?
-                              <>
-                                <span className="mr-1">
-                                  <DurationText
-                                    durationM={moment.duration(activeExercise.timeLimitS, 'seconds')}
-                                  />
-                                </span>
-                              </>
+                              <span className="mr-1">
+                                <DurationText
+                                  durationM={moment.duration(activeExercise.timeLimitS, 'seconds')}
+                                />
+                              </span>
                               :
                               <>
                                 {/* <span className="opacity-60 mr-1">Next:</span> Set #{workoutSetNum + 1} */}
@@ -810,7 +809,7 @@ function WorkoutSeshPlayer({
                   }
                 )}>
                   <div className={classNames(
-                    "flex h-auto",
+                    "flex h-auto pb-2",
                     {
                       "text-white": seshStarted,
                     }
@@ -981,10 +980,10 @@ function WorkoutSeshPlayer({
             </div>
           </div>
           <section className={classNames(
-            "flex-1 lg:py-4 px-2 z-50 transition-all overflow-auto",
+            "flex-1 lg:p-4 lg:max-h-[100vh] lg:overflow-auto px-2 z-50 transition-all overflow-auto",
             {
               "bg-active2": seshStarted && isActiveSet,
-              "bg-[#353e94]": seshStarted && !isActiveSet,
+              "bg-restBg": seshStarted && !isActiveSet,
             },
             {
               // "top-[55px] min-h-[100vh]": expanded,
@@ -999,8 +998,8 @@ function WorkoutSeshPlayer({
                   Exercises <span className="text-white/60 font-normal">({exercises.length})</span>
                 </h2>
                 :
-                <h2 className={classNames(
-                  "text-white font-semibold text-lg mb-0.5 flex",
+                <header className={classNames(
+                  "text-white font-semibold text-lg mb-0.5 flex items-center",
                 )}>
                   <span
                     onClick={() => setActiveBottomTab(BottomTab.Exercises)}
@@ -1010,7 +1009,7 @@ function WorkoutSeshPlayer({
                         "opacity-60": activeBottomTab !== BottomTab.Exercises,
                       }
                     )}>
-                    Upcoming <span className="text-white/60 font-normal">({exercises.length - activeExerciseIdx - 1})</span>
+                    Next <span className="text-white/60 font-normal">({exercises.length - activeExerciseIdx - 1})</span>
                   </span>
                   <span
                     onClick={() => setActiveBottomTab(BottomTab.History)}
@@ -1033,7 +1032,7 @@ function WorkoutSeshPlayer({
                       setSecondsTotal={setWorkoutSecondsTotal}
                     />
                   </div>
-                </h2>
+                </header>
               }
               <div className={classNames(
                 "overflow-hidden",
@@ -1137,14 +1136,6 @@ function WorkoutSeshPlayer({
                     </button>
                 </div>
               </div>
-              {
-                !seshStarted &&
-                <Link
-                  href="/"
-                  className="block py-4 text-lg text-center text-white/60 cursor-pointer">
-                  Cancel
-                </Link>
-              }
             </div>
           </section>
         </div>

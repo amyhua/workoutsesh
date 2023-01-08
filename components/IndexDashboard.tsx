@@ -177,22 +177,25 @@ export default function IndexDashboard({
                       onClick={onStartWorkout && onStartWorkout(workout)}>
                       <PlayCircleIcon className="inline-block h-14 align-middle -ml-1 group-hover:text-green-500" />
                       <h3 className="flex font-bold text-2xl">
-                        <div className="mt-2 flex-1 ml-2 mb-2">
+                        <div className="mt-2 flex-1 ml-2">
                           {workout.name}
                         </div>
                       </h3>
-                      <div className="ml-2 mt-2">
-                        <div className="mb-3">
+                      <div className="ml-2">
+                        <div className="font-normal text-base my-2">
+                          {workout.description}
+                        </div>
+                        <div className="mt-1 text-sm text-black/60">
                           {
                             workout.seshes.length ?
                             <>
-                              <strong className="font-bold">{workout.seshes.length}</strong> seshes total
+                              {workout.seshes.length} seshes total
                             </> :
                             <span className="text-green-600 font-semibold">New!</span>
                           }
                           {
                             workout.seshes.length ?
-                            <div className="text-sm text-black mt-1">
+                            <div>
                               <div className="font-normal">
                                 <div>
                                   {
@@ -208,39 +211,20 @@ export default function IndexDashboard({
                             </div>
                             : null
                           }
-                          {/* <div className="text-sm text-gray-400 mt-0.5">
-                            {workout.seshes.length ? 'Created ' + moment(workout.seshes[0].createdAt).fromNow() : ''}
-                          </div> */}
                         </div>
-                        <div className="py-0">
-                          <ImageTileRow
-                            size={75}
-                            imageUrls={getShownExercises(workout.exercises)
-                              .sort(
-                                (a: any, b: any) => a.workoutOrder - b.workoutOrder
-                              )
-                              .filter((exc: any) => !!exc.imageUrl)
-                              .map((exc: any) => exc.imageUrl)
-                            }
-                            className="border rounded-sm"
-                          />
-                        </div>
-                        <div className="flex sm:flex-row flex-col ml-1">
-                          <div className="ml-0.25 flex-1 flex sm:flex-row-reverse">
-                            <div className="flex-1">
-                              <div className="font-normal text-base mt-2 mb-5">
-                                {workout.description}
-                              </div>
-                              <div className="text-sm mt-3 text-gray-500">
-                                {getShownExercises(workout.exercises).map((exc: Exercise, i: number) => (
-                                  <span key={i} className="inline-block mr-2 mb-2 text-xs py-1 px-2 rounded-xl bg-gray-100 text-black border">
-                                    {exc.name}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
+                        <div className="flex sm:flex-row flex-col">
+                          <div className="text-sm mt-4 text-gray-500">
+                            {getShownExercises(workout.exercises).map((exc: Exercise, i: number) => (
+                              // <span key={i} className="inline-block mr-2 mb-2 text-xs py-1 px-2 rounded-xl bg-gray-100 text-black border">
+                              //   {exc.name}
+                              // </span>
+                              <span className='mr-1' key={i}>{exc.name} {
+                                i !== getShownExercises(workout.exercises).length - 1 &&
+                                '·'
+                              }</span>
+                            ))}
                           </div>
-                          <div onClick={e => e.stopPropagation()} className="text-left text-gray-500 hover:text-black cursor-pointer">
+                          <div onClick={e => e.stopPropagation()} className="pl-0.5 text-left text-gray-500 hover:text-black cursor-pointer">
                             <MoreMenu workoutId={workout.id} />
                           </div>
                         </div>

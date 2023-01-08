@@ -49,6 +49,7 @@ module.exports = {
         active1: '#2b3830',
         active2: '#000000',
         purple0: '#f3efff',
+        restBg: '#353e94',
       }
     },
   },

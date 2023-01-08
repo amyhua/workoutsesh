@@ -7,7 +7,7 @@ import DurationText from "./DurationText";
 const getAverageSet = (ints: SeshInterval[], isActive: boolean) => {
   const periods = ints.filter((int: SeshInterval) => int.active === isActive);
   const sumS = periods.reduce((sum, pd: SeshInterval) => sum + pd.durationS, 0);
-  return sumS / periods.length;
+  return Number((sumS / periods.length).toFixed(1));
 }
 
 function SeshExerciseSummary({
@@ -24,7 +24,7 @@ function SeshExerciseSummary({
   const activeDuration = avgActive ? moment.duration(avgActive, 'seconds') : 0;
   const restDuration = avgRest ? moment.duration(avgRest, 'seconds') : 0;
   return (
-    <section className="inline-block mt-0 py-4 mr-8 min-w-[180px]">
+    <section className="block sm:inline-block mt-0 py-4 sm:mr-8 min-w-[180px]">
       <header className="mb-2">
         <div
           onClick={onSelect}

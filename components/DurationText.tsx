@@ -9,7 +9,7 @@ const DurationText = ({
   short?: boolean;
 }) => {
   return (
-    durationM.asSeconds() === 60 ? <span>60s</span> :
+    durationM.asSeconds() <= 90 ? <span>{durationM.asSeconds()}s</span> :
     <>
       <span className={classNames({
         "hidden": getHours(durationM) === 0, 

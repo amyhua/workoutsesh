@@ -47,21 +47,23 @@ const WorkoutRoutine = ({
       {
         (isFirst && isLast) ?
         null :
-        <div className="ml-1 px-1 cursor-pointer flex flex-col justify-center">
+        <div className="pl-2 cursor-pointer flex flex-col justify-center">
           <Bars2Icon className="text-white/50 h-4 rounded-full" />
         </div>
       }
-      <div className="flex items-center ml-3 mr-4">
-        {counter}.
+      <div className="flex items-center pl-3 pr-4 min-w-[40px]">
+        <span className="text-right w-full inline-block">
+          {counter}.
+        </span>
       </div>
       <div className={classnames(
-        "relative w-[50px] h-[50px] text-center bg-transparent overflow-hidden",
+        "relative w-[60px] h-[60px] text-center bg-transparent overflow-hidden",
         "text-black z-100",
         isDragging ? "text-navy0": "text-black"
       )}>
         {
           exercise.isRest ?
-          <RestTile className="h-[50px] w-[50px]" />
+          <RestTile className="h-[60px] w-[60px]" />
           :
           (exercise.imageUrl && !isImageError) ?
           <Image
@@ -70,7 +72,7 @@ const WorkoutRoutine = ({
             priority
             fill
             placeholder={require('./heart-pulse.png')}
-            className="inline-block h-[50px]"
+            className="inline-block h-[60px]"
             onError={() => setIsImageError(true)}
           />
           :
@@ -87,10 +89,7 @@ const WorkoutRoutine = ({
       <div className="flex-1 flex justify-center flex-col h-[50px]">
         <div className="ml-4">
           <h2 className={classnames(
-            "font-normal text-base text-white",
-            { 
-              "font-bold": isDragging,
-            },
+            "font-bold text-lg text-white",
           )}>
             <Clamped clamp={2}>
               {exercise.name}

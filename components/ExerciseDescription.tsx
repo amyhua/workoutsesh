@@ -29,12 +29,12 @@ const ExerciseDescription = ({
                 "text-xl": !setsDescription,
               }
             )}>
-              {setsDescription || 'N/A Sets'}
+              {setsDescription || '--'}
             </span>
           </>
           : <>
             <span className="bg-green-600 inline-block p-2 text-white rounded-full text-base font-bold">
-              {setsDescription || 'N/A Sets'}
+              {setsDescription || '--'}
             </span>
             <span className="mx-2">
               sets of
@@ -54,7 +54,11 @@ const ExerciseDescription = ({
       :
       !setsDescription && !repsDescription ? null :
       <>
-      {setsDescription || '---'} sets of {repsDescription || '---'}
+      <span className="text-white/60 mr-2">Sets</span>
+      <span className="text-white">{setsDescription || '--'}</span>
+      <span className="mx-2">·</span>
+      <span className="text-white/60 mr-2">Reps</span>
+      <span className="text-white">{repsDescription || '--'}</span>
       </>
     }
   </>

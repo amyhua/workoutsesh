@@ -19,3 +19,20 @@ a {
 * {
   box-sizing: border-box;
 }
+
+/* Firefox */
+html {
+  scrollbar-color: #242424 #585858;
+  scrollbar-width: thin;
+}
+
+/* WebKit and Chromiums */
+::-webkit-scrollbar {
+  background: #242424;
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-thumb {
+  background: #585858;
+  border-radius: 10px;
+}
